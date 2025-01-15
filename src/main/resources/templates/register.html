@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html class="h-100" lang="en" xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/commons::head}"></head>
+<body class="register d-flex flex-column h-100">
+<header th:replace="~{fragments/commons::header}"></header>
+<main class="flex-shrink-0">
+    <div class="position-relative min-vh-100">
+        <div class="dark-background position-absolute top-0 start-0 w-100 h-100"></div>
+        <div class="d-flex justify-content-center align-items-center min-vh-100">
+            <!-- Register card -->
+            <div class="card shadow-lg text-center p-4"
+                 style="width: 100%; max-width: 600px; background: linear-gradient(135deg, #ffffffdd, #f7f7f7dd); border-radius: 10px;">
+                <div class="text-center mb-4">
+                    <img src="/images/register.png" alt="Register Icon" class="mb-3"
+                         style="width: 80px; height: auto;">
+                    <h3 class="fw-bold text-dark">Create Your Account</h3>
+                    <p class="text-muted">Join InstaRecipe and start sharing your favorite recipes!</p>
+                </div>
+                <form>
+                    <div class="mb-3">
+                        <label for="username" class="form-label text-dark">Username</label>
+                        <input type="text" class="form-control" id="username" placeholder="Enter your username" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="email" class="form-label text-dark">Email Address</label>
+                        <input type="email" class="form-control" id="email" placeholder="Enter your email" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="profilePicture" class="form-label text-dark">Profile Picture</label>
+                        <input type="file" class="form-control" id="profilePicture" name="profilePicture" accept="image/*">
+                    </div>
+                    <div class="mb-3">
+                        <label for="password" class="form-label text-dark">Password</label>
+                        <input type="password" class="form-control" id="password" placeholder="Create a password"
+                               required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="confirmPassword" class="form-label text-dark">Confirm Password</label>
+                        <input type="password" class="form-control" id="confirmPassword"
+                               placeholder="Confirm your password" required>
+                    </div>
+                    <button type="submit" class="register-btn btn btn-primary w-100">
+                        Register
+                    </button>
+                </form>
+                <div class="text-center mt-3">
+                    <p class="small">Already have an account? <a th:href="@{/users/login}" class="text-decoration-none">Log in
+                        here</a></p>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+<footer th:replace="~{fragments/commons::footer}"></footer>
+</body>
+</html>

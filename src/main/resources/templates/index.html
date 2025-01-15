@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html class="h-100" lang="en" xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/commons::head}"></head>
+<body class="d-flex flex-column h-100">
+<header th:replace="~{fragments/commons::header}"></header>
+<main class="flex-shrink-0">
+    <div class="hero">
+        <h1>Welcome to InstaRecipe</h1>
+        <p>Discover, share, and connect with food lovers around the world.</p>
+        <div class="d-flex justify-content-center gap-md-5 mt-4">
+            <a th:href="@{/users/login}" class="btn btn-primary btn-lg px-4 py-2 flex-grow-1 text-center" style="max-width: 200px;">Login</a>
+            <a th:href="@{/users/register}" class="btn btn-primary btn-lg px-4 py-2 flex-grow-1 text-center" style="max-width: 200px;">Register</a>
+        </div>
+    </div>
+    <div class="container my-5">
+        <div class="row text-center">
+            <div class="col-md-4 d-flex">
+                <div class="card feature-card p-3 w-100">
+                    <img src="/images/dish.png" class="card-img-top img-fluid align-self-center"
+                         style="max-width: 50px;"
+                         alt="Discover Recipes">
+                    <div class="card-body">
+                        <h5 class="card-title">Discover Recipes</h5>
+                        <p class="card-text">Explore a vast collection of recipes from around the world.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 d-flex">
+                <div class="card feature-card p-3 w-100">
+                    <img src="/images/food.png" class="card-img-top img-fluid align-self-center"
+                         style="max-width: 50px;"
+                         alt="Share Recipes">
+                    <div class="card-body">
+                        <h5 class="card-title">Share Your Creations</h5>
+                        <p class="card-text">Upload your favorite recipes and inspire others.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 d-flex">
+                <div class="card feature-card p-3 w-100">
+                    <img src="/images/burger.png" class="card-img-top img-fluid align-self-center"
+                         style="max-width: 50px;" alt="Connect">
+                    <div class="card-body">
+                        <h5 class="card-title">Connect with Food Lovers</h5>
+                        <p class="card-text">Interact with other food enthusiasts through comments and likes.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+<footer th:replace="~{fragments/commons::footer}"></footer>
+</body>
+</html>

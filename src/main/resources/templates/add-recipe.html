@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html class="h-100" lang="en">
+<head th:replace="~{fragments/commons::head}">
+</head>
+<body class="d-flex flex-column h-100">
+<header th:replace="~{fragments/commons::header}"></header>
+
+<main class="flex-shrink-0">
+    <section class="add-recipe-section">
+        <div class="container">
+            <div class="card shadow-lg mx-auto p-4" style="max-width: 600px;">
+                <div class="text-center mb-4">
+                    <h3 class="fw-bold">Add a New Recipe</h3>
+                    <p class="text-muted">Share your delicious creations with the world!</p>
+                </div>
+                <form>
+                    <div class="mb-3">
+                        <label for="recipeName" class="form-label">Recipe Name</label>
+                        <input type="text" class="form-control" id="recipeName" placeholder="Enter recipe name" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="category" class="form-label">Category</label>
+                        <select id="category" class="form-select" required>
+                            <option selected disabled>Choose a category</option>
+                            <option value="Vegan">Vegan</option>
+                            <option value="Desserts">Desserts</option>
+                            <option value="Main Course">Main Course</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="description" class="form-label">Description</label>
+                        <textarea id="description" class="form-control" rows="4" placeholder="Enter a brief description" required></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label for="ingredients" class="form-label">Ingredients</label>
+                        <textarea id="ingredients" class="form-control" rows="4" placeholder="List ingredients separated by commas" required></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label for="instructions" class="form-label">Instructions</label>
+                        <textarea id="instructions" class="form-control" rows="5" placeholder="Write the steps to prepare the recipe" required></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label for="recipeImage" class="form-label">Recipe Image</label>
+                        <input type="file" class="form-control" id="recipeImage" required>
+                    </div>
+                    <button type="submit" class="btn-submit btn btn-primary w-100">Submit Recipe</button>
+                </form>
+            </div>
+        </div>
+    </section>
+</main>
+
+<footer th:replace="~{fragments/commons::footer}"></footer>
+</body>
+</html>

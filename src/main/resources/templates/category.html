@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html class="h-100" lang="en">
+<head th:replace="~{fragments/commons::head}">
+    <title>Category</title>
+</head>
+<body class="d-flex flex-column h-100">
+<header th:replace="~{fragments/commons::header}"></header>
+
+<main class="flex-shrink-0">
+    <section class="category-section py-5">
+        <div class="container">
+            <div class="text-center mb-5">
+                <h2 class="fw-bold">Recipes in <span class="text-primary">Category Name</span></h2>
+                <p>Browse delicious recipes in this category</p>
+            </div>
+
+            <div class="row g-4 justify-content-center">
+                <!-- Recipe Card Template -->
+                <div class="col-md-3">
+                    <div class="card shadow-sm h-100">
+                        <img src="/images/main-course.jpg" class="card-img-top" alt="Recipe Image">
+                        <div class="card-body d-flex flex-column">
+                            <h5 class="card-title">Recipe Name</h5>
+                            <p class="card-text text-muted">Short description of the recipe...</p>
+<!--                            <a th:href="@{'/recipes/' + ${recipe.id}}" class="btn btn-primary mt-auto">View Recipe</a>-->
+                            <a href="#" class="btn-view btn btn-primary mt-auto">View Recipe</a>
+                        </div>
+                    </div>
+                </div>
+                <!-- End Recipe Card -->
+            </div>
+
+            <!-- Pagination -->
+            <div class="d-flex justify-content-center mt-5">
+<!--                <nav th:if="${recipes.hasPreviousPage or recipes.hasNextPage}">-->
+<!--                    <ul class="pagination">-->
+<!--                        <li class="page-item" th:classappend="${!recipes.hasPreviousPage} ? 'disabled'">-->
+<!--                            <a class="page-link" th:href="@{'/categories/' + ${categoryName} + '?page=' + ${recipes.previousPageNumber}}">Previous</a>-->
+<!--                        </li>-->
+<!--                        <li class="page-item" th:each="pageNum : ${#numbers.sequence(0, recipes.totalPages - 1)}" th:classappend="${pageNum == recipes.pageNumber} ? 'active'">-->
+<!--                            <a class="page-link" th:href="@{'/categories/' + ${categoryName} + '?page=' + ${pageNum}}" th:text="${pageNum + 1}"></a>-->
+<!--                        </li>-->
+<!--                        <li class="page-item" th:classappend="${!recipes.hasNextPage} ? 'disabled'">-->
+<!--                            <a class="page-link" th:href="@{'/categories/' + ${categoryName} + '?page=' + ${recipes.nextPageNumber}}">Next</a>-->
+<!--                        </li>-->
+<!--                    </ul>-->
+                </nav>
+            </div>
+        </div>
+    </section>
+</main>
+
+<footer th:replace="~{fragments/commons::footer}"></footer>
+</body>
+</html>
