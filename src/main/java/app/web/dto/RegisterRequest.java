@@ -1,21 +1,24 @@
 package app.web.dto;
 
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.Size;
+import jakarta.validation.constraints.*;
 import lombok.Data;
 
 @Data
 public class RegisterRequest {
 
-    @Size(min = 6, message = "Username must be at least 6 symbols")
+    @NotNull
+    @Size(min = 5, message = "Username must be at least 5 symbols")
     private String username;
 
-    @Email
+    @NotBlank(message = "Email must not be empty")
+    @Email(message = "Oops! The email address you entered seems to be invalid")
     private String email;
 
+    @NotNull
     @Size(min = 6, message = "Password must be at least 6 symbols")
     private String password;
 
+    @NotNull
     @Size(min = 6, message = "Password must be at least 6 symbols")
     private String confirmPassword;
 }

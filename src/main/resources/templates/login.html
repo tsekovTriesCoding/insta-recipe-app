@@ -13,14 +13,18 @@
                 <h3 class="fw-bold text-dark">Welcome Back!</h3>
                 <p class="text-muted">Log in to access your favorite recipes.</p>
             </div>
-            <form>
+            <form th:method="post"
+                  th:action="@{/users/login}"
+                  th:object="${loginRequest}">
                 <div class="mb-3">
-                    <label for="email" class="form-label text-dark">Email Address</label>
-                    <input type="email" class="form-control" id="email" placeholder="Enter your email" required>
+                    <label for="username" class="form-label text-dark">Username</label>
+                    <input type="text" class="form-control" id="username" name="username"
+                           placeholder="Enter your username" required>
                 </div>
                 <div class="mb-3">
                     <label for="password" class="form-label text-dark">Password</label>
-                    <input type="password" class="form-control" id="password" placeholder="Enter your password"
+                    <input type="password" class="form-control" id="password" name="password"
+                           placeholder="Enter your password"
                            required>
                 </div>
                 <div class="mb-3 form-check text-start">
