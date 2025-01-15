@@ -4,6 +4,7 @@ import app.user.model.User;
 import app.user.service.UserService;
 import app.web.dto.LoginRequest;
 import app.web.dto.RegisterRequest;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
@@ -11,6 +12,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
@@ -20,12 +22,15 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 public class UserController {
     private final UserService userService;
 
-
     @GetMapping("/login")
-    public ModelAndView getLoginPage() {
-
+    public ModelAndView getLoginPage(HttpServletRequest request) {
         ModelAndView modelAndView = new ModelAndView("login");
-        modelAndView.addObject("loginRequest", new LoginRequest());
+
+        String error = (String) request.getSession().getAttribute("error");
+        if (error != null) {
+            modelAndView.addObject("error", error);
+            request.getSession().removeAttribute("error");
+        }
 
         return modelAndView;
     }

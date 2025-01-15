@@ -34,7 +34,12 @@
                 <button type="submit" class="login-btn btn btn-primary w-100">
                     Login
                 </button>
+
+                <div th:if="${error}" class="bg-danger mt-3">
+                    <p th:text="${error}" class="text-white"></p>
+                </div>
             </form>
+
             <div class="text-center mt-3">
                 <p class="small">Don't have an account? <a th:href="@{/users/register}" class="text-decoration-none">Register
                     here</a>
