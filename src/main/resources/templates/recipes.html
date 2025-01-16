@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html class="h-100" lang="en">
+<html class="h-100" lang="en" xmlns:th="http://www.thymeleaf.org">
 <head th:replace="~{fragments/commons::head}"></head>
 <body class="d-flex flex-column h-100">
 <header th:replace="~{fragments/commons::header}"></header>
@@ -8,7 +8,6 @@
     <section class="recipes">
         <div class="container my-5">
             <h1 class="text-center mb-4">Recipes</h1>
-            <!-- Search Bar -->
             <form class="mb-5 d-flex justify-content-center">
                 <div class="input-group" style="max-width: 500px;">
                     <input type="text" class="form-control rounded-start" placeholder="Search recipes..."
@@ -19,47 +18,31 @@
                 </div>
             </form>
 
-            <!-- Recipe Cards -->
             <div class="row g-4">
-                <div class="col-md-4">
-                    <div class="card h-100 shadow border-0">
-                        <div class="card-img-top-container" style="height: 200px; overflow: hidden;">
-                            <img src="/images/desserts.jpg" class="card-img-top" alt="Recipe Image"
-                                 style="object-fit: cover; width: 100%; height: 100%;">
-                        </div>
-                        <div class="card-body text-center">
-                            <h5 class="card-title">Spaghetti Carbonara</h5>
-                            <p class="card-text">A creamy and delicious Italian classic.</p>
-                            <a href="#" class="btn-recipes btn btn-primary">View
-                                Recipe</a>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="card h-100 shadow border-0">
-                        <div class="card-img-top-container" style="height: 200px; overflow: hidden;">
-                            <img src="/images/vegan.jpg" class="card-img-top" alt="Recipe Image"
-                                 style="object-fit: cover; width: 100%; height: 100%;">
-                        </div>
-                        <div class="card-body text-center">
-                            <h5 class="card-title">Vegan Buddha Bowl</h5>
-                            <p class="card-text">A colorful and healthy dish packed with nutrients.</p>
-                            <a href="#" class="btn-recipes btn btn-primary">View
-                                Recipe</a>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="card h-100 shadow border-0">
+                <div th:each="recipe : ${recipes}" class="col-md-4 d-flex align-items-stretch">
+                    <div class="card shadow border-0 w-100">
                         <div class="card-img-top-container" style="height: 200px; overflow: hidden;">
                             <img src="/images/main-course.jpg" class="card-img-top" alt="Recipe Image"
                                  style="object-fit: cover; width: 100%; height: 100%;">
                         </div>
-                        <div class="card-body text-center">
-                            <h5 class="card-title">Chocolate Lava Cake</h5>
-                            <p class="card-text">Rich and indulgent with a gooey center.</p>
-                            <a href="#" class="btn-recipes btn btn-primary">View
-                                Recipe</a>
+                        <div class="card-body text-center d-flex flex-column">
+                            <h5 th:text="*{recipe.title}" class="card-title">Chocolate Lava Cake</h5>
+                            <div class="d-flex justify-content-center mb-2">
+                                <div class="me-3">
+                                    <i class="bi bi-clock custom-icon me-1"></i> <span
+                                        th:text="${recipe.prepTime}">20</span> mins
+                                </div>
+                                <div>
+                                    <i class="bi bi-person-fill custom-icon me-1"></i> <span
+                                        th:text="${recipe.servings}">4-6</span> servings
+                                </div>
+                            </div>
+                            <p th:text="${recipe.description.length() > 70 ? #strings.substring(recipe.description, 0, 70) + '...' : recipe.description}"
+                               class="card-text flex-grow-1">Rich and indulgent with a gooey center.</p>
+                            <div class="mt-auto">
+                                <a th:href="@{/recipes/{id}(id=${recipe.id})}" class="btn-recipes btn btn-primary">View
+                                    Recipe</a>
+                            </div>
                         </div>
                     </div>
                 </div>
