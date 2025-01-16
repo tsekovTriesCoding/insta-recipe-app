@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html class="h-100" lang="en">
+<html class="h-100" lang="en" xmlns:th="http://www.thymeleaf.org">
 <head th:replace="~{fragments/commons::head}">
     <title>My Profile</title>
 </head>
@@ -8,31 +8,40 @@
 
 <main class="flex-shrink-0">
     <section class="profile-section">
-        <div class="container">
+        <div class="container" th:object="${userProfileInfo}">
             <div class="card shadow-lg mx-auto p-4" style="max-width: 600px;">
                 <div class="text-center mb-4">
                     <h3 class="fw-bold">My Profile</h3>
                     <p class="text-muted">Manage your personal information and preferences.</p>
                 </div>
-                <form>
+
+                <div class="mt-2 align-self-center">
+                    <img th:src="*{profilePictureUrl}"
+                         alt="Profile Picture" class="rounded-circle"
+                         style="width: 130px; height: 130px; object-fit: cover;">
+                </div>
+                <form th:method="put"
+                      th:action="@{/users/profile}"
+                      enctype="multipart/form-data">
                     <div class="mb-3">
                         <label for="username" class="form-label">Username</label>
-                        <input type="text" class="form-control" id="username" placeholder="Enter your username" value="john_doe" required>
+                        <input th:field="*{username}" type="text" class="form-control" id="username" name="username"
+                               placeholder="Enter new username" value="john_doe" required>
                     </div>
                     <div class="mb-3">
                         <label for="email" class="form-label">Email</label>
-                        <input type="email" class="form-control" id="email" placeholder="Enter your email" value="john@example.com" required>
+                        <input th:field="*{email}" type="email" class="form-control" id="email" name="email"
+                               placeholder="Enter new email"
+                               value="john@example.com" required>
                     </div>
                     <div class="mb-3">
                         <label for="profilePicture" class="form-label">Profile Picture</label>
-                        <input type="file" class="form-control" id="profilePicture">
-                        <div class="mt-2">
-                            <img src="/images/default-profile.jpg" alt="Profile Picture" class="rounded-circle" style="width: 100px; height: 100px; object-fit: cover;">
-                        </div>
+                        <input type="file" class="form-control" id="profilePicture" name="profilePicture">
                     </div>
                     <div class="mb-3">
                         <label for="password" class="form-label">New Password</label>
-                        <input type="password" class="form-control" id="password" placeholder="Enter a new password">
+                        <input th:field="*{password}" type="password" class="form-control" id="password" name="password"
+                               placeholder="Enter new password">
                     </div>
                     <button type="submit" class="btn-submit btn btn-primary w-100">Update Profile</button>
                 </form>

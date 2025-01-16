@@ -5,13 +5,22 @@ import app.user.model.Role;
 import app.user.model.User;
 import app.user.repository.UserRepository;
 import app.web.dto.RegisterRequest;
+import app.web.dto.UserProfileInfo;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.time.LocalDateTime;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 
 @Slf4j
@@ -25,9 +34,9 @@ public class UserService {
     @Transactional
     public User register(RegisterRequest registerRequest) {
 
-        Optional<User> optionUser = userRepository.findByUsername((registerRequest.getUsername()));
+        Optional<User> optionalUser = userRepository.findByUsername((registerRequest.getUsername()));
 
-        if (optionUser.isPresent()) {
+        if (optionalUser.isPresent()) {
             throw new DomainException("Username [%s] already exist.".formatted(registerRequest.getUsername()));
         }
 
@@ -43,9 +52,58 @@ public class UserService {
                 .username(registerRequest.getUsername())
                 .email(registerRequest.getEmail())
                 .password(passwordEncoder.encode(registerRequest.getPassword()))
-                .profilePicture("images/default-profile.png")
+                .profilePicture("/images/default-profile.png")
                 .dateRegistered(LocalDateTime.now())
                 .role(Role.USER)
                 .build();
+    }
+
+    public UserProfileInfo getByUsername(String username) {
+        return userRepository.findByUsername(username)
+                .map(this::map)
+                .orElseThrow(NoSuchElementException::new);
+    }
+
+    private UserProfileInfo map(User user) {
+        UserProfileInfo userProfileInfo = new UserProfileInfo();
+        userProfileInfo.setUsername(user.getUsername());
+        userProfileInfo.setEmail(user.getEmail());
+        userProfileInfo.setPassword(user.getPassword());
+        userProfileInfo.setProfilePictureUrl(user.getProfilePicture());
+
+        return userProfileInfo;
+    }
+
+    public UserProfileInfo update(UserProfileInfo userProfileInfo, MultipartFile file, String username) throws IOException {
+        Path destinationFile = Paths
+                .get("src", "main", "resources", "static/images/uploads", userProfileInfo.getUsername() + "-profile-picture.png")
+                .normalize()
+                .toAbsolutePath();
+
+        try (InputStream inputStream = file.getInputStream()) {
+            Files.copy(inputStream, destinationFile, StandardCopyOption.REPLACE_EXISTING);
+        }
+
+        User user = userRepository.findByUsername(username).orElseThrow(NoSuchElementException::new);
+
+        if (userProfileInfo.getUsername() != null && !userProfileInfo.getUsername().isEmpty()) {
+            user.setUsername(userProfileInfo.getUsername());
+        }
+
+        if (userProfileInfo.getEmail() != null && !userProfileInfo.getEmail().isEmpty()) {
+            user.setEmail(userProfileInfo.getEmail());
+        }
+
+        if (userProfileInfo.getPassword() != null && !userProfileInfo.getPassword().isEmpty()) {
+            user.setPassword(passwordEncoder.encode(userProfileInfo.getPassword()));
+        }
+
+        if (destinationFile.toFile().exists()) {
+            user.setProfilePicture("/images/uploads/" + destinationFile.getFileName().toString());
+        }
+
+        User updated = userRepository.save(user);
+
+        return map(updated);
     }
 }
