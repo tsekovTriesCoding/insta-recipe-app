@@ -47,31 +47,10 @@ public class UserService {
         return user;
     }
 
-    private User initializeUser(RegisterRequest registerRequest) {
-        return User.builder()
-                .username(registerRequest.getUsername())
-                .email(registerRequest.getEmail())
-                .password(passwordEncoder.encode(registerRequest.getPassword()))
-                .profilePicture("/images/default-profile.png")
-                .dateRegistered(LocalDateTime.now())
-                .role(Role.USER)
-                .build();
-    }
-
     public UserProfileInfo getByUsername(String username) {
         return userRepository.findByUsername(username)
                 .map(this::map)
                 .orElseThrow(NoSuchElementException::new);
-    }
-
-    private UserProfileInfo map(User user) {
-        UserProfileInfo userProfileInfo = new UserProfileInfo();
-        userProfileInfo.setUsername(user.getUsername());
-        userProfileInfo.setEmail(user.getEmail());
-        userProfileInfo.setPassword(user.getPassword());
-        userProfileInfo.setProfilePictureUrl(user.getProfilePicture());
-
-        return userProfileInfo;
     }
 
     public UserProfileInfo update(UserProfileInfo userProfileInfo, MultipartFile file, String username) throws IOException {
@@ -86,6 +65,15 @@ public class UserService {
 
         User user = userRepository.findByUsername(username).orElseThrow(NoSuchElementException::new);
 
+        verifyNewInfo(userProfileInfo, user, destinationFile);
+        user.setDateUpdated(LocalDateTime.now());
+
+        User updated = userRepository.save(user);
+
+        return map(updated);
+    }
+
+    private void verifyNewInfo(UserProfileInfo userProfileInfo, User user, Path destinationFile) {
         if (userProfileInfo.getUsername() != null && !userProfileInfo.getUsername().isEmpty()) {
             user.setUsername(userProfileInfo.getUsername());
         }
@@ -101,9 +89,26 @@ public class UserService {
         if (destinationFile.toFile().exists()) {
             user.setProfilePicture("/images/uploads/" + destinationFile.getFileName().toString());
         }
+    }
 
-        User updated = userRepository.save(user);
+    private User initializeUser(RegisterRequest registerRequest) {
+        return User.builder()
+                .username(registerRequest.getUsername())
+                .email(registerRequest.getEmail())
+                .password(passwordEncoder.encode(registerRequest.getPassword()))
+                .profilePicture("/images/default-profile.png")
+                .dateRegistered(LocalDateTime.now())
+                .role(Role.USER)
+                .build();
+    }
 
-        return map(updated);
+    private UserProfileInfo map(User user) {
+        UserProfileInfo userProfileInfo = new UserProfileInfo();
+        userProfileInfo.setUsername(user.getUsername());
+        userProfileInfo.setEmail(user.getEmail());
+        userProfileInfo.setPassword(user.getPassword());
+        userProfileInfo.setProfilePictureUrl(user.getProfilePicture());
+
+        return userProfileInfo;
     }
 }
