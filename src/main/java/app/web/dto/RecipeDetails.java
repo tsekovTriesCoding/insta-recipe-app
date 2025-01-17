@@ -22,9 +22,9 @@ public class RecipeDetails {
     private LocalDateTime createdDate;
     private LocalDateTime updatedDate;
     private String image;
-    private int prepTime;
-    private int cookTime;
-    private int servings;
+    private Integer prepTime;
+    private Integer cookTime;
+    private Integer servings;
     private User createdBy;
     private List<Category> categories;
     private List<Comment> comments;

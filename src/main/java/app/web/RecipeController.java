@@ -68,8 +68,8 @@ public class RecipeController {
             return new ModelAndView("redirect:/recipes/add");
         }
 
-        recipeService.create(recipe, userDetails.getUsername());
+        Recipe newRecipe = recipeService.create(recipe, userDetails.getUsername());
 
-        return new ModelAndView("redirect:/home");
+        return new ModelAndView("redirect:/recipes/" + newRecipe.getId());
     }
 }
