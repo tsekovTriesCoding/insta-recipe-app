@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html class="h-100" lang="en">
+<html class="h-100" lang="en" xmlns:th="http://www.thymeleaf.org">
 <head th:replace="~{fragments/commons::head}">
 </head>
 <body class="d-flex flex-column h-100">
@@ -13,35 +13,44 @@
                     <h3 class="fw-bold">Add a New Recipe</h3>
                     <p class="text-muted">Share your delicious creations with the world!</p>
                 </div>
-                <form>
+                <form th:method="POST"
+                      th:action="@{/recipes/add}"
+                      th:object="${recipe}">
                     <div class="mb-3">
-                        <label for="recipeName" class="form-label">Recipe Name</label>
-                        <input type="text" class="form-control" id="recipeName" placeholder="Enter recipe name" required>
+                        <label for="title" class="form-label">Recipe Title</label>
+                        <input th:field="*{title}" type="text" class="form-control" id="title"
+                               placeholder="Enter recipe title" required>
                     </div>
                     <div class="mb-3">
                         <label for="category" class="form-label">Category</label>
-                        <select id="category" class="form-select" required>
-                            <option selected disabled>Choose a category</option>
-                            <option value="Vegan">Vegan</option>
-                            <option value="Desserts">Desserts</option>
-                            <option value="Main Course">Main Course</option>
+                        <select th:field="*{categories}" id="category" class="form-select" required multiple>
+                            <option value="choose"
+                                    selected disabled>Choose a category
+                            </option>
+                            <option th:each="category : ${categories}" th:value="${category}" th:text="${category}">
+                                Choose a category
+                            </option>
                         </select>
                     </div>
                     <div class="mb-3">
                         <label for="description" class="form-label">Description</label>
-                        <textarea id="description" class="form-control" rows="4" placeholder="Enter a brief description" required></textarea>
+                        <textarea th:field="*{description}" id="description" class="form-control" rows="4"
+                                  placeholder="Enter a brief description"
+                                  required></textarea>
                     </div>
                     <div class="mb-3">
                         <label for="ingredients" class="form-label">Ingredients</label>
-                        <textarea id="ingredients" class="form-control" rows="4" placeholder="List ingredients separated by commas" required></textarea>
+                        <textarea th:field="*{ingredients}" id="ingredients" class="form-control" rows="4"
+                                  placeholder="List ingredients separated by commas" required></textarea>
                     </div>
                     <div class="mb-3">
                         <label for="instructions" class="form-label">Instructions</label>
-                        <textarea id="instructions" class="form-control" rows="5" placeholder="Write the steps to prepare the recipe" required></textarea>
+                        <textarea th:field="*{instructions}" id="instructions" class="form-control" rows="5"
+                                  placeholder="Write the steps to prepare the recipe" required></textarea>
                     </div>
                     <div class="mb-3">
-                        <label for="recipeImage" class="form-label">Recipe Image</label>
-                        <input type="file" class="form-control" id="recipeImage" required>
+                        <label for="image" class="form-label">Recipe Image</label>
+                        <input type="file" class="form-control" id="image" required>
                     </div>
                     <button type="submit" class="btn-submit btn btn-primary w-100">Submit Recipe</button>
                 </form>

@@ -7,7 +7,6 @@ import app.user.model.User;
 import lombok.Builder;
 import lombok.Data;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
@@ -20,7 +19,7 @@ public class RecipeDetails {
     private String description;
     private List<String> ingredients;
     private String instructions;
-    private LocalDate createdDate;
+    private LocalDateTime createdDate;
     private LocalDateTime updatedDate;
     private String image;
     private int prepTime;

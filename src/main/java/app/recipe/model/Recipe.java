@@ -39,7 +39,7 @@ public class Recipe {
     private String instructions;
 
     @Column(nullable = false)
-    private LocalDate createdDate;
+    private LocalDateTime createdDate;
 
     @Column
     private LocalDateTime updatedDate;
@@ -48,13 +48,13 @@ public class Recipe {
     private String image;
 
     @Column
-    private int prepTime;
+    private Integer prepTime;
 
     @Column(nullable = false)
-    private int cookTime;
+    private Integer cookTime;
 
     @Column(nullable = false)
-    private int servings;
+    private Integer servings;
 
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
