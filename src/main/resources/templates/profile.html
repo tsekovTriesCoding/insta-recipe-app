@@ -20,31 +20,37 @@
                          alt="Profile Picture" class="rounded-circle"
                          style="width: 130px; height: 130px; object-fit: cover;">
                 </div>
-                <form th:method="put"
-                      th:action="@{/users/profile}"
-                      enctype="multipart/form-data">
-                    <div class="mb-3">
-                        <label for="username" class="form-label">Username</label>
-                        <input th:field="*{username}" type="text" class="form-control" id="username" name="username"
-                               placeholder="Enter new username" value="john_doe" required>
+                <div class="container">
+                    <div class="m-xl-4">
+                        <label for="username" class="form-label fw-bold text-dark">Username</label>
+                        <div id="username"
+                             class="form-control bg-light d-flex justify-content-between align-items-center mb-0">
+                            <span th:text="*{username}">john_doe</span>
+                            <a th:href="@{/my-profile/change/username/{id}(id=${userProfileInfo.id})}"
+                               class="btn-change btn btn-sm btn-outline-primary ms-3">Change</a>
+                        </div>
                     </div>
-                    <div class="mb-3">
-                        <label for="email" class="form-label">Email</label>
-                        <input th:field="*{email}" type="email" class="form-control" id="email" name="email"
-                               placeholder="Enter new email"
-                               value="john@example.com" required>
+
+                    <div class="m-xl-4">
+                        <label for="email" class="form-label fw-bold text-dark">Email</label>
+                        <div id="email"
+                             class="form-control bg-light d-flex justify-content-between align-items-center mb-0">
+                            <span th:text="*{email}">john@example.com</span>
+                            <a th:href="@{/my-profile/change/email/{id}(id=${userProfileInfo.id})}"
+                               class="btn-change btn btn-sm btn-outline-primary ms-3">Change</a>
+                        </div>
                     </div>
-                    <div class="mb-3">
-                        <label for="profilePicture" class="form-label">Profile Picture</label>
-                        <input type="file" class="form-control" id="profilePicture" name="profilePicture">
+                    <div class="m-xl-4">
+                        <label for="password" class="form-label fw-bold text-dark">Password</label>
+                        <div id="password"
+                             class="form-control bg-light d-flex justify-content-between align-items-center mb-0">
+                            <span>********</span>
+                            <a th:href="@{/my-profile/change/password/{id}(id=${userProfileInfo.id})}"
+                               class="btn-change btn btn-sm btn-outline-primary ms-3">Change</a>
+                        </div>
                     </div>
-                    <div class="mb-3">
-                        <label for="password" class="form-label">New Password</label>
-                        <input th:field="*{password}" type="password" class="form-control" id="password" name="password"
-                               placeholder="Enter new password">
-                    </div>
-                    <button type="submit" class="btn-submit btn btn-primary w-100">Update Profile</button>
-                </form>
+                </div>
+
             </div>
         </div>
     </section>
