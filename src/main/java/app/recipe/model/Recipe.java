@@ -9,6 +9,7 @@ import lombok.*;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -32,13 +33,12 @@ public class Recipe {
 
     @ElementCollection
     @CollectionTable(name = "recipe_ingredients", joinColumns = @JoinColumn(name = "recipe_id"))
-    @Column
-    private List<String> ingredients;
+    private List<String> ingredients = new ArrayList<>();
 
     @Column(columnDefinition = "LONGTEXT")
     private String instructions;
 
-    @Column
+    @Column(nullable = false)
     private LocalDate createdDate;
 
     @Column
@@ -50,10 +50,10 @@ public class Recipe {
     @Column
     private int prepTime;
 
-    @Column
+    @Column(nullable = false)
     private int cookTime;
 
-    @Column
+    @Column(nullable = false)
     private int servings;
 
     @ManyToOne
@@ -64,11 +64,11 @@ public class Recipe {
     @JoinTable(name = "recipes_categories",
             joinColumns = @JoinColumn(name = "recipe_id"),
             inverseJoinColumns = @JoinColumn(name = "category_id"))
-    private List<Category> categories;
+    private List<Category> categories = new ArrayList<>();
 
     @OneToMany(mappedBy = "recipe", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Comment> comments;
+    private List<Comment> comments = new ArrayList<>();
 
     @OneToMany(mappedBy = "recipe", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Like> likes;
+    private List<Like> likes = new ArrayList<>();
 }
