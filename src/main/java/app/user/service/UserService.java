@@ -82,10 +82,6 @@ public class UserService {
             user.setEmail(userProfileInfo.getEmail());
         }
 
-        if (userProfileInfo.getPassword() != null && !userProfileInfo.getPassword().isEmpty()) {
-            user.setPassword(passwordEncoder.encode(userProfileInfo.getPassword()));
-        }
-
         if (destinationFile.toFile().exists()) {
             user.setProfilePicture("/images/uploads/" + destinationFile.getFileName().toString());
         }
@@ -104,9 +100,9 @@ public class UserService {
 
     private UserProfileInfo map(User user) {
         UserProfileInfo userProfileInfo = new UserProfileInfo();
+        userProfileInfo.setId(user.getId());
         userProfileInfo.setUsername(user.getUsername());
         userProfileInfo.setEmail(user.getEmail());
-        userProfileInfo.setPassword(user.getPassword());
         userProfileInfo.setProfilePictureUrl(user.getProfilePicture());
 
         return userProfileInfo;
