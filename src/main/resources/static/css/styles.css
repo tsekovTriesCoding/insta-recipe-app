@@ -34,7 +34,8 @@
     padding: 10px 25px;
     border-radius: 50px;
 }
-.hero .btn:hover, .home .btn:hover,.btn-recipes:hover {
+
+.hero .btn:hover, .home .btn:hover, .btn-recipes:hover {
     background: linear-gradient(135deg, rgba(255, 87, 34, 0.9), rgba(255, 175, 75, 0.9));
 }
 
@@ -70,13 +71,15 @@
     width: 100%;
 }
 
-.view-recipe-btn {
+.view-recipe-btn,
+.btn-change {
     border-color: rgba(255, 175, 75, 0.9);
     color: rgba(255, 87, 34, 0.9);
     transition: all 0.3s ease-in-out;
 }
 
-.view-recipe-btn:hover {
+.view-recipe-btn:hover,
+.btn-change:hover {
     background: linear-gradient(135deg, rgba(255, 175, 75, 0.9), rgba(255, 87, 34, 0.9));
     color: #fff;
     border-color: transparent;
@@ -172,6 +175,7 @@
     overflow: hidden;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
+
 /*--------------------------recipe-details styles*/
 .recipe-details-page {
     position: relative;
@@ -209,7 +213,7 @@
 
 .card.recipe-card .btn-like,
 .btn-view,
-.btn-submit{
+.btn-submit {
     background: linear-gradient(135deg, rgba(255, 175, 75, 0.9), rgba(255, 87, 34, 0.9));
     border: none;
     font-size: 1.2rem;
@@ -219,7 +223,7 @@
 
 .card.recipe-card .btn-like:hover,
 .btn-view:hover,
-.btn-submit:hover{
+.btn-submit:hover {
     background: linear-gradient(135deg, rgba(255, 87, 34, 0.9), rgba(255, 175, 75, 0.9));
 }
 
