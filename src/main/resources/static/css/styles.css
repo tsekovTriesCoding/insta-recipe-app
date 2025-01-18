@@ -271,3 +271,18 @@
 .btn-add-comment:hover {
     background: linear-gradient(135deg, rgba(255, 87, 34, 1), rgba(255, 175, 75, 1));
 }
+
+/*-----------------------*/
+/* Additional styling for the multi-select dropdown */
+.choices {
+    min-height: 44px;
+    border-radius: 0.375rem;
+}
+.choices__list--multiple .choices__item {
+    background-color: #FF5722FF;
+    color: #fff;
+    border-radius: 0.375rem;
+}
+.choices__list--dropdown .choices__item--selectable:hover {
+    background-color: #f0f0f0;
+}
