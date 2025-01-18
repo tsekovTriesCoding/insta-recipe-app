@@ -273,16 +273,23 @@
 }
 
 /*-----------------------*/
-/* Additional styling for the multi-select dropdown */
 .choices {
     min-height: 44px;
     border-radius: 0.375rem;
+    margin-bottom: 0;
 }
+
 .choices__list--multiple .choices__item {
     background-color: #FF5722FF;
     color: #fff;
     border-radius: 0.375rem;
 }
+
 .choices__list--dropdown .choices__item--selectable:hover {
     background-color: #f0f0f0;
+}
+
+.choices.is-invalid .choices__inner {
+    border-color: #dc3545;
+    box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25);
 }

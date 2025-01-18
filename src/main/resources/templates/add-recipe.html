@@ -18,37 +18,80 @@
                       th:object="${recipe}">
                     <div class="mb-3">
                         <label for="title" class="form-label">Recipe Title</label>
-                        <input th:field="*{title}" type="text" class="form-control" id="title"
-                               placeholder="Enter recipe title" required>
+                        <input th:field="*{title}" th:errorclass="is-invalid" type="text" class="form-control"
+                               id="title"
+                               placeholder="Enter recipe title">
+
+                        <small th:errors="*{title}" id="titleError" class="bg-danger rounded text-white"></small>
                     </div>
                     <div class="mb-3">
                         <label for="categories" class="form-label">Categories</label>
-                        <select th:field="*{categories}" id="categories" class="form-select" multiple>
+                        <select th:field="*{categories}" th:errorclass="is-invalid" id="categories" class="form-select"
+                                multiple>
                             <option th:each="category : ${categories}" th:value="${category}" th:text="${category.name}"
                                     th:attr="selected=${#lists.contains(categories, category)}">
                                 Choose a category
                             </option>
                         </select>
+
+                        <small th:errors="*{categories}" id="categoriesError"
+                               class="bg-danger rounded text-white"></small>
                     </div>
                     <div class="mb-3">
                         <label for="description" class="form-label">Description</label>
-                        <textarea th:field="*{description}" id="description" class="form-control" rows="4"
-                                  placeholder="Enter a brief description"
-                                  required></textarea>
+                        <textarea th:field="*{description}" th:errorclass="is-invalid" id="description"
+                                  class="form-control" rows="4"
+                                  placeholder="Enter a brief description"></textarea>
+
+                        <small th:errors="*{description}" id="descriptionError"
+                               class="bg-danger rounded text-white"></small>
                     </div>
                     <div class="mb-3">
                         <label for="ingredients" class="form-label">Ingredients</label>
-                        <textarea th:field="*{ingredients}" id="ingredients" class="form-control" rows="4"
-                                  placeholder="List ingredients separated by commas" required></textarea>
+                        <textarea th:field="*{ingredients}" th:errorclass="is-invalid" id="ingredients"
+                                  class="form-control" rows="4"
+                                  placeholder="List ingredients separated by commas"></textarea>
+
+                        <small th:errors="*{ingredients}" id="ingredientsError"
+                               class="bg-danger rounded text-white"></small>
                     </div>
                     <div class="mb-3">
                         <label for="instructions" class="form-label">Instructions</label>
-                        <textarea th:field="*{instructions}" id="instructions" class="form-control" rows="5"
-                                  placeholder="Write the steps to prepare the recipe" required></textarea>
+                        <textarea th:field="*{instructions}" th:errorclass="is-invalid" id="instructions"
+                                  class="form-control" rows="4"
+                                  placeholder="Write the steps to prepare the recipe"></textarea>
+
+                        <small th:errors="*{instructions}" id="instructionsError"
+                               class="bg-danger rounded text-white"></small>
                     </div>
                     <div class="mb-3">
                         <label for="image" class="form-label">Recipe Image</label>
-                        <input type="file" class="form-control" id="image" required>
+                        <input type="file" class="form-control" id="image">
+                    </div>
+                    <div class="form-row d-flex gap-2">
+                        <div class="col">
+                            <label for="cookTime" class="form-label">Cook Time</label>
+                            <input th:field="*{cookTime}" th:errorclass="is-invalid" type="number" class="form-control"
+                                   id="cookTime"
+                                   name="cookTime">
+
+                            <small th:errors="*{cookTime}" id="cookTimeError"
+                                   class="bg-danger rounded text-white"></small>
+                        </div>
+                        <div class="col">
+                            <label for="prepTime" class="form-label">Prep Time</label>
+                            <input th:field="*{prepTime}" type="number" class="form-control" id="prepTime"
+                                   name="prepTime">
+                        </div>
+                        <div class="col">
+                            <label for="servings" class="form-label">Servings</label>
+                            <input th:field="*{servings}" th:errorclass="is-invalid" type="number" class="form-control"
+                                   id="servings"
+                                   name="servings">
+                            <small th:errors="*{servings}" id="servingsError"
+                                   class="bg-danger rounded text-white"></small>
+
+                        </div>
                     </div>
                     <button type="submit" class="btn-submit btn btn-primary w-100">Submit Recipe</button>
                 </form>
@@ -62,13 +105,20 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
 <script>
-    document.addEventListener('DOMContentLoaded', function () {
-        const multiSelect = new Choices('#categories', {
-            removeItemButton: true,
-            placeholderValue: 'Select categories',
-            searchPlaceholderValue: 'Search categories',
-        });
+    const originalSelect = document.getElementById('categories');
+
+    const multiSelect = new Choices(originalSelect, {
+        removeItemButton: true,
+        placeholderValue: 'Select categories',
+        searchPlaceholderValue: 'Search categories',
     });
+
+    if (originalSelect.classList.contains('is-invalid')) {
+        const choicesContainer = originalSelect.closest('.choices');
+        if (choicesContainer) {
+            choicesContainer.classList.add('is-invalid');
+        }
+    }
 </script>
 </body>
 </html>

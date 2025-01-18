@@ -85,8 +85,9 @@ public class RecipeService {
                 .instructions(recipe.getInstructions())
                 .createdDate(LocalDateTime.now())
                 .createdBy(user)
-                .servings(5)
-                .cookTime(2)
+                .servings(recipe.getServings())
+                .cookTime(recipe.getCookTime())
+                .prepTime(recipe.getPrepTime())
                 .build();
 
         return recipeRepository.save(newRecipe);
