@@ -28,52 +28,49 @@ public class RecipeController {
     private final RecipeService recipeService;
 
     @GetMapping("/all")
-    public ModelAndView allRecipes() {
-        ModelAndView mav = new ModelAndView("recipes");
-
+    public String allRecipes(Model model) {
         List<RecipeShortInfo> recipes = recipeService.getAll();
-        mav.addObject("recipes", recipes);
+        model.addAttribute("recipes", recipes);
 
-        return mav;
+        return "recipes";
     }
 
     @GetMapping("/{id}")
-    public ModelAndView recipeDetails(@PathVariable UUID id) {
-        ModelAndView mav = new ModelAndView("recipe-details");
-
+    public String recipeDetails(@PathVariable UUID id, Model model) {
         RecipeDetails recipe = recipeService.getById(id);
-        mav.addObject("recipe", recipe);
-        return mav;
+        model.addAttribute("recipe", recipe);
+
+        return "recipe-details";
     }
 
     @GetMapping("/add")
-    public ModelAndView addRecipe() {
-        ModelAndView mav = new ModelAndView("add-recipe");
-        CategoryName[] categories = CategoryName.values();
+    public String addRecipe(Model model) {
+        if (!model.containsAttribute("recipe")) {
+            model.addAttribute("recipe", new AddRecipe());
+        }
 
-        mav.addObject("recipe", new AddRecipe());
-        mav.addObject("categories", categories);
-        return mav;
+        if (!model.containsAttribute("categories")) {
+            model.addAttribute("categories", CategoryName.values());
+        }
+
+        return "add-recipe";
     }
 
     @PostMapping("/add")
-    public ModelAndView addRecipe(@Valid AddRecipe recipe,
-                                  BindingResult bindingResult,
-                                  RedirectAttributes redirectAttributes,
-                                  @AuthenticationPrincipal UserDetails userDetails) {
+    public String addRecipe(@Valid AddRecipe recipe,
+                            BindingResult bindingResult,
+                            RedirectAttributes redirectAttributes,
+                            @AuthenticationPrincipal UserDetails userDetails) {
 
         if (bindingResult.hasErrors()) {
             redirectAttributes.addFlashAttribute("recipe", recipe);
             redirectAttributes.addFlashAttribute("org.springframework.validation.BindingResult.recipe", bindingResult);
 
-            ModelAndView mav = new ModelAndView("add-recipe");
-            mav.addObject("recipe", recipe);
-            mav.addObject("categories", CategoryName.values());
-            return mav;
+            return "redirect:/recipes/add";
         }
 
         Recipe newRecipe = recipeService.create(recipe, userDetails.getUsername());
 
-        return new ModelAndView("redirect:/recipes/" + newRecipe.getId());
+        return "redirect:/recipes/" + newRecipe.getId();
     }
 }

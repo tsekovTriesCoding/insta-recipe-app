@@ -7,6 +7,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -21,40 +22,39 @@ public class UserController {
     private final UserService userService;
 
     @GetMapping("/login")
-    public ModelAndView getLoginPage(HttpServletRequest request) {
-        ModelAndView modelAndView = new ModelAndView("login");
-
+    public String login(Model model, HttpServletRequest request) {
         String error = (String) request.getSession().getAttribute("error");
         if (error != null) {
-            modelAndView.addObject("error", error);
+            model.addAttribute("error", error);
             request.getSession().removeAttribute("error");
         }
 
-        return modelAndView;
+        return "login";
     }
 
     @GetMapping("/register")
-    public ModelAndView getRegisterPage() {
-        ModelAndView modelAndView = new ModelAndView("register");
+    public String getRegisterPage(Model model) {
+        if (!model.containsAttribute("registerRequest")) {
+            model.addAttribute("registerRequest", new RegisterRequest());
+        }
 
-        modelAndView.addObject("registerRequest", new RegisterRequest());
-
-        return modelAndView;
+        return "register";
     }
 
     @PostMapping("/register")
-    public ModelAndView register(@Valid RegisterRequest registerRequest,
-                                 BindingResult bindingResult,
-                                 RedirectAttributes redirectAttributes) {
+    public String register(@Valid RegisterRequest registerRequest,
+                           BindingResult bindingResult,
+                           RedirectAttributes redirectAttributes) {
 
         if (bindingResult.hasErrors()) {
             redirectAttributes.addFlashAttribute("registerRequest", registerRequest);
             redirectAttributes.addFlashAttribute("org.springframework.validation.BindingResult.registerRequest", bindingResult);
-            return new ModelAndView("register");
+
+            return "redirect:/users/register";
         }
 
         User registeredUser = userService.register(registerRequest);
 
-        return new ModelAndView("redirect:/home");
+        return "redirect:/home";
     }
 }
