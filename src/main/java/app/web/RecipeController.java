@@ -47,18 +47,12 @@ public class RecipeController {
     }
 
     @GetMapping("/add")
-    public ModelAndView addRecipe(Model model) {
+    public ModelAndView addRecipe() {
         ModelAndView mav = new ModelAndView("add-recipe");
         CategoryName[] categories = CategoryName.values();
 
-        if (!model.containsAttribute("recipe")) {
-            mav.addObject("recipe", new AddRecipe());
-        }
-
-        if (!model.containsAttribute("categories")) {
-            mav.addObject("categories", categories);
-        }
-
+        mav.addObject("recipe", new AddRecipe());
+        mav.addObject("categories", categories);
         return mav;
     }
 
@@ -72,7 +66,10 @@ public class RecipeController {
             redirectAttributes.addFlashAttribute("recipe", recipe);
             redirectAttributes.addFlashAttribute("org.springframework.validation.BindingResult.recipe", bindingResult);
 
-            return new ModelAndView("redirect:/recipes/add");
+            ModelAndView mav = new ModelAndView("add-recipe");
+            mav.addObject("recipe", recipe);
+            mav.addObject("categories", CategoryName.values());
+            return mav;
         }
 
         Recipe newRecipe = recipeService.create(recipe, userDetails.getUsername());
