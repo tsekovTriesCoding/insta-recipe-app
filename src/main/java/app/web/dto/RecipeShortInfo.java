@@ -13,4 +13,5 @@ public class RecipeShortInfo {
     private String description;
     private int cookTime;
     private int servings;
+    private String image;
 }

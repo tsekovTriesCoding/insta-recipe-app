@@ -14,9 +14,11 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.UUID;
 
@@ -58,9 +60,10 @@ public class RecipeController {
 
     @PostMapping("/add")
     public String addRecipe(@Valid AddRecipe recipe,
+                            @RequestParam("image") MultipartFile file,
                             BindingResult bindingResult,
                             RedirectAttributes redirectAttributes,
-                            @AuthenticationPrincipal UserDetails userDetails) {
+                            @AuthenticationPrincipal UserDetails userDetails) throws IOException {
 
         if (bindingResult.hasErrors()) {
             redirectAttributes.addFlashAttribute("recipe", recipe);
@@ -69,7 +72,7 @@ public class RecipeController {
             return "redirect:/recipes/add";
         }
 
-        Recipe newRecipe = recipeService.create(recipe, userDetails.getUsername());
+        Recipe newRecipe = recipeService.create(recipe, userDetails.getUsername(), file);
 
         return "redirect:/recipes/" + newRecipe.getId();
     }

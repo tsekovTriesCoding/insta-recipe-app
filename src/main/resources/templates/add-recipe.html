@@ -15,7 +15,8 @@
                 </div>
                 <form th:method="POST"
                       th:action="@{/recipes/add}"
-                      th:object="${recipe}">
+                      th:object="${recipe}"
+                      enctype="multipart/form-data">
                     <div class="mb-3">
                         <label for="title" class="form-label">Recipe Title</label>
                         <input th:field="*{title}" th:errorclass="is-invalid" type="text" class="form-control"
@@ -66,7 +67,7 @@
                     </div>
                     <div class="mb-3">
                         <label for="image" class="form-label">Recipe Image</label>
-                        <input type="file" class="form-control" id="image">
+                        <input type="file" class="form-control" id="image" name="image">
                     </div>
                     <div class="form-row d-flex gap-2">
                         <div class="col">

@@ -22,7 +22,7 @@
                 <div th:each="recipe : ${recipes}" class="col-md-4 d-flex align-items-stretch">
                     <div class="card shadow border-0 w-100">
                         <div class="card-img-top-container" style="height: 200px; overflow: hidden;">
-                            <img src="/images/main-course.jpg" class="card-img-top" alt="Recipe Image"
+                            <img th:src="${recipe.image}" class="card-img-top" alt="Recipe Image"
                                  style="object-fit: cover; width: 100%; height: 100%;">
                         </div>
                         <div class="card-body text-center d-flex flex-column">
