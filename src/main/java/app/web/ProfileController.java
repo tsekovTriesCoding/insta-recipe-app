@@ -6,9 +6,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.servlet.ModelAndView;
 
 @RequiredArgsConstructor
 @Controller
@@ -18,12 +18,11 @@ public class ProfileController {
     private final UserService userService;
 
     @GetMapping()
-    public ModelAndView getMyProfilePage(@AuthenticationPrincipal UserDetails userDetails) {
-        ModelAndView modelAndView = new ModelAndView("profile");
-
+    public String getMyProfilePage(@AuthenticationPrincipal UserDetails userDetails, Model model) {
         UserProfileInfo userProfileInfo = userService.getByUsername(userDetails.getUsername());
 
-        modelAndView.addObject("userProfileInfo", userProfileInfo);
-        return modelAndView;
+        model.addAttribute("userProfileInfo", userProfileInfo);
+
+        return "profile";
     }
 }
