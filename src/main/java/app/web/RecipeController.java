@@ -11,6 +11,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
@@ -46,12 +47,17 @@ public class RecipeController {
     }
 
     @GetMapping("/add")
-    public ModelAndView addRecipe() {
+    public ModelAndView addRecipe(Model model) {
         ModelAndView mav = new ModelAndView("add-recipe");
         CategoryName[] categories = CategoryName.values();
 
-        mav.addObject("recipe", new AddRecipe());
-        mav.addObject("categories", categories);
+        if (!model.containsAttribute("recipe")) {
+            mav.addObject("recipe", new AddRecipe());
+        }
+
+        if (!model.containsAttribute("categories")) {
+            mav.addObject("categories", categories);
+        }
 
         return mav;
     }
@@ -65,6 +71,7 @@ public class RecipeController {
         if (bindingResult.hasErrors()) {
             redirectAttributes.addFlashAttribute("recipe", recipe);
             redirectAttributes.addFlashAttribute("org.springframework.validation.BindingResult.recipe", bindingResult);
+
             return new ModelAndView("redirect:/recipes/add");
         }
 

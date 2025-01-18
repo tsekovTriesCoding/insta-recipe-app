@@ -24,7 +24,8 @@
                     <div class="mb-3">
                         <label for="categories" class="form-label">Categories</label>
                         <select th:field="*{categories}" id="categories" class="form-select" multiple>
-                            <option th:each="category : ${categories}" th:value="${category}" th:text="${category.name}">
+                            <option th:each="category : ${categories}" th:value="${category}" th:text="${category.name}"
+                                    th:attr="selected=${#lists.contains(categories, category)}">
                                 Choose a category
                             </option>
                         </select>
