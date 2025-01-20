@@ -98,4 +98,13 @@ public class UserService {
     public UserProfileInfo getUserProfileInfo(String username) {
         return map(this.getByUsername(username));
     }
+
+    public UserProfileInfo updateUsername(UUID userId, String username) {
+        User user = userRepository.findById(userId).orElseThrow(NoSuchElementException::new);
+
+        user.setUsername(username);
+        User updated = userRepository.save(user);
+
+        return map(updated);
+    }
 }

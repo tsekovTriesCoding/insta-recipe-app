@@ -1,9 +1,13 @@
 package app.web;
 
+import app.user.model.User;
 import app.user.service.UserService;
 import app.web.dto.UserProfileInfo;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -37,6 +41,18 @@ public class ProfileController {
                                          Model model) throws IOException {
 
         UserProfileInfo userProfileInfo = userService.updateProfilePicture(id, file);
+        model.addAttribute("userProfileInfo", userProfileInfo);
+
+        return "redirect:/my-profile";
+    }
+
+    @PutMapping("/{id}/change-username")
+    public String changeMyProfileUsername(@PathVariable UUID id,
+                                          @RequestParam("username") String username,
+                                          Model model,
+                                          @AuthenticationPrincipal UserDetails userDetails) {
+
+        UserProfileInfo userProfileInfo = userService.updateUsername(id, username);
         model.addAttribute("userProfileInfo", userProfileInfo);
 
         return "redirect:/my-profile";
