@@ -98,7 +98,6 @@
 .recipes {
     position: relative;
     background: url('/images/background.jpg') no-repeat center center/cover;
-    height: 100vh;
     display: flex;
     align-items: center;
     justify-content: center;

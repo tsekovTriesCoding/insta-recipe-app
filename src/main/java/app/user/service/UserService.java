@@ -8,6 +8,7 @@ import app.web.dto.RegisterRequest;
 import app.web.dto.UserProfileInfo;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -47,15 +48,15 @@ public class UserService {
         return user;
     }
 
-    public UserProfileInfo getByUsername(String username) {
+    public User getByUsername(String username) {
         return userRepository.findByUsername(username)
-                .map(this::map)
                 .orElseThrow(NoSuchElementException::new);
     }
 
-    public UserProfileInfo update(UserProfileInfo userProfileInfo, MultipartFile file, String username) throws IOException {
+    public UserProfileInfo updateProfilePicture(UserDetails userDetails,
+                                                MultipartFile file) throws IOException {
         Path destinationFile = Paths
-                .get("src", "main", "resources", "static/images/uploads", userProfileInfo.getUsername() + "-profile-picture.png")
+                .get("src", "main", "resources", "static/images/uploads", userDetails.getUsername() + "-profile-picture.png")
                 .normalize()
                 .toAbsolutePath();
 
@@ -63,28 +64,13 @@ public class UserService {
             Files.copy(inputStream, destinationFile, StandardCopyOption.REPLACE_EXISTING);
         }
 
-        User user = userRepository.findByUsername(username).orElseThrow(NoSuchElementException::new);
+        User user = this.getByUsername(userDetails.getUsername());
 
-        verifyNewInfo(userProfileInfo, user, destinationFile);
         user.setDateUpdated(LocalDateTime.now());
-
+        user.setProfilePicture("/images/uploads/" + destinationFile.getFileName());
         User updated = userRepository.save(user);
 
         return map(updated);
-    }
-
-    private void verifyNewInfo(UserProfileInfo userProfileInfo, User user, Path destinationFile) {
-        if (userProfileInfo.getUsername() != null && !userProfileInfo.getUsername().isEmpty()) {
-            user.setUsername(userProfileInfo.getUsername());
-        }
-
-        if (userProfileInfo.getEmail() != null && !userProfileInfo.getEmail().isEmpty()) {
-            user.setEmail(userProfileInfo.getEmail());
-        }
-
-        if (destinationFile.toFile().exists()) {
-            user.setProfilePicture("/images/uploads/" + destinationFile.getFileName().toString());
-        }
     }
 
     private User initializeUser(RegisterRequest registerRequest) {
@@ -106,5 +92,9 @@ public class UserService {
         userProfileInfo.setProfilePictureUrl(user.getProfilePicture());
 
         return userProfileInfo;
+    }
+
+    public UserProfileInfo getUserProfileInfo(String username) {
+        return map(this.getByUsername(username));
     }
 }
