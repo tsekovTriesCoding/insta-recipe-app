@@ -16,7 +16,7 @@
                 </div>
 
                 <div class="mt-2 align-self-center position-relative">
-                    <img th:src="*{profilePictureUrl}"
+                    <img th:src="@{*{profilePictureUrl} + '?t=' + ${#dates.format(#dates.createNow(), 'yyyyMMddHHmmss')}}"
                          alt="Profile Picture"
                          class="rounded-circle border border-secondary"
                          style="width: 130px; height: 130px; object-fit: cover;">
@@ -74,7 +74,7 @@
             <div class="modal-body">
                 <form
                         th:method="PUT"
-                        th:action="@{/my-profile/picture/change}"
+                        th:action="@{/my-profile/{id}/change-picture(id=${userProfileInfo.id})}"
                         enctype="multipart/form-data">
                     <div class="mb-3">
                         <label for="profilePicture" class="form-label">Upload New Picture</label>

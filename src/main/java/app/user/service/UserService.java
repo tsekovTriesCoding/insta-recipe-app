@@ -23,6 +23,7 @@ import java.nio.file.StandardCopyOption;
 import java.time.LocalDateTime;
 import java.util.NoSuchElementException;
 import java.util.Optional;
+import java.util.UUID;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -53,10 +54,10 @@ public class UserService {
                 .orElseThrow(NoSuchElementException::new);
     }
 
-    public UserProfileInfo updateProfilePicture(UserDetails userDetails,
+    public UserProfileInfo updateProfilePicture(UUID userId,
                                                 MultipartFile file) throws IOException {
         Path destinationFile = Paths
-                .get("src", "main", "resources", "static/images/uploads", userDetails.getUsername() + "-profile-picture.png")
+                .get("src", "main", "resources", "static/images/uploads", userId + "-profile-picture.png")
                 .normalize()
                 .toAbsolutePath();
 
@@ -64,7 +65,7 @@ public class UserService {
             Files.copy(inputStream, destinationFile, StandardCopyOption.REPLACE_EXISTING);
         }
 
-        User user = this.getByUsername(userDetails.getUsername());
+        User user = userRepository.findById(userId).orElseThrow(NoSuchElementException::new);
 
         user.setDateUpdated(LocalDateTime.now());
         user.setProfilePicture("/images/uploads/" + destinationFile.getFileName());

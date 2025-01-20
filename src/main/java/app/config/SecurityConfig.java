@@ -20,6 +20,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(authorizeRequests -> {
                     authorizeRequests
                             .requestMatchers(PathRequest.toStaticResources().atCommonLocations()).permitAll()
+                            .requestMatchers("/images/uploads/**").permitAll()
                             .requestMatchers("/", "/users/login", "/users/register").permitAll()
                             .anyRequest().authenticated();
                 })
