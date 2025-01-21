@@ -1,6 +1,7 @@
 package app.web;
 
 import app.user.model.User;
+import app.user.service.UserDetailsServiceImpl;
 import app.user.service.UserService;
 import app.web.dto.UserProfileInfo;
 import lombok.RequiredArgsConstructor;
@@ -23,6 +24,7 @@ import java.util.UUID;
 public class ProfileController {
 
     private final UserService userService;
+    private final UserDetailsServiceImpl userDetailsService;
 
     @GetMapping()
     public String getMyProfilePage(@AuthenticationPrincipal UserDetails userDetails, Model model) {
@@ -49,10 +51,17 @@ public class ProfileController {
     @PutMapping("/{id}/change-username")
     public String changeMyProfileUsername(@PathVariable UUID id,
                                           @RequestParam("username") String username,
-                                          Model model,
-                                          @AuthenticationPrincipal UserDetails userDetails) {
+                                          Model model) {
 
         UserProfileInfo userProfileInfo = userService.updateUsername(id, username);
+
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        UserDetails updatedUserDetails = userDetailsService.loadUserByUsername(username);
+        UsernamePasswordAuthenticationToken newAuth = new UsernamePasswordAuthenticationToken(
+                updatedUserDetails, authentication.getCredentials(), updatedUserDetails.getAuthorities()
+        );
+        SecurityContextHolder.getContext().setAuthentication(newAuth);
+
         model.addAttribute("userProfileInfo", userProfileInfo);
 
         return "redirect:/my-profile";
