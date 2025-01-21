@@ -85,6 +85,9 @@
                     </div>
                     <button type="submit" class="btn btn-primary">Save Changes</button>
                 </form>
+
+                <small th:if="${error}" th:text="${error}" id="pictureError"
+                       class="bg-danger rounded text-white"></small>
             </div>
         </div>
     </div>
@@ -111,13 +114,20 @@
                     </div>
                 </form>
 
-                <small th:if="${error}" th:text="${error}" id="usernameError" class="bg-danger rounded text-white"></small>
+                <small th:if="${error}" th:text="${error}" id="usernameError"
+                       class="bg-danger rounded text-white"></small>
             </div>
         </div>
     </div>
 </div>
 <footer th:replace="~{fragments/commons::footer}"></footer>
 
+<script th:if="${openPictureModal}">
+    document.addEventListener("DOMContentLoaded", function () {
+        const modal = new bootstrap.Modal(document.getElementById('changePictureModal'));
+        modal.show();
+    });
+</script>
 <script th:if="${openModal}">
     document.addEventListener("DOMContentLoaded", function () {
         const modal = new bootstrap.Modal(document.getElementById('changeUsernameModal'));
