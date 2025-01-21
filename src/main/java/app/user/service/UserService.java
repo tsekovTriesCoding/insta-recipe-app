@@ -107,4 +107,8 @@ public class UserService {
 
         return map(updated);
     }
+
+    public boolean existsByUsername(String username) {
+        return userRepository.existsByUsername(username);
+    }
 }
