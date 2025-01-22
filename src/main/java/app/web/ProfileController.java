@@ -16,9 +16,10 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MaxUploadSizeExceededException;
-import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.io.IOException;
@@ -98,17 +99,6 @@ public class ProfileController {
         redirectAttributes.addFlashAttribute("success", "Email updated successfully");
 
         return "redirect:/my-profile";
-    }
-
-    @ControllerAdvice
-    public static class FileUploadExceptionAdvice {
-
-        @ExceptionHandler(MaxUploadSizeExceededException.class)
-        public String handleMaxSizeException(MaxUploadSizeExceededException e, RedirectAttributes redirectAttributes) {
-            redirectAttributes.addFlashAttribute("error", "File size exceeds the 3MB limit.");
-            redirectAttributes.addFlashAttribute("openModal", true);
-            return "redirect:/my-profile";
-        }
     }
 
     private void updateAuthentication(String username, Object credentials) {
