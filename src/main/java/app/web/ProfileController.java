@@ -4,6 +4,7 @@ import app.user.service.UserDetailsServiceImpl;
 import app.user.service.UserService;
 import app.web.dto.ChangeEmail;
 import app.web.dto.ChangeProfilePicture;
+import app.web.dto.ChangeUsername;
 import app.web.dto.UserProfileInfo;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -60,23 +61,20 @@ public class ProfileController {
 
     @PutMapping("/{id}/change-username")
     public String changeMyProfileUsername(@PathVariable UUID id,
-                                          @RequestParam("username") String username,
+                                          @Valid ChangeUsername changeUsername,
+                                          BindingResult bindingResult,
                                           RedirectAttributes redirectAttributes) {
 
-        if (userService.existsByUsername(username)) {
-            redirectAttributes.addFlashAttribute("error", "Username already exists");
-            redirectAttributes.addFlashAttribute("openModal", true);
+        if (bindingResult.hasErrors()) {
+            redirectAttributes.addFlashAttribute("errors", bindingResult.getAllErrors().get(0).getDefaultMessage());
+            redirectAttributes.addFlashAttribute("openUsernameModal", true);
             return "redirect:/my-profile";
         }
 
-        if (username.length() < 5) {
-            redirectAttributes.addFlashAttribute("error", "Username must be at least 5 symbols");
-            redirectAttributes.addFlashAttribute("openModal", true);
-            return "redirect:/my-profile";
-        }
+        UserProfileInfo userProfileInfo = userService.updateUsername(id, changeUsername.getUsername());
 
-        UserProfileInfo userProfileInfo = userService.updateUsername(id, username);
-        updateAuthentication(username, SecurityContextHolder.getContext().getAuthentication());
+        updateAuthentication(changeUsername.getUsername(), SecurityContextHolder.getContext().getAuthentication());
+
         redirectAttributes.addFlashAttribute("userProfileInfo", userProfileInfo);
         redirectAttributes.addFlashAttribute("success", "Username updated successfully");
 

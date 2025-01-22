@@ -118,7 +118,8 @@
                     </div>
                 </form>
 
-                <small th:if="${error}" th:text="${error}" id="usernameError"
+                <small th:each="error : ${errors}" th:text="${error}"
+                       id="UsernameError"
                        class="bg-danger rounded text-white"></small>
             </div>
         </div>
@@ -161,7 +162,7 @@
         modal.show();
     });
 </script>
-<script th:if="${openModal}">
+<script th:if="${openUsernameModal}">
     document.addEventListener("DOMContentLoaded", function () {
         const modal = new bootstrap.Modal(document.getElementById('changeUsernameModal'));
         modal.show();
