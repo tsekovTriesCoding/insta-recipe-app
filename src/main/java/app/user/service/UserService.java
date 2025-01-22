@@ -108,7 +108,20 @@ public class UserService {
         return map(updated);
     }
 
+    public UserProfileInfo updateEmail(UUID userId, String email) {
+        User user = userRepository.findById(userId).orElseThrow(NoSuchElementException::new);
+
+        user.setEmail(email);
+        User updated = userRepository.save(user);
+
+        return map(updated);
+    }
+
     public boolean existsByUsername(String username) {
         return userRepository.existsByUsername(username);
+    }
+
+    public boolean existsByEmail(String email) {
+        return userRepository.existsByEmail(email);
     }
 }

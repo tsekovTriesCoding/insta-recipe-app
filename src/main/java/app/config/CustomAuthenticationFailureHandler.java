@@ -17,8 +17,6 @@ public class CustomAuthenticationFailureHandler implements AuthenticationFailure
                                         AuthenticationException exception) throws IOException {
 
         request.getSession().setAttribute("error", "Invalid username or password!");
-
-        // Redirect to login page
         response.sendRedirect("/login");
     }
 }

@@ -2,7 +2,10 @@ package app.web;
 
 import app.user.service.UserDetailsServiceImpl;
 import app.user.service.UserService;
+import app.web.dto.ChangeEmail;
+import app.web.dto.ChangeProfilePicture;
 import app.web.dto.UserProfileInfo;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -11,6 +14,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MaxUploadSizeExceededException;
 import org.springframework.web.multipart.MultipartFile;
@@ -38,29 +42,17 @@ public class ProfileController {
 
     @PutMapping("/{id}/change-picture")
     public String changeMyProfilePicture(@PathVariable UUID id,
-                                         @RequestParam("profilePicture") MultipartFile file,
+                                         @Valid ChangeProfilePicture changeProfilePicture,
+                                         BindingResult bindingResult,
                                          RedirectAttributes redirectAttributes) throws IOException {
 
-        if (file.isEmpty()) {
-            redirectAttributes.addFlashAttribute("error", "You must choose a file");
+        if (bindingResult.hasErrors()) {
+            redirectAttributes.addFlashAttribute("errors", bindingResult.getAllErrors().get(0).getDefaultMessage());
             redirectAttributes.addFlashAttribute("openPictureModal", true);
             return "redirect:/my-profile";
         }
 
-        String contentType = file.getContentType();
-        if (contentType == null || (!contentType.equals("image/png") && !contentType.equals("image/jpeg") && !contentType.equals("image/jpg"))) {
-            redirectAttributes.addFlashAttribute("error", "Invalid file type. Only PNG, JPEG, and JPG are allowed.");
-            redirectAttributes.addFlashAttribute("openPictureModal", true);
-            return "redirect:/my-profile";
-        }
-
-        if (file.getSize() > 3 * 1024 * 1024) {
-            redirectAttributes.addFlashAttribute("error", "File size must not exceed 3MB.");
-            redirectAttributes.addFlashAttribute("openPictureModal", true);
-            return "redirect:/my-profile";
-        }
-
-        UserProfileInfo userProfileInfo = userService.updateProfilePicture(id, file);
+        UserProfileInfo userProfileInfo = userService.updateProfilePicture(id, changeProfilePicture.getProfilePicture());
         redirectAttributes.addFlashAttribute("userProfileInfo", userProfileInfo);
         redirectAttributes.addFlashAttribute("success", "Profile picture updated successfully");
         return "redirect:/my-profile";
@@ -87,6 +79,25 @@ public class ProfileController {
         updateAuthentication(username, SecurityContextHolder.getContext().getAuthentication());
         redirectAttributes.addFlashAttribute("userProfileInfo", userProfileInfo);
         redirectAttributes.addFlashAttribute("success", "Username updated successfully");
+
+        return "redirect:/my-profile";
+    }
+
+    @PutMapping("/{id}/change-email")
+    public String changeMyProfileEmail(@PathVariable UUID id,
+                                       @Valid ChangeEmail changeEmail,
+                                       BindingResult bindingResult,
+                                       RedirectAttributes redirectAttributes) {
+
+        if (bindingResult.hasErrors()) {
+            redirectAttributes.addFlashAttribute("errors", bindingResult.getAllErrors().get(0).getDefaultMessage());
+            redirectAttributes.addFlashAttribute("changeEmailModal", true);
+            return "redirect:/my-profile";
+        }
+
+        UserProfileInfo userProfileInfo = userService.updateEmail(id, changeEmail.getEmail());
+        redirectAttributes.addFlashAttribute("userProfileInfo", userProfileInfo);
+        redirectAttributes.addFlashAttribute("success", "Email updated successfully");
 
         return "redirect:/my-profile";
     }
