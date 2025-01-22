@@ -82,16 +82,18 @@
                 <form
                         th:method="PUT"
                         th:action="@{/my-profile/{id}/change-picture(id=${userProfileInfo.id})}"
+                        th:object="${changeProfilePicture}"
                         enctype="multipart/form-data">
                     <div class="mb-3">
                         <label for="profilePicture" class="form-label">Upload New Picture</label>
-                        <input type="file" class="form-control" id="profilePicture" onchange="validateFileSize()"
+                        <input th:field="*{profilePicture}" th:errorclass="is-invalid" type="file" class="form-control"
+                               id="profilePicture" onchange="validateFileSize()"
                                name="profilePicture" required>
                     </div>
                     <button type="submit" class="btn btn-primary">Save Changes</button>
                 </form>
 
-                <small th:each="error : ${errors}" th:text="${error}"
+                <small th:errors="${changeProfilePicture.profilePicture}"
                        id="profilePictureError"
                        class="bg-danger rounded text-white"></small>
             </div>
@@ -108,10 +110,13 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <form th:method="PUT" th:action="@{/my-profile/{id}/change-username(id=${userProfileInfo.id})}">
+                <form th:method="PUT"
+                      th:action="@{/my-profile/{id}/change-username(id=${userProfileInfo.id})}"
+                      th:object="${changeUsername}">
                     <div class="mb-3">
                         <label for="newUsername" class="form-label">New Username</label>
-                        <input type="text" class="form-control" id="newUsername" name="username"
+                        <input th:field="*{username}" th:errorclass="is-invalid" type="text" class="form-control"
+                               id="newUsername" name="username"
                                placeholder="Enter new username" required>
                     </div>
                     <div class="modal-footer">
@@ -120,8 +125,8 @@
                     </div>
                 </form>
 
-                <small th:each="error : ${errors}" th:text="${error}"
-                       id="UsernameError"
+                <small th:errors="${changeUsername.username}"
+                       id="usernameError"
                        class="bg-danger rounded text-white"></small>
             </div>
         </div>
@@ -137,10 +142,13 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <form th:method="PUT" th:action="@{/my-profile/{id}/change-email(id=${userProfileInfo.id})}">
+                <form th:method="PUT"
+                      th:action="@{/my-profile/{id}/change-email(id=${userProfileInfo.id})}"
+                      th:object="${changeEmail}">
                     <div class="mb-3">
                         <label for="newEmail" class="form-label">New Email</label>
-                        <input type="text" class="form-control" id="newEmail" name="email"
+                        <input th:field="*{email}" th:errorclass="is-invalid" type="text" class="form-control"
+                               id="newEmail" name="email"
                                placeholder="Enter new email" required>
                     </div>
                     <div class="modal-footer">
@@ -149,7 +157,7 @@
                     </div>
                 </form>
 
-                <small th:each="error : ${errors}" th:text="${error}"
+                <small th:errors="${changeEmail.email}"
                        id="emailError"
                        class="bg-danger rounded text-white"></small>
             </div>
@@ -166,10 +174,13 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <form th:method="PUT" th:action="@{/my-profile/{id}/change-password(id=${userProfileInfo.id})}">
+                <form th:method="PUT"
+                      th:action="@{/my-profile/{id}/change-password(id=${userProfileInfo.id})}"
+                      th:object="${changePassword}">
                     <div class="mb-3">
                         <label for="newPassword" class="form-label">New Email</label>
-                        <input type="text" class="form-control" id="newPassword" name="password"
+                        <input th:field="*{password}" th:errorclass="is-invalid" type="text" class="form-control"
+                               id="newPassword" name="password"
                                placeholder="Enter new password" required>
                     </div>
                     <div class="modal-footer">
@@ -178,7 +189,7 @@
                     </div>
                 </form>
 
-                <small th:each="error : ${errors}" th:text="${error}"
+                <small th:errors="${changePassword.password}"
                        id="passwordError"
                        class="bg-danger rounded text-white"></small>
             </div>
@@ -199,13 +210,13 @@
         modal.show();
     });
 </script>
-<script th:if="${changeEmailModal}">
+<script th:if="${openEmailModal}">
     document.addEventListener("DOMContentLoaded", function () {
         const modal = new bootstrap.Modal(document.getElementById('changeEmailModal'));
         modal.show();
     });
 </script>
-<script th:if="${changePasswordModal}">
+<script th:if="${openPasswordModal}">
     document.addEventListener("DOMContentLoaded", function () {
         const modal = new bootstrap.Modal(document.getElementById('changePasswordModal'));
         modal.show();

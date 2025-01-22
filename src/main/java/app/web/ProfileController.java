@@ -36,6 +36,22 @@ public class ProfileController {
 
         model.addAttribute("userProfileInfo", userProfileInfo);
 
+        if (!model.containsAttribute("changeEmail")) {
+            model.addAttribute("changeEmail", new ChangeEmail());
+        }
+
+        if (!model.containsAttribute("changePassword")) {
+            model.addAttribute("changePassword", new ChangePassword());
+        }
+
+        if (!model.containsAttribute("changeUsername")) {
+            model.addAttribute("changeUsername", new ChangeUsername());
+        }
+
+        if (!model.containsAttribute("changeProfilePicture")) {
+            model.addAttribute("changeProfilePicture", new ChangeProfilePicture());
+        }
+
         return "profile";
     }
 
@@ -46,7 +62,8 @@ public class ProfileController {
                                          RedirectAttributes redirectAttributes) throws IOException {
 
         if (bindingResult.hasErrors()) {
-            redirectAttributes.addFlashAttribute("errors", bindingResult.getAllErrors().get(0).getDefaultMessage());
+            redirectAttributes.addFlashAttribute("changeProfilePicture", changeProfilePicture);
+            redirectAttributes.addFlashAttribute("org.springframework.validation.BindingResult.changeProfilePicture", bindingResult);
             redirectAttributes.addFlashAttribute("openPictureModal", true);
             return "redirect:/my-profile";
         }
@@ -64,7 +81,8 @@ public class ProfileController {
                                           RedirectAttributes redirectAttributes) {
 
         if (bindingResult.hasErrors()) {
-            redirectAttributes.addFlashAttribute("errors", bindingResult.getAllErrors().get(0).getDefaultMessage());
+            redirectAttributes.addFlashAttribute("changeUsername", changeUsername);
+            redirectAttributes.addFlashAttribute("org.springframework.validation.BindingResult.changeUsername", bindingResult);
             redirectAttributes.addFlashAttribute("openUsernameModal", true);
             return "redirect:/my-profile";
         }
@@ -86,8 +104,9 @@ public class ProfileController {
                                        RedirectAttributes redirectAttributes) {
 
         if (bindingResult.hasErrors()) {
-            redirectAttributes.addFlashAttribute("errors", bindingResult.getAllErrors().get(0).getDefaultMessage());
-            redirectAttributes.addFlashAttribute("changeEmailModal", true);
+            redirectAttributes.addFlashAttribute("changeEmail", changeEmail);
+            redirectAttributes.addFlashAttribute("org.springframework.validation.BindingResult.changeEmail", bindingResult);
+            redirectAttributes.addFlashAttribute("openEmailModal", true);
             return "redirect:/my-profile";
         }
 
@@ -105,8 +124,9 @@ public class ProfileController {
                                           RedirectAttributes redirectAttributes) {
 
         if (bindingResult.hasErrors()) {
-            redirectAttributes.addFlashAttribute("errors", bindingResult.getAllErrors().get(0).getDefaultMessage());
-            redirectAttributes.addFlashAttribute("changePasswordModal", true);
+            redirectAttributes.addFlashAttribute("changePassword", changePassword);
+            redirectAttributes.addFlashAttribute("org.springframework.validation.BindingResult.changePassword", bindingResult);
+            redirectAttributes.addFlashAttribute("openPasswordModal", true);
             return "redirect:/my-profile";
         }
 

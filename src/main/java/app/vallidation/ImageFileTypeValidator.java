@@ -15,7 +15,7 @@ public class ImageFileTypeValidator implements ConstraintValidator<ImageFileType
 
     @Override
     public boolean isValid(MultipartFile file, ConstraintValidatorContext context) {
-        if (file == null) {
+        if (file == null || file.isEmpty()) {
             return true;
         }
 
