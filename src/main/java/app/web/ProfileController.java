@@ -2,10 +2,7 @@ package app.web;
 
 import app.user.service.UserDetailsServiceImpl;
 import app.user.service.UserService;
-import app.web.dto.ChangeEmail;
-import app.web.dto.ChangeProfilePicture;
-import app.web.dto.ChangeUsername;
-import app.web.dto.UserProfileInfo;
+import app.web.dto.*;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -97,6 +94,25 @@ public class ProfileController {
         UserProfileInfo userProfileInfo = userService.updateEmail(id, changeEmail.getEmail());
         redirectAttributes.addFlashAttribute("userProfileInfo", userProfileInfo);
         redirectAttributes.addFlashAttribute("success", "Email updated successfully");
+
+        return "redirect:/my-profile";
+    }
+
+    @PutMapping("/{id}/change-password")
+    public String changeMyProfilePassword(@PathVariable UUID id,
+                                          @Valid ChangePassword changePassword,
+                                          BindingResult bindingResult,
+                                          RedirectAttributes redirectAttributes) {
+
+        if (bindingResult.hasErrors()) {
+            redirectAttributes.addFlashAttribute("errors", bindingResult.getAllErrors().get(0).getDefaultMessage());
+            redirectAttributes.addFlashAttribute("changePasswordModal", true);
+            return "redirect:/my-profile";
+        }
+
+        UserProfileInfo userProfileInfo = userService.updatePassword(id, changePassword.getPassword());
+        redirectAttributes.addFlashAttribute("userProfileInfo", userProfileInfo);
+        redirectAttributes.addFlashAttribute("success", "Password updated successfully");
 
         return "redirect:/my-profile";
     }

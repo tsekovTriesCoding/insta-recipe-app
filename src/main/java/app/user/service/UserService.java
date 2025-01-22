@@ -117,6 +117,14 @@ public class UserService {
         return map(updated);
     }
 
+    public UserProfileInfo updatePassword(UUID userId, String password) {
+        User user = userRepository.findById(userId).orElseThrow(NoSuchElementException::new);
+        user.setPassword(passwordEncoder.encode(password));
+        User updated = userRepository.save(user);
+
+        return map(updated);
+    }
+
     public boolean existsByUsername(String username) {
         return userRepository.existsByUsername(username);
     }
