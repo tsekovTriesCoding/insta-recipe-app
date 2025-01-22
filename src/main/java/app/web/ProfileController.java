@@ -93,16 +93,16 @@ public class ProfileController {
         return "redirect:/my-profile";
     }
 
-    //TODO: do the controller advice when the file exceed 10MB to return a custom error page
-//    @ControllerAdvice
-//    public class MyControllerAdvice {
-//
-//        @ExceptionHandler(MaxUploadSizeExceededException.class)
-//        public ResponseEntity<String> handleMaxUploadSizeExceeded(MaxUploadSizeExceededException ex) {
-//            return ResponseEntity.status(HttpStatus.PAYLOAD_TOO_LARGE)
-//                    .body("File size exceeded. Maximum allowed size is " + ex.getMaxUploadSize());
-//        }
-//    }
+    @ControllerAdvice
+    public static class FileUploadExceptionAdvice {
+
+        @ExceptionHandler(MaxUploadSizeExceededException.class)
+        public String handleMaxSizeException(MaxUploadSizeExceededException e, RedirectAttributes redirectAttributes) {
+            redirectAttributes.addFlashAttribute("error", "File size exceeds the 3MB limit.");
+            redirectAttributes.addFlashAttribute("openModal", true);
+            return "redirect:/my-profile";
+        }
+    }
 
     private void updateAuthentication(String username, Object credentials) {
         UserDetails updatedUserDetails = userDetailsService.loadUserByUsername(username);
