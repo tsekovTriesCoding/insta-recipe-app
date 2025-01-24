@@ -6,6 +6,7 @@ import app.recipe.model.Recipe;
 import app.recipe.repository.RecipeRepository;
 import app.user.model.User;
 import app.user.repository.UserRepository;
+import app.user.service.UserService;
 import app.web.dto.AddRecipe;
 import app.web.dto.RecipeDetails;
 import app.web.dto.RecipeShortInfo;
@@ -32,7 +33,7 @@ public class RecipeService {
 
     private final RecipeRepository recipeRepository;
     private final CategoryRepository categoryRepository;
-    private final UserRepository userRepository;
+    private final UserService userService;
 
     public List<RecipeShortInfo> getAll() {
         List<Recipe> recipes = recipeRepository.findAll();
@@ -80,7 +81,7 @@ public class RecipeService {
     }
 
     public Recipe create(AddRecipe recipe, String username) throws IOException {
-        User user = userRepository.findByUsername(username).orElseThrow(NoSuchElementException::new);
+        User user = userService.getByUsername(username);
 
         String title = recipe.getTitle();
 
