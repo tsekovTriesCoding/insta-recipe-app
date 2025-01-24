@@ -33,15 +33,22 @@ public class RecipeController {
     @GetMapping("/all")
     public String allRecipes(Model model) {
         List<RecipeShortInfo> recipes = recipeService.getAll();
+
         model.addAttribute("recipes", recipes);
 
         return "recipes";
     }
 
     @GetMapping("/{id}")
-    public String recipeDetails(@PathVariable UUID id, Model model) {
+    public String recipeDetails(@PathVariable UUID id,
+                                @AuthenticationPrincipal UserDetails userDetails,
+                                Model model) {
         RecipeDetails recipe = recipeService.getDetailsById(id);
+
+        boolean isCreator = recipe.getCreator().equals(userDetails.getUsername());
+
         model.addAttribute("recipe", recipe);
+        model.addAttribute("isCreator", isCreator);
 
         return "recipe-details";
     }

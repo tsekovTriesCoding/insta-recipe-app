@@ -71,7 +71,7 @@ public class RecipeService {
                 .servings(recipe.getServings())
                 .image(recipe.getImage())
                 .comments(recipe.getComments())
-                .likes(recipe.getLikes())
+                .likes(recipe.getLikes().size())
                 .build();
     }
 

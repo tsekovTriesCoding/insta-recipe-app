@@ -28,5 +28,9 @@ public class RecipeDetails {
     private User createdBy;
     private List<Category> categories;
     private List<Comment> comments;
-    private List<Like> likes;
+    private Integer likes;
+
+    public String getCreator() {
+        return createdBy.getUsername();
+    }
 }

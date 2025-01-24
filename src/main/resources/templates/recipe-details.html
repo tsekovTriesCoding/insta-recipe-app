@@ -14,8 +14,8 @@
                     <h1 th:text="*{title}" class="card-title mb-0">Spaghetti Carbonara</h1>
                     <form th:action="@{/like/{id}(id=${recipe.id})}" method="post"
                           class="d-flex justify-content-between align-items-center mt-4">
-                        <button type="submit" class="btn-like btn btn-primary">Like Recipe</button>
-                        <!--                    <p class="mb-0"><strong>Likes:</strong> <span th:text="${recipe.likeCount}">120</span></p>-->
+                        <button th:unless="${isCreator}" type="submit" class="btn-like btn btn-primary">Like Recipe</button>
+                        <p class="mb-0"><strong>Likes:</strong> <span th:text="*{likes}">120</span></p>
                     </form>
                 </div>
                 <p class="card-text text-muted text-center">Published on: <strong th:text="*{createdDate}">Dec 28,
