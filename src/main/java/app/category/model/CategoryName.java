@@ -1,5 +1,8 @@
 package app.category.model;
 
+import lombok.Getter;
+
+@Getter
 public enum CategoryName {
     VEGAN("Vegan"),
     DESSERTS("Desserts"),
@@ -11,13 +14,9 @@ public enum CategoryName {
     SALADS("Salads"),
     ;
 
-    private final String name;
+    private final String value;
 
-    CategoryName(String name) {
-        this.name = name;
-    }
-
-    public String getName() {
-        return name;
+    CategoryName(String value) {
+        this.value = value;
     }
 }

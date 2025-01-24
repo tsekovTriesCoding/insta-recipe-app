@@ -2,6 +2,7 @@ package app.web;
 
 import app.category.model.Category;
 import app.category.service.CategoryService;
+import app.web.dto.CategoryDetails;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -9,7 +10,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-import java.util.List;
+import java.util.UUID;
 
 @RequiredArgsConstructor
 @Controller
@@ -18,11 +19,10 @@ public class CategoryController {
 
     private final CategoryService categoryService;
 
-    @GetMapping("/{name}")
-    public String categoryView(Model model, @PathVariable String name) {
-        List<Category> categories = categoryService.getAll();
-
-        model.addAttribute("categories", categories);
-        return "categories";
+    @GetMapping("/{id}")
+    public String categoryView(Model model, @PathVariable UUID id) {
+        CategoryDetails categoryDetails = categoryService.getById(id);
+        model.addAttribute("categoryDetails", categoryDetails);
+        return "category";
     }
 }
