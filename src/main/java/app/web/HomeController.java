@@ -31,6 +31,7 @@ public class HomeController {
 
     @GetMapping("/about")
     public String getAboutPage() {
+        //TODO: Add the admin to see who is CEO......, etc.
         return "about";
     }
 }

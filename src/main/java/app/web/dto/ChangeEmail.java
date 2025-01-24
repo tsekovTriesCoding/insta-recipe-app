@@ -6,7 +6,7 @@ import lombok.Data;
 
 @Data
 public class ChangeEmail {
-    @NotBlank
-    @Email
+    @NotBlank(message = "Email must not be empty")
+    @Email(message = "Oops! The email address you entered seems to be invalid")
     private String email;
 }
