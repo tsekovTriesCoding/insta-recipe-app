@@ -1,6 +1,5 @@
 package app.web;
 
-import app.category.model.CategoryName;
 import app.category.service.CategoryService;
 import app.web.dto.CategoryShort;
 import lombok.RequiredArgsConstructor;
@@ -13,7 +12,7 @@ import java.util.List;
 @RequiredArgsConstructor
 @Controller
 public class HomeController {
-    
+
     private final CategoryService categoryService;
 
     @GetMapping("/")
@@ -28,5 +27,10 @@ public class HomeController {
         model.addAttribute("categories", categories);
 
         return "/home";
+    }
+
+    @GetMapping("/about")
+    public String getAboutPage() {
+        return "about";
     }
 }
