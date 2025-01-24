@@ -55,8 +55,8 @@ public class RecipeService {
     }
 
     @Transactional(readOnly = true)
-    public RecipeDetails getById(UUID recipeId) {
-        Recipe recipe = recipeRepository.findById(recipeId).orElseThrow(NoSuchElementException::new);
+    public RecipeDetails getDetailsById(UUID recipeId) {
+        Recipe recipe = this.getById(recipeId);
 
         return RecipeDetails.builder()
                 .id(recipe.getId())
@@ -73,6 +73,10 @@ public class RecipeService {
                 .comments(recipe.getComments())
                 .likes(recipe.getLikes())
                 .build();
+    }
+
+    public Recipe getById(UUID recipeId) {
+        return recipeRepository.findById(recipeId).orElseThrow(NoSuchElementException::new);
     }
 
     public Recipe create(AddRecipe recipe, String username) throws IOException {

@@ -8,4 +8,5 @@ import java.util.UUID;
 
 @Repository
 public interface LikeRepository extends JpaRepository<Like, UUID> {
+    boolean existsByUser_IdAndRecipe_Id(UUID userId, UUID recipeId);
 }

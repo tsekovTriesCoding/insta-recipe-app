@@ -12,7 +12,11 @@
             <div class="card-body">
                 <div class="d-flex justify-content-between align-items-center mb-3">
                     <h1 th:text="*{title}" class="card-title mb-0">Spaghetti Carbonara</h1>
-                    <a th:href="@{/recipe/edit}" class="btn-recipes btn btn-primary">Edit Recipe</a>
+                    <form th:action="@{/like/{id}(id=${recipe.id})}" method="post"
+                          class="d-flex justify-content-between align-items-center mt-4">
+                        <button type="submit" class="btn-like btn btn-primary">Like Recipe</button>
+                        <!--                    <p class="mb-0"><strong>Likes:</strong> <span th:text="${recipe.likeCount}">120</span></p>-->
+                    </form>
                 </div>
                 <p class="card-text text-muted text-center">Published on: <strong th:text="*{createdDate}">Dec 28,
                     2024</strong></p>
@@ -23,26 +27,12 @@
                 <h3>Ingredients</h3>
                 <ul th:each="ingredient : *{ingredients}">
                     <li th:text="${ingredient}">200g spaghetti</li>
-                    <!--                    <li>100g pancetta</li>-->
-                    <!--                    <li>2 large eggs</li>-->
-                    <!--                    <li>50g Parmesan cheese</li>-->
-                    <!--                    <li>Freshly ground black pepper</li>-->
-                    <!--                    <li>Salt</li>-->
                 </ul>
 
                 <h3>Steps</h3>
-                <ol>
-                    <li>Cook the spaghetti in salted boiling water until al dente.</li>
-                    <li>Fry the pancetta until crispy.</li>
-                    <li>Whisk the eggs with grated Parmesan and a generous amount of black pepper.</li>
-                    <li>Toss the spaghetti with the pancetta, then remove from heat and mix with the egg mixture.</li>
-                    <li>Serve immediately with more Parmesan and black pepper.</li>
-                </ol>
+                <p th:text="*{instructions}"></p>
 
-                <div class="d-flex justify-content-between align-items-center mt-4">
-                    <button class="btn-like btn btn-primary">Like Recipe</button>
-                    <p class="mb-0"><strong>Likes:</strong> 120</p>
-                </div>
+                <a th:href="@{/recipe/edit}" class="btn-recipes btn btn-primary">Edit Recipe</a>
             </div>
         </div>
 
