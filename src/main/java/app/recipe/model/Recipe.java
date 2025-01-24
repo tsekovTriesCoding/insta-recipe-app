@@ -28,14 +28,14 @@ public class Recipe {
     @Column(nullable = false)
     private String title;
 
-    @Column(columnDefinition = "LONGTEXT")
+    @Column(length = 500)
     private String description;
 
     @ElementCollection
     @CollectionTable(name = "recipe_ingredients", joinColumns = @JoinColumn(name = "recipe_id"))
     private List<String> ingredients = new ArrayList<>();
 
-    @Column(columnDefinition = "LONGTEXT")
+    @Column(length = 500)
     private String instructions;
 
     @Column(nullable = false)
@@ -60,7 +60,7 @@ public class Recipe {
     @JoinColumn(name = "user_id", nullable = false)
     private User createdBy;
 
-    @ManyToMany
+    @ManyToMany()
     @JoinTable(name = "recipes_categories",
             joinColumns = @JoinColumn(name = "recipe_id"),
             inverseJoinColumns = @JoinColumn(name = "category_id"))

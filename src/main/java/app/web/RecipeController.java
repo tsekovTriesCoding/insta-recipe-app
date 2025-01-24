@@ -59,7 +59,6 @@ public class RecipeController {
 
     @PostMapping("/add")
     public String addRecipe(@Valid AddRecipe recipe,
-                            @RequestParam("image") MultipartFile file,
                             BindingResult bindingResult,
                             RedirectAttributes redirectAttributes,
                             @AuthenticationPrincipal UserDetails userDetails) throws IOException {
@@ -71,7 +70,7 @@ public class RecipeController {
             return "redirect:/recipes/add";
         }
 
-        Recipe newRecipe = recipeService.create(recipe, userDetails.getUsername(), file);
+        Recipe newRecipe = recipeService.create(recipe, userDetails.getUsername());
 
         return "redirect:/recipes/" + newRecipe.getId();
     }

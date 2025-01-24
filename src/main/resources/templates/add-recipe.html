@@ -21,13 +21,15 @@
                         <label for="title" class="form-label">Recipe Title</label>
                         <input th:field="*{title}" th:errorclass="is-invalid" type="text" class="form-control"
                                id="title"
+                               name="title"
                                placeholder="Enter recipe title">
 
                         <small th:errors="*{title}" id="titleError" class="bg-danger rounded text-white"></small>
                     </div>
                     <div class="mb-3">
                         <label for="categories" class="form-label">Categories</label>
-                        <select th:field="*{categories}" th:errorclass="is-invalid" id="categories" class="form-select"
+                        <select th:field="*{categories}" th:errorclass="is-invalid" id="categories" name="categories"
+                                class="form-select"
                                 multiple>
                             <option th:each="category : ${categories}" th:value="${category}" th:text="${category.name}"
                                     th:attr="selected=${#lists.contains(categories, category)}">
@@ -41,6 +43,7 @@
                     <div class="mb-3">
                         <label for="description" class="form-label">Description</label>
                         <textarea th:field="*{description}" th:errorclass="is-invalid" id="description"
+                                  name="description"
                                   class="form-control" rows="4"
                                   placeholder="Enter a brief description"></textarea>
 
@@ -50,6 +53,7 @@
                     <div class="mb-3">
                         <label for="ingredients" class="form-label">Ingredients</label>
                         <textarea th:field="*{ingredients}" th:errorclass="is-invalid" id="ingredients"
+                                  name="ingredients"
                                   class="form-control" rows="4"
                                   placeholder="List ingredients separated by commas"></textarea>
 
@@ -59,6 +63,7 @@
                     <div class="mb-3">
                         <label for="instructions" class="form-label">Instructions</label>
                         <textarea th:field="*{instructions}" th:errorclass="is-invalid" id="instructions"
+                                  name="instructions"
                                   class="form-control" rows="4"
                                   placeholder="Write the steps to prepare the recipe"></textarea>
 
@@ -67,7 +72,11 @@
                     </div>
                     <div class="mb-3">
                         <label for="image" class="form-label">Recipe Image</label>
-                        <input type="file" class="form-control" id="image" name="image">
+                        <input th:field="*{image}" th:errorclass="is-invalid" type="file" class="form-control"
+                               id="image" name="image">
+
+                        <small th:errors="*{image}" id="imageError"
+                               class="bg-danger rounded text-white"></small>
                     </div>
                     <div class="form-row d-flex gap-2">
                         <div class="col">

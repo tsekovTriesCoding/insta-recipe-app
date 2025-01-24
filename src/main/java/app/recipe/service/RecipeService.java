@@ -75,19 +75,25 @@ public class RecipeService {
                 .build();
     }
 
-    public Recipe create(AddRecipe recipe, String username, MultipartFile file) throws IOException {
+    public Recipe create(AddRecipe recipe, String username) throws IOException {
         User user = userRepository.findByUsername(username).orElseThrow(NoSuchElementException::new);
 
-        Path destinationFile = Paths
-                .get("src", "main", "resources", "static", "images", "uploads", recipe.getTitle() + "-recipe.png")
-                .normalize()
-                .toAbsolutePath();
+        String title = recipe.getTitle();
 
-        try (InputStream inputStream = file.getInputStream()) {
-            Files.copy(inputStream, destinationFile, StandardCopyOption.REPLACE_EXISTING);
+        if (recipeRepository.existsByTitle(title)) {
+            List<Recipe> allByTitle = recipeRepository.getAllByTitle(title);
+
+            title = title + allByTitle.size();
         }
 
-        //TODO:check if some the inputs are too long and throw unexpected error
+        String imageUrl = saveImage(recipe.getImage(), title + "-recipe");
+
+        Recipe newRecipe = initializeRecipe(recipe, user, imageUrl);
+
+        return recipeRepository.save(newRecipe);
+    }
+
+    private Recipe initializeRecipe(AddRecipe recipe, User creator, String imageUrl) {
         List<Category> categories = recipe.getCategories()
                 .stream()
                 .map(categoryName -> categoryRepository.findByName(categoryName)
@@ -95,20 +101,32 @@ public class RecipeService {
 
         List<String> ingredients = Arrays.stream(recipe.getIngredients().split(",")).toList();
 
-        Recipe newRecipe = Recipe.builder()
+
+        return Recipe.builder()
                 .title(recipe.getTitle())
                 .description(recipe.getDescription())
                 .categories(categories)
                 .ingredients(ingredients)
                 .instructions(recipe.getInstructions())
                 .createdDate(LocalDateTime.now())
-                .createdBy(user)
+                .createdBy(creator)
                 .servings(recipe.getServings())
                 .cookTime(recipe.getCookTime())
                 .prepTime(recipe.getPrepTime())
-                .image("/images/uploads/" + destinationFile.getFileName())
+                .image("/images/uploads/" + imageUrl)
                 .build();
+    }
 
-        return recipeRepository.save(newRecipe);
+    private String saveImage(MultipartFile file, String recipeTitle) throws IOException {
+        Path destinationFile = Paths
+                .get("src", "main", "resources", "static/images/uploads", recipeTitle + ".png")
+                .normalize()
+                .toAbsolutePath();
+
+        try (InputStream inputStream = file.getInputStream()) {
+            Files.copy(inputStream, destinationFile, StandardCopyOption.REPLACE_EXISTING);
+        }
+
+        return destinationFile.getFileName().toString();
     }
 }
