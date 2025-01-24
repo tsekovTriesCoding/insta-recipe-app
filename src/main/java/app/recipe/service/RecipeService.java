@@ -5,7 +5,6 @@ import app.category.repository.CategoryRepository;
 import app.recipe.model.Recipe;
 import app.recipe.repository.RecipeRepository;
 import app.user.model.User;
-import app.user.repository.UserRepository;
 import app.user.service.UserService;
 import app.web.dto.AddRecipe;
 import app.web.dto.RecipeDetails;
@@ -106,7 +105,6 @@ public class RecipeService {
 
         List<String> ingredients = Arrays.stream(recipe.getIngredients().split(",")).toList();
 
-
         return Recipe.builder()
                 .title(recipe.getTitle())
                 .description(recipe.getDescription())
@@ -133,5 +131,10 @@ public class RecipeService {
         }
 
         return destinationFile.getFileName().toString();
+    }
+
+    public List<Recipe> getRecipesByCreator(String username) {
+        User user = userService.getByUsername(username);
+        return recipeRepository.findAllByCreatedBy(user);
     }
 }

@@ -83,4 +83,19 @@ public class RecipeController {
 
         return "redirect:/recipes/" + newRecipe.getId();
     }
+
+    @GetMapping("/edit/{id}")
+    public String editRecipe(@PathVariable UUID id) {
+
+        return "edit-recipe";
+    }
+
+    @GetMapping("/my-recipes")
+    public String myRecipes(@AuthenticationPrincipal UserDetails userDetails, Model model) {
+        List<Recipe> myRecipes = recipeService.getRecipesByCreator(userDetails.getUsername());
+
+        model.addAttribute("myRecipes", myRecipes);
+
+        return "my-recipes";
+    }
 }

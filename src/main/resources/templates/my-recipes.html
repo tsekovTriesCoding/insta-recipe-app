@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html class="h-100" lang="en">
+<html class="h-100" lang="en" xmlns:th="http://www.thymeleaf.org">
 <head th:replace="~{fragments/commons::head}">
     <title>My Recipes</title>
 </head>
@@ -15,20 +15,20 @@
                     <p class="text-muted">Manage your personal recipe collection here.</p>
                 </div>
 
-                <!-- Recipes List -->
                 <div class="row g-4">
-                    <!-- Example Recipe Card -->
-                    <div class="col-md-4">
+                    <div th:each="recipe : ${myRecipes}" class="col-md-4">
                         <div class="card h-100 shadow border-2">
                             <div class="card-img-top-container" style="height: 200px; overflow: hidden;">
-                                <img src="/images/main-course.jpg" class="card-img-top" alt="Recipe Image"
+                                <img th:src="${recipe.image}" class="card-img-top" alt="Recipe Image"
                                      style="object-fit: cover; width: 100%; height: 100%;">
                             </div>
                             <div class="card-body text-center">
-                                <h5 class="card-title">Spaghetti Carbonara</h5>
-                                <p class="card-text text-muted">Published on: <strong>Dec 28, 2024</strong></p>
+                                <h5 th:text="${recipe.title}" class="card-title">Spaghetti Carbonara</h5>
+                                <p th:text="|Published on: ${#temporals.format(recipe.createdDate, 'dd MMM YYYY HH:mm')}|"
+                                   class="card-text text-muted">Published on: <strong>Dec
+                                    28, 2024</strong></p>
                                 <div class="d-flex justify-content-between">
-                                    <a th:href="@{/recipes/edit}" class="btn btn-primary btn-sm">Edit</a>
+                                    <a th:href="@{/recipes/edit/{id}(id=${recipe.id})}" class="btn btn-primary btn-sm">Edit</a>
                                     <button class="btn btn-danger btn-sm">Delete</button>
                                 </div>
                             </div>
