@@ -1,6 +1,5 @@
 package app.web;
 
-import app.category.model.Category;
 import app.category.service.CategoryService;
 import app.web.dto.CategoryDetails;
 import lombok.RequiredArgsConstructor;

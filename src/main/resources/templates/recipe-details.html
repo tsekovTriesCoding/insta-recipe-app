@@ -58,9 +58,12 @@
 
             <!-- Comment Form -->
             <div class="card shadow-sm p-3 mb-4">
-                <form>
+                <form th:method="POST"
+                      th:action="@{/comments/add/{id}(id=${recipe.id})}"
+                      th:object="${addComment}">
                     <div class="mb-3">
-                        <textarea class="form-control" rows="3" placeholder="Add a comment..."></textarea>
+                        <textarea id="content" name="content" class="form-control" rows="3"
+                                  placeholder="Add a comment..."></textarea>
                     </div>
                     <button type="submit" class="btn-add-comment btn btn-primary w-100">Post Comment</button>
                 </form>
