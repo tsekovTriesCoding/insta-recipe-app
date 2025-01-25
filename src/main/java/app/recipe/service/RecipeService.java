@@ -210,6 +210,7 @@ public class RecipeService {
     }
 
     public void delete(UUID id) {
+        //TODO: remove the picture from the uploads files...
         recipeRepository.delete(getById(id));
     }
 }

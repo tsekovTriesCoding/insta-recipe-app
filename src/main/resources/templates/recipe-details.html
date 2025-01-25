@@ -19,8 +19,23 @@
                         <p class="mb-0"><strong>Likes:</strong> <span th:text="*{likes}">120</span></p>
                     </form>
                 </div>
-                <p class="card-text text-muted text-center">Published on: <strong th:text="*{createdDate}">Dec 28,
-                    2024</strong></p>
+                <p th:text="|Published on: ${#temporals.format(recipe.createdDate, 'dd MMM YYYY HH:mm')}|"
+                   class="card-text text-muted text-center"></p>
+
+                <div class="d-flex justify-content-center mb-2">
+                    <div th:if="${recipe.prepTime}" class="me-3">
+                        <i class="bi bi-alarm custom-icon me-1"></i> <span
+                            th:text="|Prep time: ${recipe.prepTime}|">15</span> mins
+                    </div>
+                    <div class="me-3">
+                        <i class="bi bi-clock custom-icon me-1"></i> <span
+                            th:text="|Cook time: ${recipe.cookTime}|">20</span> mins
+                    </div>
+                    <div class="me-3">
+                        <i class="bi bi-person-fill custom-icon me-1"></i> <span
+                            th:text="${recipe.servings}">4-6</span> servings
+                    </div>
+                </div>
                 <p th:text="*{description}" class="card-text mb-4">A creamy and delicious Italian classic, made with
                     eggs, cheese, pancetta, and black pepper. Quick and easy to make, it's the perfect meal for any
                     time!</p>
