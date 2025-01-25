@@ -29,7 +29,11 @@
                                     28, 2024</strong></p>
                                 <div class="d-flex justify-content-between">
                                     <a th:href="@{/recipes/edit/{id}(id=${recipe.id})}" class="btn btn-primary btn-sm">Edit</a>
-                                    <button class="btn btn-danger btn-sm">Delete</button>
+                                    <form th:method="DELETE"
+                                          th:action="@{/recipes/delete/{id}(id=${recipe.id})}">
+                                        <input type="hidden" name="_method" value="delete">
+                                        <input type="submit" class="btn btn-danger btn-sm" value="Delete"/>
+                                    </form>
                                 </div>
                             </div>
                         </div>

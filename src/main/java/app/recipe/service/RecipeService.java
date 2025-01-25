@@ -2,7 +2,6 @@ package app.recipe.service;
 
 import app.category.model.Category;
 import app.category.model.CategoryName;
-import app.category.repository.CategoryRepository;
 import app.category.service.CategoryService;
 import app.recipe.model.Recipe;
 import app.recipe.repository.RecipeRepository;
@@ -208,5 +207,9 @@ public class RecipeService {
         }
 
         recipeRepository.save(recipeToUpdate);
+    }
+
+    public void delete(UUID id) {
+        recipeRepository.delete(getById(id));
     }
 }
