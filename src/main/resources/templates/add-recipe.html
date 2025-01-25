@@ -31,7 +31,7 @@
                         <select th:field="*{categories}" th:errorclass="is-invalid" id="categories" name="categories"
                                 class="form-select"
                                 multiple>
-                            <option th:each="category : ${categories}" th:value="${category}" th:text="${category.name}"
+                            <option th:each="category : ${categories}" th:value="${category}" th:text="${category.value}"
                                     th:attr="selected=${#lists.contains(categories, category)}">
                                 Choose a category
                             </option>

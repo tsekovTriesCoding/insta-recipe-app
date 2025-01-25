@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html class="h-100" lang="en">
+<html class="h-100" lang="en" xmlns:th="http://www.thymeleaf.org">
 <head th:replace="~{fragments/commons::head}">
 </head>
 <body class="d-flex flex-column h-100">
@@ -13,36 +13,95 @@
                     <h3 class="fw-bold">Edit Recipe</h3>
                     <p class="text-muted">Make changes to your delicious creation!</p>
                 </div>
-                <form>
+                <form th:method="POST"
+                      th:action="@{/recipes/edit/{id}(id=${recipe.id})}"
+                      th:object="${recipe}"
+                      enctype="multipart/form-data">
                     <div class="mb-3">
-                        <label for="recipeName" class="form-label">Recipe Name</label>
-                        <input type="text" class="form-control" id="recipeName" placeholder="Enter recipe name"
-                               value="Spaghetti Carbonara" required>
+                        <label for="title" class="form-label">Recipe Title</label>
+                        <input th:field="*{title}" th:errorclass="is-invalid" type="text" class="form-control"
+                               id="title"
+                               name="title"
+                               placeholder="Enter recipe title">
+
+                        <small th:errors="*{title}" id="titleError" class="bg-danger rounded text-white"></small>
                     </div>
                     <div class="mb-3">
-                        <label for="category" class="form-label">Category</label>
-                        <select id="category" class="form-select" required>
-                            <option disabled>Choose a category</option>
-                            <option value="Vegan">Vegan</option>
-                            <option value="Desserts">Desserts</option>
-                            <option value="Main Course" selected>Main Course</option>
+                        <label for="categories" class="form-label">Categories</label>
+                        <select th:field="*{categories}" th:errorclass="is-invalid" id="categories" name="categories"
+                                class="form-select"
+                                multiple>
+                            <option th:each="category : ${categories}" th:value="${category}" th:text="${category.value}"
+                                    th:attr="selected=${#lists.contains(categories, category)}">
+                                Choose a category
+                            </option>
                         </select>
+
+                        <small th:errors="*{categories}" id="categoriesError"
+                               class="bg-danger rounded text-white"></small>
                     </div>
                     <div class="mb-3">
                         <label for="description" class="form-label">Description</label>
-                        <textarea id="description" class="form-control" rows="4" required></textarea>
+                        <textarea th:field="*{description}" th:errorclass="is-invalid" id="description"
+                                  name="description"
+                                  class="form-control" rows="4"
+                                  placeholder="Enter a brief description"></textarea>
+
+                        <small th:errors="*{description}" id="descriptionError"
+                               class="bg-danger rounded text-white"></small>
                     </div>
                     <div class="mb-3">
                         <label for="ingredients" class="form-label">Ingredients</label>
-                        <textarea id="ingredients" class="form-control" rows="4" required></textarea>
+                        <textarea th:field="*{ingredients}" th:errorclass="is-invalid" id="ingredients"
+                                  name="ingredients"
+                                  class="form-control" rows="4"
+                                  placeholder="List ingredients separated by commas"></textarea>
+
+                        <small th:errors="*{ingredients}" id="ingredientsError"
+                               class="bg-danger rounded text-white"></small>
                     </div>
                     <div class="mb-3">
                         <label for="instructions" class="form-label">Instructions</label>
-                        <textarea id="instructions" class="form-control" rows="5" required></textarea>
+                        <textarea th:field="*{instructions}" th:errorclass="is-invalid" id="instructions"
+                                  name="instructions"
+                                  class="form-control" rows="4"
+                                  placeholder="Write the steps to prepare the recipe"></textarea>
+
+                        <small th:errors="*{instructions}" id="instructionsError"
+                               class="bg-danger rounded text-white"></small>
                     </div>
                     <div class="mb-3">
-                        <label for="recipeImage" class="form-label">Recipe Image</label>
-                        <input type="file" class="form-control" id="recipeImage">
+                        <label for="image" class="form-label">Recipe Image</label>
+                        <input th:field="*{image}" th:errorclass="is-invalid" type="file" class="form-control"
+                               id="image" name="image">
+
+                        <small th:errors="*{image}" id="imageError"
+                               class="bg-danger rounded text-white"></small>
+                    </div>
+                    <div class="form-row d-flex gap-2">
+                        <div class="col">
+                            <label for="cookTime" class="form-label">Cook Time</label>
+                            <input th:field="*{cookTime}" th:errorclass="is-invalid" type="number" class="form-control"
+                                   id="cookTime"
+                                   name="cookTime">
+
+                            <small th:errors="*{cookTime}" id="cookTimeError"
+                                   class="bg-danger rounded text-white"></small>
+                        </div>
+                        <div class="col">
+                            <label for="prepTime" class="form-label">Prep Time</label>
+                            <input th:field="*{prepTime}" type="number" class="form-control" id="prepTime"
+                                   name="prepTime">
+                        </div>
+                        <div class="col">
+                            <label for="servings" class="form-label">Servings</label>
+                            <input th:field="*{servings}" th:errorclass="is-invalid" type="number" class="form-control"
+                                   id="servings"
+                                   name="servings">
+                            <small th:errors="*{servings}" id="servingsError"
+                                   class="bg-danger rounded text-white"></small>
+
+                        </div>
                     </div>
                     <button type="submit" class="btn-submit btn btn-primary w-100">Save Changes</button>
                 </form>
@@ -52,5 +111,24 @@
 </main>
 
 <footer th:replace="~{fragments/commons::footer}"></footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
+<script>
+    const originalSelect = document.getElementById('categories');
+
+    const multiSelect = new Choices(originalSelect, {
+        removeItemButton: true,
+        placeholderValue: 'Select categories',
+        searchPlaceholderValue: 'Search categories',
+    });
+
+    if (originalSelect.classList.contains('is-invalid')) {
+        const choicesContainer = originalSelect.closest('.choices');
+        if (choicesContainer) {
+            choicesContainer.classList.add('is-invalid');
+        }
+    }
+</script>
 </body>
 </html>

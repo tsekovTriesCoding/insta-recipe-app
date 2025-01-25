@@ -1,12 +1,15 @@
 package app.recipe.service;
 
 import app.category.model.Category;
+import app.category.model.CategoryName;
 import app.category.repository.CategoryRepository;
+import app.category.service.CategoryService;
 import app.recipe.model.Recipe;
 import app.recipe.repository.RecipeRepository;
 import app.user.model.User;
 import app.user.service.UserService;
 import app.web.dto.AddRecipe;
+import app.web.dto.EditRecipe;
 import app.web.dto.RecipeDetails;
 import app.web.dto.RecipeShortInfo;
 import lombok.RequiredArgsConstructor;
@@ -31,7 +34,7 @@ import java.util.UUID;
 public class RecipeService {
 
     private final RecipeRepository recipeRepository;
-    private final CategoryRepository categoryRepository;
+    private final CategoryService categoryService;
     private final UserService userService;
 
     public List<RecipeShortInfo> getAll() {
@@ -100,8 +103,7 @@ public class RecipeService {
     private Recipe initializeRecipe(AddRecipe recipe, User creator, String imageUrl) {
         List<Category> categories = recipe.getCategories()
                 .stream()
-                .map(categoryName -> categoryRepository.findByName(categoryName)
-                        .orElseThrow(NoSuchElementException::new)).toList();
+                .map(categoryService::getByName).toList();
 
         List<String> ingredients = Arrays.stream(recipe.getIngredients().split(",")).toList();
 
@@ -136,5 +138,75 @@ public class RecipeService {
     public List<Recipe> getRecipesByCreator(String username) {
         User user = userService.getByUsername(username);
         return recipeRepository.findAllByCreatedBy(user);
+    }
+
+    public EditRecipe getAddRecipeById(UUID id) {
+        Recipe recipe = this.getById(id);
+
+        List<CategoryName> categories = recipe.getCategories().stream().map(Category::getName).toList();
+        String ingredients = String.join(",", recipe.getIngredients());
+
+        return EditRecipe.builder()
+                .id(id)
+                .title(recipe.getTitle())
+                .description(recipe.getDescription())
+                .categories(categories)
+                .ingredients(ingredients)
+                .instructions(recipe.getInstructions())
+                .servings(recipe.getServings())
+                .cookTime(recipe.getCookTime())
+                .prepTime(recipe.getPrepTime())
+                .build();
+    }
+
+    @Transactional
+    public void update(EditRecipe recipe) throws IOException {
+        Recipe recipeToUpdate = this.getById(recipe.getId());
+        List<Category> categories = recipe.getCategories()
+                .stream()
+                .map(categoryService::getByName)
+                .toList();
+
+        if (!recipe.getTitle().equals(recipeToUpdate.getTitle())) {
+            recipeToUpdate.setTitle(recipe.getTitle());
+        }
+
+        if (!recipe.getDescription().equals(recipeToUpdate.getDescription())) {
+            recipeToUpdate.setDescription(recipe.getDescription());
+        }
+
+        if (!categories.equals(recipeToUpdate.getCategories())) {
+            categories.forEach(category -> {
+                categoryService.update(category, recipeToUpdate);
+            });
+        }
+
+        if (!recipe.getIngredients().equals(String.join(",", recipeToUpdate.getIngredients()))) {
+            recipeToUpdate.getIngredients().clear();
+            recipeToUpdate.getIngredients().addAll(List.of(recipe.getIngredients().split(",")));
+        }
+
+        if (!recipe.getInstructions().equals(recipeToUpdate.getInstructions())) {
+            recipeToUpdate.setInstructions(recipe.getInstructions());
+        }
+
+        if (!recipe.getServings().equals(recipeToUpdate.getServings())) {
+            recipeToUpdate.setServings(recipe.getServings());
+        }
+
+        if (!recipe.getCookTime().equals(recipeToUpdate.getCookTime())) {
+            recipeToUpdate.setCookTime(recipe.getCookTime());
+        }
+
+        if (recipe.getPrepTime() != null && !recipe.getPrepTime().equals(recipeToUpdate.getPrepTime())) {
+            recipeToUpdate.setPrepTime(recipe.getPrepTime());
+        }
+
+        if (recipe.getImage() != null && !recipe.getImage().isEmpty()) {
+            String s = saveImage(recipe.getImage(), recipeToUpdate.getTitle() + "-recipe");
+            recipeToUpdate.setImage(s);
+        }
+
+        recipeRepository.save(recipeToUpdate);
     }
 }

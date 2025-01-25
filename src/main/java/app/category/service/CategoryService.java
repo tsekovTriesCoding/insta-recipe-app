@@ -1,8 +1,12 @@
 package app.category.service;
 
+import app.category.model.Category;
+import app.category.model.CategoryName;
 import app.category.repository.CategoryRepository;
-import app.web.dto.CategoryShort;
+import app.recipe.model.Recipe;
+import app.recipe.service.RecipeService;
 import app.web.dto.CategoryDetails;
+import app.web.dto.CategoryShort;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -34,5 +38,21 @@ public class CategoryService {
                         .recipes(category.getRecipes())
                         .build())
                 .orElseThrow(NoSuchElementException::new);
+    }
+
+    public Category getByName(CategoryName categoryName) {
+        return categoryRepository.findByName(categoryName).orElseThrow(NoSuchElementException::new);
+    }
+
+    public void update(Category categoryToEdit, Recipe recipeToUpdate) {
+        if (recipeToUpdate.getCategories().contains(categoryToEdit)) {
+            categoryToEdit.getRecipes().remove(recipeToUpdate);
+            recipeToUpdate.getCategories().remove(categoryToEdit);
+        } else {
+            categoryToEdit.getRecipes().add(recipeToUpdate);
+            recipeToUpdate.getCategories().add(categoryToEdit);
+        }
+
+        categoryRepository.save(categoryToEdit);
     }
 }

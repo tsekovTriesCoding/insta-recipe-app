@@ -3,7 +3,6 @@ package app.web.dto;
 import app.category.model.CategoryName;
 import app.vallidation.annotation.FileSize;
 import app.vallidation.annotation.ImageFileType;
-import app.vallidation.annotation.NotEmptyFile;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
@@ -13,9 +12,13 @@ import lombok.Data;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
+import java.util.UUID;
 
+@Builder
 @Data
-public class AddRecipe {
+public class EditRecipe {
+    private UUID id;
+
     @Size(min = 3, max = 30)
     private String title;
 
@@ -27,7 +30,6 @@ public class AddRecipe {
 
     @FileSize(maxSize = 3145728, message = "File size must be less than 3MB")
     @ImageFileType
-    @NotEmptyFile
     private MultipartFile image;
 
     @NotNull

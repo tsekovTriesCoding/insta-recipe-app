@@ -4,6 +4,7 @@ import app.category.model.CategoryName;
 import app.recipe.model.Recipe;
 import app.recipe.service.RecipeService;
 import app.web.dto.AddRecipe;
+import app.web.dto.EditRecipe;
 import app.web.dto.RecipeDetails;
 import app.web.dto.RecipeShortInfo;
 import jakarta.validation.Valid;
@@ -85,9 +86,37 @@ public class RecipeController {
     }
 
     @GetMapping("/edit/{id}")
-    public String editRecipe(@PathVariable UUID id) {
+    public String editRecipe(@PathVariable UUID id, Model model) {
+        EditRecipe recipe = recipeService.getAddRecipeById(id);
+
+        if (!model.containsAttribute("recipe")) {
+            model.addAttribute("recipe", recipe);
+        }
+
+        if (!model.containsAttribute("categories")) {
+            model.addAttribute("categories", CategoryName.values());
+        }
 
         return "edit-recipe";
+    }
+
+    @PostMapping("/edit/{id}")
+    public String editRecipe(@Valid EditRecipe recipe,
+                             Model model,
+                             BindingResult bindingResult,
+                             RedirectAttributes redirectAttributes) throws IOException {
+        model.addAttribute("recipe", recipe);
+
+        if (bindingResult.hasErrors()) {
+            redirectAttributes.addFlashAttribute("recipe", recipe);
+            redirectAttributes.addFlashAttribute("org.springframework.validation.BindingResult.recipe", bindingResult);
+
+            return "redirect:/recipes/edit/" + recipe.getId();
+        }
+
+        recipeService.update(recipe);
+
+        return "redirect:/recipes/" + recipe.getId();
     }
 
     @GetMapping("/my-recipes")
