@@ -59,13 +59,16 @@
             <!-- Comment Form -->
             <div class="card shadow-sm p-3 mb-4">
                 <form th:method="POST"
-                      th:action="@{/comments/add/{id}(id=${recipe.id})}"
-                      th:object="${addComment}">
+                      th:action="@{/comments/add/{id}(id=${recipe.id})}">
                     <div class="mb-3">
-                        <textarea id="content" name="content" class="form-control" rows="3"
+                        <label for="content" class="form-label"></label>
+                        <textarea th:classappend="${error} ? 'is-invalid' : ''" id="content" name="content"
+                                  class="form-control" rows="3"
                                   placeholder="Add a comment..."></textarea>
+                        <small th:if="${error}" th:text="${error}" id="contentError"
+                               class="bg-danger rounded text-white"></small>
                     </div>
-                    <button type="submit" class="btn-add-comment btn btn-primary w-100">Post Comment</button>
+                    <input type="submit" class="btn-add-comment btn btn-primary w-100" value="Post Comment"/>
                 </form>
             </div>
 
