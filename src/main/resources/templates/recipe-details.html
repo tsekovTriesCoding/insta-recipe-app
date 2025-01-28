@@ -74,6 +74,7 @@
 
             <!-- List of Comments -->
             <div class="comment-card card">
+                <input type="hidden" name="recipeId" id="recipeId" th:value="${recipe.id}">
                 <div class="card-body">
                     <p class="comment-author mb-1">John Doe</p>
                     <p class="comment-text">This recipe is amazing! My family loved it!</p>
@@ -92,6 +93,7 @@
     </div>
 </main>
 
+<script th:src="@{/js/comments.js}"></script>
 <footer th:replace="~{fragments/commons::footer}"></footer>
 </body>
 </html>
