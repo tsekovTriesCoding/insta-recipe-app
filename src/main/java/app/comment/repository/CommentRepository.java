@@ -9,5 +9,5 @@ import java.util.UUID;
 
 @Repository
 public interface CommentRepository extends JpaRepository<Comment, UUID> {
-    List<Comment> findAllByRecipeId(UUID id);
+    List<Comment> findAllByRecipeIdOrderByCreatedDate(UUID id);
 }

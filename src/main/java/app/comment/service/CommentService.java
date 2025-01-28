@@ -40,7 +40,7 @@ public class CommentService {
     }
 
     public List<CommentDTO> getCommentsByRecipeId(UUID recipeId) {
-        return commentRepository.findAllByRecipeId(recipeId)
+        return commentRepository.findAllByRecipeIdOrderByCreatedDate(recipeId)
                 .stream()
                 .map(this::convertToDTO)
                 .collect(Collectors.toList());
