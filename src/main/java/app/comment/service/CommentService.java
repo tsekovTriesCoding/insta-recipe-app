@@ -13,6 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -51,5 +52,26 @@ public class CommentService {
                 comment.getContent(),
                 comment.getCreator().getUsername(),
                 comment.getCreatedDate());
+    }
+
+    public boolean deleteComment(UUID commentId, String username) {
+        Optional<Comment> commentOpt = commentRepository.findById(commentId);
+
+        if (commentOpt.isEmpty()) {
+            return false;
+        }
+
+        Comment comment = commentOpt.get();
+        Recipe recipe = comment.getRecipe();
+
+        // Check if the user is the comment creator or the recipe creator
+        if (comment.getCreator().getUsername().equals(username) ||
+                recipe.getCreatedBy().getUsername().equals(username)) {
+
+            commentRepository.delete(comment);
+            return true;
+        }
+
+        return false;
     }
 }

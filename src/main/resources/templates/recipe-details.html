@@ -60,6 +60,7 @@
             <div class="card shadow-sm p-3 mb-4">
                 <form th:method="POST"
                       th:action="@{/comments/add/{id}(id=${recipe.id})}">
+                    <input type="hidden" id="csrfToken" name="_csrf" th:value="${_csrf.token}"/>
                     <div class="mb-3">
                         <label for="content" class="form-label"></label>
                         <textarea th:classappend="${error} ? 'is-invalid' : ''" id="content" name="content"
@@ -75,18 +76,12 @@
             <!-- List of Comments -->
             <div class="comment-card card">
                 <input type="hidden" name="recipeId" id="recipeId" th:value="${recipe.id}">
+                <input type="hidden" id="loggedInUser" th:value="${#authentication.name}">
+                <input type="hidden" id="recipeCreator" th:value="${recipe.createdBy.username}">
                 <div class="card-body">
                     <p class="comment-author mb-1">John Doe</p>
                     <p class="comment-text">This recipe is amazing! My family loved it!</p>
                     <p class="comment-time text-end mb-0">2 hours ago</p>
-                </div>
-            </div>
-
-            <div class="comment-card card">
-                <div class="card-body">
-                    <p class="comment-author mb-1">Jane Smith</p>
-                    <p class="comment-text">I tried this with some extra garlic, and it was delicious!</p>
-                    <p class="comment-time text-end mb-0">5 hours ago</p>
                 </div>
             </div>
         </div>

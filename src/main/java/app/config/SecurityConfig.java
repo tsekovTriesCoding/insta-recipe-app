@@ -22,6 +22,7 @@ public class SecurityConfig {
                             .requestMatchers(PathRequest.toStaticResources().atCommonLocations()).permitAll()
                             .requestMatchers("/images/uploads/**").permitAll()
                             .requestMatchers("/", "/users/login", "/users/register", "/about").permitAll()
+                            .requestMatchers("/api/comments/**").authenticated()
                             .anyRequest().authenticated();
                 })
                 .formLogin(formLogin ->

@@ -3,11 +3,11 @@ package app.web;
 import app.comment.service.CommentService;
 import app.web.dto.CommentDTO;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.UUID;
@@ -30,5 +30,17 @@ public class CommentsApiController {
 
         // Return comments with 200 OK
         return ResponseEntity.ok(comments);
+    }
+
+    @DeleteMapping("/delete/{commentId}")
+    public ResponseEntity<Void> deleteComment(@PathVariable UUID commentId,
+                                              @AuthenticationPrincipal UserDetails userDetails) {
+        boolean isDeleted = commentService.deleteComment(commentId, userDetails.getUsername());
+
+        if (isDeleted) {
+            return ResponseEntity.ok().build();
+        } else {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
     }
 }
