@@ -5,7 +5,6 @@ document.addEventListener("DOMContentLoaded", function () {
     const loggedInUser = document.querySelector("#loggedInUser").value;
     const recipeCreator = document.querySelector("#recipeCreator").value;
 
-    // Function to fetch comments
     function fetchComments() {
         fetch(`/api/comments/${recipeId}`)
             .then(response => {
