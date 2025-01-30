@@ -132,4 +132,8 @@ public class UserService {
     public boolean existsByEmail(String email) {
         return userRepository.existsByEmail(email);
     }
+
+    public long countUsers() {
+        return userRepository.count();
+    }
 }

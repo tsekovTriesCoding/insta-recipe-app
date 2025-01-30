@@ -213,4 +213,8 @@ public class RecipeService {
         //TODO: remove the picture from the uploads files...
         recipeRepository.delete(getById(id));
     }
+
+    public long countRecipes() {
+        return recipeRepository.count();
+    }
 }

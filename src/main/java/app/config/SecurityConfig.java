@@ -23,6 +23,7 @@ public class SecurityConfig {
                             .requestMatchers("/images/uploads/**").permitAll()
                             .requestMatchers("/", "/users/login", "/users/register", "/about").permitAll()
                             .requestMatchers("/api/comments/**").authenticated()
+                            .requestMatchers("/admin/**").hasRole("ADMIN") // this is for only the admin can access the admin pages
                             .anyRequest().authenticated();
                 })
                 .formLogin(formLogin ->

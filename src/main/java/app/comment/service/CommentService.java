@@ -74,4 +74,8 @@ public class CommentService {
 
         return false;
     }
+
+    public long countComments() {
+        return commentRepository.count();
+    }
 }

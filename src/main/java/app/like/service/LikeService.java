@@ -50,4 +50,8 @@ public class LikeService {
 //            throw new IllegalStateException("You have already liked this recipe");
 //        }
     }
+
+    public long countLikes() {
+        return likeRepository.count();
+    }
 }
