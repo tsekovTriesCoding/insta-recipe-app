@@ -4,12 +4,15 @@ import app.comment.service.CommentService;
 import app.like.service.LikeService;
 import app.recipe.service.RecipeService;
 import app.user.service.UserService;
+import app.web.dto.UserWithRole;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.List;
 
 @RequiredArgsConstructor
 @RestController
@@ -44,5 +47,16 @@ public class AdminRestController {
     public ResponseEntity<Long> getTotalLikes() {
         long totalLikes = likeService.countLikes();
         return ResponseEntity.ok(totalLikes);
+    }
+
+    @GetMapping("/users")
+    public ResponseEntity<List<UserWithRole>> getUsers() {
+        List<UserWithRole> all = userService.getAll();
+
+        if (all.isEmpty()) {
+            return ResponseEntity.noContent().build();
+        }
+
+        return ResponseEntity.ok(all);
     }
 }

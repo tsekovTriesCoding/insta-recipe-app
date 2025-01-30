@@ -8,7 +8,7 @@ import java.util.UUID;
 
 @Data
 @AllArgsConstructor
-public class CommentDTO {
+public class CommentByRecipe {
     private UUID id;
     private String content;
     private String createdBy;

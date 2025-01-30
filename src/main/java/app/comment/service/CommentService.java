@@ -6,7 +6,7 @@ import app.recipe.model.Recipe;
 import app.recipe.service.RecipeService;
 import app.user.model.User;
 import app.user.service.UserService;
-import app.web.dto.CommentDTO;
+import app.web.dto.CommentByRecipe;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -40,15 +40,15 @@ public class CommentService {
         commentRepository.save(comment);
     }
 
-    public List<CommentDTO> getCommentsByRecipeId(UUID recipeId) {
+    public List<CommentByRecipe> getCommentsByRecipeId(UUID recipeId) {
         return commentRepository.findAllByRecipeIdOrderByCreatedDate(recipeId)
                 .stream()
                 .map(this::convertToDTO)
                 .collect(Collectors.toList());
     }
 
-    private CommentDTO convertToDTO(Comment comment) {
-        return new CommentDTO(comment.getId(),
+    private CommentByRecipe convertToDTO(Comment comment) {
+        return new CommentByRecipe(comment.getId(),
                 comment.getContent(),
                 comment.getCreator().getUsername(),
                 comment.getCreatedDate());

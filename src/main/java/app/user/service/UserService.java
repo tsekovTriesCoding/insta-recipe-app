@@ -6,9 +6,9 @@ import app.user.model.User;
 import app.user.repository.UserRepository;
 import app.web.dto.RegisterRequest;
 import app.web.dto.UserProfileInfo;
+import app.web.dto.UserWithRole;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -21,6 +21,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.UUID;
@@ -135,5 +136,16 @@ public class UserService {
 
     public long countUsers() {
         return userRepository.count();
+    }
+
+    public List<UserWithRole> getAll() {
+        return userRepository.findAll()
+                .stream()
+                .map(user -> UserWithRole.builder()
+                        .id(user.getId())
+                        .username(user.getUsername())
+                        .email(user.getEmail())
+                        .role(user.getRole())
+                        .build()).toList();
     }
 }

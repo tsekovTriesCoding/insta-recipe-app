@@ -1,7 +1,7 @@
 package app.web;
 
 import app.comment.service.CommentService;
-import app.web.dto.CommentDTO;
+import app.web.dto.CommentByRecipe;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -20,8 +20,8 @@ public class CommentsApiController {
     private final CommentService commentService;
 
     @GetMapping("/{recipeId}")
-    public ResponseEntity<List<CommentDTO>> getCommentsByRecipe(@PathVariable UUID recipeId) {
-        List<CommentDTO> comments = commentService.getCommentsByRecipeId(recipeId);
+    public ResponseEntity<List<CommentByRecipe>> getCommentsByRecipe(@PathVariable UUID recipeId) {
+        List<CommentByRecipe> comments = commentService.getCommentsByRecipeId(recipeId);
 
         // If no comments found, return 204 No Content
         if (comments.isEmpty()) {
