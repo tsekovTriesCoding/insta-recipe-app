@@ -13,10 +13,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.io.IOException;
@@ -30,27 +27,31 @@ public class ProfileController {
     private final UserService userService;
     private final UserDetailsServiceImpl userDetailsService;
 
+    @ModelAttribute
+    public ChangeProfilePicture changeProfilePicture() {
+        return new ChangeProfilePicture();
+    }
+
+    @ModelAttribute
+    public ChangeUsername changeUsername() {
+        return new ChangeUsername();
+    }
+
+    @ModelAttribute
+    public ChangeEmail changeEmail() {
+        return new ChangeEmail();
+    }
+
+    @ModelAttribute
+    public ChangePassword changePassword() {
+        return new ChangePassword();
+    }
+
     @GetMapping()
     public String getMyProfilePage(@AuthenticationPrincipal UserDetails userDetails, Model model) {
         UserProfileInfo userProfileInfo = userService.getUserProfileInfo(userDetails.getUsername());
 
         model.addAttribute("userProfileInfo", userProfileInfo);
-
-        if (!model.containsAttribute("changeEmail")) {
-            model.addAttribute("changeEmail", new ChangeEmail());
-        }
-
-        if (!model.containsAttribute("changePassword")) {
-            model.addAttribute("changePassword", new ChangePassword());
-        }
-
-        if (!model.containsAttribute("changeUsername")) {
-            model.addAttribute("changeUsername", new ChangeUsername());
-        }
-
-        if (!model.containsAttribute("changeProfilePicture")) {
-            model.addAttribute("changeProfilePicture", new ChangeProfilePicture());
-        }
 
         return "profile";
     }
@@ -59,13 +60,17 @@ public class ProfileController {
     public String changeMyProfilePicture(@PathVariable UUID id,
                                          @Valid ChangeProfilePicture changeProfilePicture,
                                          BindingResult bindingResult,
-                                         RedirectAttributes redirectAttributes) throws IOException {
+                                         RedirectAttributes redirectAttributes,
+                                         Model model,
+                                         @AuthenticationPrincipal UserDetails userDetails) throws IOException {
 
         if (bindingResult.hasErrors()) {
-            redirectAttributes.addFlashAttribute("changeProfilePicture", changeProfilePicture);
-            redirectAttributes.addFlashAttribute("org.springframework.validation.BindingResult.changeProfilePicture", bindingResult);
-            redirectAttributes.addFlashAttribute("openPictureModal", true);
-            return "redirect:/my-profile";
+            UserProfileInfo userProfileInfo = userService.getUserProfileInfo(userDetails.getUsername());
+
+            model.addAttribute("userProfileInfo", userProfileInfo);
+            model.addAttribute("openPictureModal", true);
+
+            return "profile";
         }
 
         UserProfileInfo userProfileInfo = userService.updateProfilePicture(id, changeProfilePicture.getProfilePicture());
@@ -78,13 +83,17 @@ public class ProfileController {
     public String changeMyProfileUsername(@PathVariable UUID id,
                                           @Valid ChangeUsername changeUsername,
                                           BindingResult bindingResult,
-                                          RedirectAttributes redirectAttributes) {
+                                          RedirectAttributes redirectAttributes,
+                                          Model model,
+                                          @AuthenticationPrincipal UserDetails userDetails) {
 
         if (bindingResult.hasErrors()) {
-            redirectAttributes.addFlashAttribute("changeUsername", changeUsername);
-            redirectAttributes.addFlashAttribute("org.springframework.validation.BindingResult.changeUsername", bindingResult);
-            redirectAttributes.addFlashAttribute("openUsernameModal", true);
-            return "redirect:/my-profile";
+            UserProfileInfo userProfileInfo = userService.getUserProfileInfo(userDetails.getUsername());
+
+            model.addAttribute("userProfileInfo", userProfileInfo);
+            model.addAttribute("openUsernameModal", true);
+
+            return "profile";
         }
 
         UserProfileInfo userProfileInfo = userService.updateUsername(id, changeUsername.getUsername());
@@ -101,13 +110,17 @@ public class ProfileController {
     public String changeMyProfileEmail(@PathVariable UUID id,
                                        @Valid ChangeEmail changeEmail,
                                        BindingResult bindingResult,
-                                       RedirectAttributes redirectAttributes) {
+                                       RedirectAttributes redirectAttributes,
+                                       Model model,
+                                       @AuthenticationPrincipal UserDetails userDetails) {
 
         if (bindingResult.hasErrors()) {
-            redirectAttributes.addFlashAttribute("changeEmail", changeEmail);
-            redirectAttributes.addFlashAttribute("org.springframework.validation.BindingResult.changeEmail", bindingResult);
-            redirectAttributes.addFlashAttribute("openEmailModal", true);
-            return "redirect:/my-profile";
+            UserProfileInfo userProfileInfo = userService.getUserProfileInfo(userDetails.getUsername());
+
+            model.addAttribute("userProfileInfo", userProfileInfo);
+            model.addAttribute("openEmailModal", true);
+
+            return "profile";
         }
 
         UserProfileInfo userProfileInfo = userService.updateEmail(id, changeEmail.getEmail());
@@ -121,13 +134,17 @@ public class ProfileController {
     public String changeMyProfilePassword(@PathVariable UUID id,
                                           @Valid ChangePassword changePassword,
                                           BindingResult bindingResult,
-                                          RedirectAttributes redirectAttributes) {
+                                          RedirectAttributes redirectAttributes,
+                                          Model model,
+                                          @AuthenticationPrincipal UserDetails userDetails) {
 
         if (bindingResult.hasErrors()) {
-            redirectAttributes.addFlashAttribute("changePassword", changePassword);
-            redirectAttributes.addFlashAttribute("org.springframework.validation.BindingResult.changePassword", bindingResult);
-            redirectAttributes.addFlashAttribute("openPasswordModal", true);
-            return "redirect:/my-profile";
+            UserProfileInfo userProfileInfo = userService.getUserProfileInfo(userDetails.getUsername());
+
+            model.addAttribute("userProfileInfo", userProfileInfo);
+            model.addAttribute("openPasswordModal", true);
+
+            return "profile";
         }
 
         UserProfileInfo userProfileInfo = userService.updatePassword(id, changePassword.getPassword());
