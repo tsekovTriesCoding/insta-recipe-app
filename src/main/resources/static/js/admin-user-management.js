@@ -4,6 +4,7 @@ document.addEventListener("DOMContentLoaded", function () {
     function fetchUsers() {
         fetch("/api/admin/users")
             .then(response => {
+                //TODO: check if the response is 204 no content!
                 if (!response.ok) {
                     throw new Error("Failed to fetch users");
                 }
