@@ -25,6 +25,11 @@ public class RecipeController {
 
     private final RecipeService recipeService;
 
+    @ModelAttribute(name = "categories")
+    public CategoryName[] categoryName() {
+        return CategoryName.values();
+    }
+
     @GetMapping("/all")
     public String allRecipes(Model model) {
         List<RecipeShortInfo> recipes = recipeService.getAll();
@@ -50,31 +55,26 @@ public class RecipeController {
 
     @GetMapping("/add")
     public String addRecipe(Model model) {
-        if (!model.containsAttribute("recipe")) {
-            model.addAttribute("recipe", new AddRecipe());
-        }
-
-        if (!model.containsAttribute("categories")) {
-            model.addAttribute("categories", CategoryName.values());
-        }
+        model.addAttribute("addRecipe", new AddRecipe());
 
         return "add-recipe";
     }
 
     @PostMapping("/add")
-    public String addRecipe(@Valid AddRecipe recipe,
+    public String addRecipe(@Valid AddRecipe addRecipe,
                             BindingResult bindingResult,
-                            RedirectAttributes redirectAttributes,
                             @AuthenticationPrincipal UserDetails userDetails) throws IOException {
 
         if (bindingResult.hasErrors()) {
-            redirectAttributes.addFlashAttribute("recipe", recipe);
+            /*
+            This is if the name of the object is different from that in the binding result:
+             redirectAttributes.addFlashAttribute("recipe", recipe);
             redirectAttributes.addFlashAttribute("org.springframework.validation.BindingResult.recipe", bindingResult);
-
-            return "redirect:/recipes/add";
+          */
+            return "add-recipe";
         }
 
-        Recipe newRecipe = recipeService.create(recipe, userDetails.getUsername());
+        Recipe newRecipe = recipeService.create(addRecipe, userDetails.getUsername());
 
         return "redirect:/recipes/" + newRecipe.getId();
     }

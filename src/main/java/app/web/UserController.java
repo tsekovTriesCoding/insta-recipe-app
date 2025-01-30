@@ -12,7 +12,6 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 @RequiredArgsConstructor
 @Controller
@@ -33,23 +32,17 @@ public class UserController {
 
     @GetMapping("/register")
     public String getRegisterPage(Model model) {
-        if (!model.containsAttribute("registerRequest")) {
-            model.addAttribute("registerRequest", new RegisterRequest());
-        }
+        model.addAttribute("registerRequest", new RegisterRequest());
 
         return "register";
     }
 
     @PostMapping("/register")
     public String register(@Valid RegisterRequest registerRequest,
-                           BindingResult bindingResult,
-                           RedirectAttributes redirectAttributes) {
+                           BindingResult bindingResult) {
 
         if (bindingResult.hasErrors()) {
-            redirectAttributes.addFlashAttribute("registerRequest", registerRequest);
-            redirectAttributes.addFlashAttribute("org.springframework.validation.BindingResult.registerRequest", bindingResult);
-
-            return "redirect:/users/register";
+            return "register";
         }
 
         User registeredUser = userService.register(registerRequest);

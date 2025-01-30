@@ -15,7 +15,7 @@
                 </div>
                 <form th:method="POST"
                       th:action="@{/recipes/add}"
-                      th:object="${recipe}"
+                      th:object="${addRecipe}"
                       enctype="multipart/form-data">
                     <div class="mb-3">
                         <label for="title" class="form-label">Recipe Title</label>
@@ -24,7 +24,7 @@
                                name="title"
                                placeholder="Enter recipe title">
 
-                        <small th:errors="*{title}" id="titleError" class="bg-danger rounded text-white"></small>
+                        <small th:if="${#fields.hasErrors('title')}" th:errors="*{title}" id="titleError" class="bg-danger rounded text-white"></small>
                     </div>
                     <div class="mb-3">
                         <label for="categories" class="form-label">Categories</label>
