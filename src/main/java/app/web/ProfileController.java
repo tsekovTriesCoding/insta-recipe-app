@@ -14,6 +14,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.io.IOException;
@@ -57,26 +58,25 @@ public class ProfileController {
     }
 
     @PutMapping("/{id}/change-picture")
-    public String changeMyProfilePicture(@PathVariable UUID id,
-                                         @Valid ChangeProfilePicture changeProfilePicture,
-                                         BindingResult bindingResult,
-                                         RedirectAttributes redirectAttributes,
-                                         Model model,
-                                         @AuthenticationPrincipal UserDetails userDetails) throws IOException {
+    public ModelAndView changeMyProfilePicture(@PathVariable UUID id,
+                                               @Valid ChangeProfilePicture changeProfilePicture,
+                                               BindingResult bindingResult,
+                                               RedirectAttributes redirectAttributes) throws IOException {
 
         if (bindingResult.hasErrors()) {
-            UserProfileInfo userProfileInfo = userService.getUserProfileInfo(userDetails.getUsername());
+            UserProfileInfo userProfileInfo = userService.getUserProfileInfoById(id);
 
-            model.addAttribute("userProfileInfo", userProfileInfo);
-            model.addAttribute("openPictureModal", true);
-
-            return "profile";
+            ModelAndView modelAndView = new ModelAndView("profile", "userProfileInfo", userProfileInfo);
+            modelAndView.addObject("changeProfilePicture", changeProfilePicture);
+            modelAndView.addObject("openPictureModal", true);
+            return modelAndView;
         }
 
         UserProfileInfo userProfileInfo = userService.updateProfilePicture(id, changeProfilePicture.getProfilePicture());
-        redirectAttributes.addFlashAttribute("userProfileInfo", userProfileInfo);
+        ModelAndView modelAndView = new ModelAndView("redirect:/my-profile");
         redirectAttributes.addFlashAttribute("success", "Profile picture updated successfully");
-        return "redirect:/my-profile";
+
+        return modelAndView;
     }
 
     @PutMapping("/{id}/change-username")

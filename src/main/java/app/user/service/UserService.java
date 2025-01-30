@@ -148,4 +148,10 @@ public class UserService {
                         .role(user.getRole())
                         .build()).toList();
     }
+
+    public UserProfileInfo getUserProfileInfoById(UUID userId) {
+        User user = userRepository.findById(userId).orElseThrow(NoSuchElementException::new);
+
+        return map(user);
+    }
 }
