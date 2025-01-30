@@ -3,7 +3,10 @@ package app.web;
 import app.category.model.CategoryName;
 import app.recipe.model.Recipe;
 import app.recipe.service.RecipeService;
-import app.web.dto.*;
+import app.web.dto.AddRecipe;
+import app.web.dto.EditRecipe;
+import app.web.dto.RecipeDetails;
+import app.web.dto.RecipeShortInfo;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -12,7 +15,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.io.IOException;
 import java.util.List;
@@ -81,36 +83,24 @@ public class RecipeController {
 
     @GetMapping("/edit/{id}")
     public String editRecipe(@PathVariable UUID id, Model model) {
-        EditRecipe recipe = recipeService.getAddRecipeById(id);
+        EditRecipe editRecipe = recipeService.getAddRecipeById(id);
 
-        if (!model.containsAttribute("recipe")) {
-            model.addAttribute("recipe", recipe);
-        }
-
-        if (!model.containsAttribute("categories")) {
-            model.addAttribute("categories", CategoryName.values());
-        }
+        model.addAttribute("editRecipe", editRecipe);
 
         return "edit-recipe";
     }
 
     @PostMapping("/edit/{id}")
-    public String editRecipe(@Valid EditRecipe recipe,
-                             Model model,
-                             BindingResult bindingResult,
-                             RedirectAttributes redirectAttributes) throws IOException {
-        model.addAttribute("recipe", recipe);
+    public String editRecipe(@Valid EditRecipe editRecipe,
+                             BindingResult bindingResult) throws IOException {
 
         if (bindingResult.hasErrors()) {
-            redirectAttributes.addFlashAttribute("recipe", recipe);
-            redirectAttributes.addFlashAttribute("org.springframework.validation.BindingResult.recipe", bindingResult);
-
-            return "redirect:/recipes/edit/" + recipe.getId();
+            return "edit-recipe";
         }
 
-        recipeService.update(recipe);
+        recipeService.update(editRecipe);
 
-        return "redirect:/recipes/" + recipe.getId();
+        return "redirect:/recipes/" + editRecipe.getId();
     }
 
     @GetMapping("/my-recipes")
