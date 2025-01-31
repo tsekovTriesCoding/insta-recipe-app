@@ -92,6 +92,7 @@ public class UserService {
         userProfileInfo.setUsername(user.getUsername());
         userProfileInfo.setEmail(user.getEmail());
         userProfileInfo.setProfilePictureUrl(user.getProfilePicture());
+        userProfileInfo.setDateRegistered(user.getDateRegistered());
 
         return userProfileInfo;
     }
