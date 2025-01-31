@@ -80,78 +80,69 @@ public class ProfileController {
     }
 
     @PutMapping("/{id}/change-username")
-    public String changeMyProfileUsername(@PathVariable UUID id,
-                                          @Valid ChangeUsername changeUsername,
-                                          BindingResult bindingResult,
-                                          RedirectAttributes redirectAttributes,
-                                          Model model,
-                                          @AuthenticationPrincipal UserDetails userDetails) {
+    public ModelAndView changeMyProfileUsername(@PathVariable UUID id,
+                                                @Valid ChangeUsername changeUsername,
+                                                BindingResult bindingResult,
+                                                RedirectAttributes redirectAttributes) {
 
         if (bindingResult.hasErrors()) {
-            UserProfileInfo userProfileInfo = userService.getUserProfileInfo(userDetails.getUsername());
+            UserProfileInfo userProfileInfo = userService.getUserProfileInfoById(id);
 
-            model.addAttribute("userProfileInfo", userProfileInfo);
-            model.addAttribute("openUsernameModal", true);
-
-            return "profile";
+            ModelAndView modelAndView = new ModelAndView("profile", "userProfileInfo", userProfileInfo);
+            modelAndView.addObject("changeUsername", changeUsername);
+            modelAndView.addObject("openUsernameModal", true);
+            return modelAndView;
         }
 
         UserProfileInfo userProfileInfo = userService.updateUsername(id, changeUsername.getUsername());
-
-        updateAuthentication(changeUsername.getUsername(), SecurityContextHolder.getContext().getAuthentication());
-
-        redirectAttributes.addFlashAttribute("userProfileInfo", userProfileInfo);
+        ModelAndView modelAndView = new ModelAndView("redirect:/my-profile");
         redirectAttributes.addFlashAttribute("success", "Username updated successfully");
 
-        return "redirect:/my-profile";
+        return modelAndView;
     }
 
     @PutMapping("/{id}/change-email")
-    public String changeMyProfileEmail(@PathVariable UUID id,
-                                       @Valid ChangeEmail changeEmail,
-                                       BindingResult bindingResult,
-                                       RedirectAttributes redirectAttributes,
-                                       Model model,
-                                       @AuthenticationPrincipal UserDetails userDetails) {
+    public ModelAndView changeMyProfileEmail(@PathVariable UUID id,
+                                             @Valid ChangeEmail changeEmail,
+                                             BindingResult bindingResult,
+                                             RedirectAttributes redirectAttributes) {
 
         if (bindingResult.hasErrors()) {
-            UserProfileInfo userProfileInfo = userService.getUserProfileInfo(userDetails.getUsername());
+            UserProfileInfo userProfileInfo = userService.getUserProfileInfoById(id);
 
-            model.addAttribute("userProfileInfo", userProfileInfo);
-            model.addAttribute("openEmailModal", true);
-
-            return "profile";
+            ModelAndView modelAndView = new ModelAndView("profile", "userProfileInfo", userProfileInfo);
+            modelAndView.addObject("changeEmail", changeEmail);
+            modelAndView.addObject("openEmailModal", true);
+            return modelAndView;
         }
 
         UserProfileInfo userProfileInfo = userService.updateEmail(id, changeEmail.getEmail());
-        redirectAttributes.addFlashAttribute("userProfileInfo", userProfileInfo);
+        ModelAndView modelAndView = new ModelAndView("redirect:/my-profile");
         redirectAttributes.addFlashAttribute("success", "Email updated successfully");
 
-        return "redirect:/my-profile";
+        return modelAndView;
     }
 
     @PutMapping("/{id}/change-password")
-    public String changeMyProfilePassword(@PathVariable UUID id,
-                                          @Valid ChangePassword changePassword,
-                                          BindingResult bindingResult,
-                                          RedirectAttributes redirectAttributes,
-                                          Model model,
-                                          @AuthenticationPrincipal UserDetails userDetails) {
+    public ModelAndView changeMyProfilePassword(@PathVariable UUID id,
+                                                @Valid ChangePassword changePassword,
+                                                BindingResult bindingResult,
+                                                RedirectAttributes redirectAttributes) {
 
         if (bindingResult.hasErrors()) {
-            UserProfileInfo userProfileInfo = userService.getUserProfileInfo(userDetails.getUsername());
+            UserProfileInfo userProfileInfo = userService.getUserProfileInfoById(id);
 
-            model.addAttribute("userProfileInfo", userProfileInfo);
-            model.addAttribute("openPasswordModal", true);
-
-            return "profile";
+            ModelAndView modelAndView = new ModelAndView("profile", "userProfileInfo", userProfileInfo);
+            modelAndView.addObject("changePassword", changePassword);
+            modelAndView.addObject("openPasswordModal", true);
+            return modelAndView;
         }
 
         UserProfileInfo userProfileInfo = userService.updatePassword(id, changePassword.getPassword());
-        redirectAttributes.addFlashAttribute("userProfileInfo", userProfileInfo);
+        ModelAndView modelAndView = new ModelAndView("redirect:/my-profile");
         redirectAttributes.addFlashAttribute("success", "Password updated successfully");
 
-        return "redirect:/my-profile";
+        return modelAndView;
     }
 
     private void updateAuthentication(String username, Object credentials) {
