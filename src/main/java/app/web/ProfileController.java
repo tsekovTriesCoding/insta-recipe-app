@@ -95,6 +95,8 @@ public class ProfileController {
         }
 
         UserProfileInfo userProfileInfo = userService.updateUsername(id, changeUsername.getUsername());
+        updateAuthentication(changeUsername.getUsername(), SecurityContextHolder.getContext().getAuthentication());
+
         ModelAndView modelAndView = new ModelAndView("redirect:/my-profile");
         redirectAttributes.addFlashAttribute("success", "Username updated successfully");
 
