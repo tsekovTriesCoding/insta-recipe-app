@@ -7,10 +7,7 @@ import app.recipe.model.Recipe;
 import app.recipe.repository.RecipeRepository;
 import app.user.model.User;
 import app.user.service.UserService;
-import app.web.dto.AddRecipe;
-import app.web.dto.EditRecipe;
-import app.web.dto.RecipeDetails;
-import app.web.dto.RecipeShortInfo;
+import app.web.dto.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -216,5 +213,16 @@ public class RecipeService {
 
     public long countRecipes() {
         return recipeRepository.count();
+    }
+
+    public List<RecipeForAdminPageInfo> getAllForAdmin() {
+        return recipeRepository.findAll()
+                .stream()
+                .map(recipe -> RecipeForAdminPageInfo.builder()
+                        .id(recipe.getId())
+                        .title(recipe.getTitle())
+                        .author(recipe.getCreatedBy().getUsername())
+                        .createdDate(recipe.getCreatedDate())
+                        .build()).toList();
     }
 }
