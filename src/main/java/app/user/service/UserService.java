@@ -1,6 +1,8 @@
 package app.user.service;
 
-import app.exception.DomainException;
+import app.exception.UserAlreadyExistsException;
+import app.exception.UserNotFoundException;
+import app.mapper.DtoMapper;
 import app.user.model.Role;
 import app.user.model.User;
 import app.user.repository.UserRepository;
@@ -11,7 +13,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -27,6 +28,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 import static app.mapper.DtoMapper.mapUserToUserProfileInfo;
+import static app.mapper.DtoMapper.mapUserToUserWithRole;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -36,25 +38,26 @@ public class UserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
 
-    @Transactional
     public User register(RegisterRequest registerRequest) {
+        if (userRepository.existsByUsername(registerRequest.getUsername())) {
+            throw new UserAlreadyExistsException("User with username " + registerRequest.getUsername() + " already exists.");
+        }
 
-        Optional<User> optionalUser = userRepository.findByUsername((registerRequest.getUsername()));
-
-        if (optionalUser.isPresent()) {
-            throw new DomainException("Username [%s] already exist.".formatted(registerRequest.getUsername()));
+        if (userRepository.existsByEmail(registerRequest.getEmail())) {
+            throw new UserAlreadyExistsException("User with email " + registerRequest.getEmail() + " already exists.");
         }
 
         User user = userRepository.save(initializeUser(registerRequest));
 
-        log.info("Successfully create new user account for username [%s] and id [%s]".formatted(user.getUsername(), user.getId()));
+        log.info("Successfully create new user account for username [%s] and email [%s], with id [%s]"
+                .formatted(user.getUsername(), user.getEmail(), user.getId()));
 
         return user;
     }
 
     public User getByUsername(String username) {
         return userRepository.findByUsername(username)
-                .orElseThrow(NoSuchElementException::new);
+                .orElseThrow(() -> new UserNotFoundException("User with username " + username + " not found."));
     }
 
     public UserProfileInfo updateProfilePicture(UUID userId,
@@ -68,12 +71,13 @@ public class UserService {
             Files.copy(inputStream, destinationFile, StandardCopyOption.REPLACE_EXISTING);
         }
 
-        User user = userRepository.findById(userId).orElseThrow(NoSuchElementException::new);
-
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new UserNotFoundException("User with id " + userId + " not found."));
         user.setDateUpdated(LocalDateTime.now());
         user.setProfilePicture("/images/uploads/" + destinationFile.getFileName());
         User updated = userRepository.save(user);
 
+        log.info("Successfully update profile picture for user [%s] with id [%s]".formatted(updated.getUsername(), updated.getId()));
         return mapUserToUserProfileInfo(updated);
     }
 
@@ -84,7 +88,7 @@ public class UserService {
                 .password(passwordEncoder.encode(registerRequest.getPassword()))
                 .profilePicture("/images/default-profile.png")
                 .dateRegistered(LocalDateTime.now())
-                .role(Role.USER)
+                .role(Role.USER) //every new user has user role by default
                 .build();
     }
 
@@ -94,28 +98,32 @@ public class UserService {
     }
 
     public UserProfileInfo updateUsername(UUID userId, String username) {
-        User user = userRepository.findById(userId).orElseThrow(NoSuchElementException::new);
-
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new UserNotFoundException("User with id " + userId + " not found."));
         user.setUsername(username);
         User updated = userRepository.save(user);
 
+        log.info("Successfully update profile username for user [%s] with id [%s]".formatted(updated.getUsername(), updated.getId()));
         return mapUserToUserProfileInfo(updated);
     }
 
     public UserProfileInfo updateEmail(UUID userId, String email) {
-        User user = userRepository.findById(userId).orElseThrow(NoSuchElementException::new);
-
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new UserNotFoundException("User with id " + userId + " not found."));
         user.setEmail(email);
         User updated = userRepository.save(user);
 
+        log.info("Successfully update profile email for user [%s] with id [%s]".formatted(updated.getUsername(), updated.getId()));
         return mapUserToUserProfileInfo(updated);
     }
 
     public UserProfileInfo updatePassword(UUID userId, String password) {
-        User user = userRepository.findById(userId).orElseThrow(NoSuchElementException::new);
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new UserNotFoundException("User with id " + userId + " not found."));
         user.setPassword(passwordEncoder.encode(password));
         User updated = userRepository.save(user);
 
+        log.info("Successfully update profile password for user [%s] with id [%s]".formatted(updated.getUsername(), updated.getId()));
         return mapUserToUserProfileInfo(updated);
     }
 
@@ -130,16 +138,13 @@ public class UserService {
     public List<UserWithRole> getAll() {
         return userRepository.findAll()
                 .stream()
-                .map(user -> UserWithRole.builder()
-                        .id(user.getId())
-                        .username(user.getUsername())
-                        .email(user.getEmail())
-                        .role(user.getRole())
-                        .build()).toList();
+                .map(DtoMapper::mapUserToUserWithRole)
+                .toList();
     }
 
     public UserProfileInfo getUserProfileInfoById(UUID userId) {
-        User user = userRepository.findById(userId).orElseThrow(NoSuchElementException::new);
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new UserNotFoundException("User with id " + userId + " not found."));
 
         return mapUserToUserProfileInfo(user);
     }
