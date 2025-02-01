@@ -71,8 +71,7 @@ public class UserService {
             Files.copy(inputStream, destinationFile, StandardCopyOption.REPLACE_EXISTING);
         }
 
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new UserNotFoundException("User with id " + userId + " not found."));
+        User user = getUserById(userId);
         user.setDateUpdated(LocalDateTime.now());
         user.setProfilePicture("/images/uploads/" + destinationFile.getFileName());
         User updated = userRepository.save(user);
@@ -98,8 +97,7 @@ public class UserService {
     }
 
     public UserProfileInfo updateUsername(UUID userId, String username) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new UserNotFoundException("User with id " + userId + " not found."));
+        User user = getUserById(userId);
         user.setUsername(username);
         User updated = userRepository.save(user);
 
@@ -108,8 +106,7 @@ public class UserService {
     }
 
     public UserProfileInfo updateEmail(UUID userId, String email) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new UserNotFoundException("User with id " + userId + " not found."));
+        User user = getUserById(userId);
         user.setEmail(email);
         User updated = userRepository.save(user);
 
@@ -118,8 +115,7 @@ public class UserService {
     }
 
     public UserProfileInfo updatePassword(UUID userId, String password) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new UserNotFoundException("User with id " + userId + " not found."));
+        User user = getUserById(userId);
         user.setPassword(passwordEncoder.encode(password));
         User updated = userRepository.save(user);
 
@@ -143,9 +139,7 @@ public class UserService {
     }
 
     public UserProfileInfo getUserProfileInfoById(UUID userId) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new UserNotFoundException("User with id " + userId + " not found."));
-
+        User user = getUserById(userId);
         return mapUserToUserProfileInfo(user);
     }
 
@@ -160,5 +154,10 @@ public class UserService {
         }
 
         return false;
+    }
+
+    private User getUserById(UUID userId) {
+        return userRepository.findById(userId)
+                .orElseThrow(() -> new UserNotFoundException("User with id " + userId + " not found."));
     }
 }
