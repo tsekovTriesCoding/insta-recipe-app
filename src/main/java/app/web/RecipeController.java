@@ -46,7 +46,7 @@ public class RecipeController {
     public String recipeDetails(@PathVariable UUID id,
                                 @AuthenticationPrincipal UserDetails userDetails,
                                 Model model) {
-        RecipeDetails recipe = recipeService.getDetailsById(UUID.randomUUID());
+        RecipeDetails recipe = recipeService.getDetailsById(id);
 
         boolean isCreator = recipe.getCreator().equals(userDetails.getUsername());
 

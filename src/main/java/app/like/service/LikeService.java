@@ -1,5 +1,6 @@
 package app.like.service;
 
+import app.exception.RecipeAlreadyLikedException;
 import app.like.model.Like;
 import app.like.repository.LikeRepository;
 import app.recipe.model.Recipe;
@@ -28,30 +29,17 @@ public class LikeService {
         boolean userAlreadyLiked = likeRepository.existsByUser_IdAndRecipe_Id(user.getId(), recipeId);
 
         if (userAlreadyLiked) {
-            return;
+            throw new RecipeAlreadyLikedException("You have already liked this recipe");
         }
 
-        if (recipe.getCreatedBy().getId().equals(user.getId())) {
-            return;
-        }
-        
+//        if (recipe.getCreatedBy().getId().equals(user.getId())) {
+//            return;
+//        }
+
         Like like = new Like();
         like.setUser(user);
         like.setRecipe(recipe);
 
         likeRepository.save(like);
-
-//        try {
-//            UserRecipeLike like = new UserRecipeLike();
-//            like.setUser(user);
-//            like.setRecipe(recipe);
-//            userRecipeLikeRepository.save(like);
-//        } catch (DataIntegrityViolationException e) {
-//            throw new IllegalStateException("You have already liked this recipe");
-//        }
-    }
-
-    public long countLikes() {
-        return likeRepository.count();
     }
 }
