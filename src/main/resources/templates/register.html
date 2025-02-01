@@ -16,6 +16,9 @@
                          style="width: 80px; height: auto;">
                     <h3 class="fw-bold text-dark">Create Your Account</h3>
                     <p class="text-muted">Join InstaRecipe and start sharing your favorite recipes!</p>
+                    <div th:if="${error}" class="alert alert-danger" role="alert">
+                        <p th:text="${error}"></p>
+                    </div>
                 </div>
                 <form th:method="post"
                       th:action="@{/users/register}"

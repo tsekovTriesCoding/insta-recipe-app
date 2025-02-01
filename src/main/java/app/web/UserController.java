@@ -56,6 +56,6 @@ public class UserController {
     public String handleUserAlreadyExists(UserAlreadyExistsException ex,
                                           RedirectAttributes redirectAttributes) {
         redirectAttributes.addFlashAttribute("error", ex.getMessage());
-        return "redirect:/register"; // TODO: make it work better!
+        return "redirect:/users/register"; // TODO: make it work better!
     }
 }
