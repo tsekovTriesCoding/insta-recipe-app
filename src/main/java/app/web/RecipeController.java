@@ -2,6 +2,7 @@ package app.web;
 
 import app.category.model.CategoryName;
 import app.exception.RecipeNotFoundException;
+import app.like.service.LikeService;
 import app.recipe.model.Recipe;
 import app.recipe.service.RecipeService;
 import app.web.dto.AddRecipe;
@@ -27,6 +28,7 @@ import java.util.UUID;
 public class RecipeController {
 
     private final RecipeService recipeService;
+    private final LikeService likeService;
 
     @ModelAttribute(name = "categories")
     public CategoryName[] categoryName() {
@@ -47,11 +49,12 @@ public class RecipeController {
                                 @AuthenticationPrincipal UserDetails userDetails,
                                 Model model) {
         RecipeDetails recipe = recipeService.getDetailsById(id);
-
         boolean isCreator = recipe.getCreator().equals(userDetails.getUsername());
+        boolean hasLiked = likeService.userHasLikedRecipe(userDetails.getUsername(), id);
 
         model.addAttribute("recipe", recipe);
         model.addAttribute("isCreator", isCreator);
+        model.addAttribute("hasLiked", hasLiked);
 
         return "recipe-details";
     }

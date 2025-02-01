@@ -1,6 +1,7 @@
 package app.web;
 
 import app.exception.RecipeAlreadyLikedException;
+import app.exception.UserCannotLikeOwnRecipeException;
 import app.like.service.LikeService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -10,7 +11,6 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.UUID;
 
@@ -25,6 +25,12 @@ public class LikeController {
         likeService.like(userDetails.getUsername(), recipeId);
 
         return "redirect:/recipes/" + recipeId;
+    }
+
+    @ExceptionHandler(UserCannotLikeOwnRecipeException.class)
+    public String handleCannotLikeOwnRecipe(UserCannotLikeOwnRecipeException ex, Model model) {
+        model.addAttribute("error", ex.getMessage());
+        return "error-page";
     }
 
     @ExceptionHandler(RecipeAlreadyLikedException.class)

@@ -1,6 +1,7 @@
 package app.like.service;
 
 import app.exception.RecipeAlreadyLikedException;
+import app.exception.UserCannotLikeOwnRecipeException;
 import app.like.model.Like;
 import app.like.repository.LikeRepository;
 import app.recipe.model.Recipe;
@@ -26,20 +27,23 @@ public class LikeService {
         User user = userService.getByUsername(username);
         Recipe recipe = recipeService.getById(recipeId);
 
-        boolean userAlreadyLiked = likeRepository.existsByUser_IdAndRecipe_Id(user.getId(), recipeId);
-
-        if (userAlreadyLiked) {
-            throw new RecipeAlreadyLikedException("You have already liked this recipe");
+        if (recipe.getCreatedBy().getId().equals(user.getId())) {
+            throw new UserCannotLikeOwnRecipeException("You cannot like your own recipe.");
         }
 
-//        if (recipe.getCreatedBy().getId().equals(user.getId())) {
-//            return;
-//        }
+        try {
+            Like like = new Like();
+            like.setUser(user);
+            like.setRecipe(recipe);
 
-        Like like = new Like();
-        like.setUser(user);
-        like.setRecipe(recipe);
+            likeRepository.save(like);
+        } catch (DataIntegrityViolationException e) {
+            throw new RecipeAlreadyLikedException("You have already liked this recipe");
+        }
+    }
 
-        likeRepository.save(like);
+    public boolean userHasLikedRecipe(String username, UUID recipeId) {
+        User user = userService.getByUsername(username);
+        return likeRepository.existsByUser_IdAndRecipe_Id(user.getId(), recipeId);
     }
 }
