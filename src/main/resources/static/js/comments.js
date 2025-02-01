@@ -84,7 +84,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 if (!response.ok) {
                     throw new Error("Failed to delete comment");
                 }
-                fetchComments(); // Refresh comments after deletion
+                fetchComments();
             })
             .catch(error => console.error("Error deleting comment:", error));
     }

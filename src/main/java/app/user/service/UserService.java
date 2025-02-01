@@ -155,4 +155,17 @@ public class UserService {
 
         return map(user);
     }
+
+    public boolean updateUserRole(UUID userId, String newRole) {
+        Optional<User> userOptional = userRepository.findById(userId);
+
+        if (userOptional.isPresent()) {
+            User user = userOptional.get();
+            user.setRole(Role.valueOf(newRole.toUpperCase()));
+            userRepository.save(user);
+            return true;
+        }
+
+        return false;
+    }
 }

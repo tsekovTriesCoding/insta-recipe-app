@@ -20,8 +20,8 @@ document.addEventListener("DOMContentLoaded", function () {
                             <td>${user.email}</td>
                             <td>${user.role}</td>
                             <td>
-                                <button class="btn btn-warning btn-sm update-role" data-id="\${user.id}">Update Role</button>
-                                <button class="btn btn-danger btn-sm delete-user" data-id="\${user.id}">Delete</button>
+                                <button class="btn btn-warning btn-sm update-role" data-id="${user.id}">Update Role</button>
+                                <button class="btn btn-danger btn-sm delete-user" data-id="${user.id}">Delete</button>
                             </td>
                         </tr>
                     `;
@@ -45,7 +45,7 @@ document.addEventListener("DOMContentLoaded", function () {
     function deleteUser(userId) {
         if (!confirm("Are you sure you want to delete this user?")) return;
 
-        fetch(`/api/admin/users/\${userId}`, {method: "DELETE"})
+        fetch(`/api/admin/users/${userId}`, {method: "DELETE"})
             .then(response => {
                 if (!response.ok) {
                     throw new Error("Failed to delete user");
@@ -56,13 +56,19 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     function updateUserRole(userId) {
-        const newRole = prompt("Enter new role (e.g., ROLE_USER, ROLE_ADMIN):");
+        const newRole = prompt("Enter new role (e.g., User, Admin):");
         if (!newRole) return;
 
-        fetch(`/api/admin/users/\${userId}/role`, {
+        const csrfToken = document.querySelector("meta[name='_csrf']").getAttribute("content");
+        const csrfHeader = document.querySelector("meta[name='_csrf_header']").getAttribute("content");
+
+        fetch(`/api/admin/users/${userId}/role`, {
             method: "PUT",
-            headers: {"Content-Type": "application/json"},
-            body: JSON.stringify({role: newRole})
+            headers: {
+                "Content-Type": "application/json",
+                [csrfHeader]: csrfToken
+            },
+            body: JSON.stringify({role: newRole},)
         })
             .then(response => {
                 if (!response.ok) {

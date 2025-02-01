@@ -8,11 +8,11 @@ import app.web.dto.UserWithRole;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 
 @RequiredArgsConstructor
 @RestController
@@ -58,5 +58,19 @@ public class AdminRestController {
         }
 
         return ResponseEntity.ok(all);
+    }
+
+    @PreAuthorize("hasRole('ADMIN')")
+    @PutMapping("/users/{userId}/role")
+    public ResponseEntity<String> updateUserRole(@PathVariable UUID userId,
+                                                 @RequestBody Map<String, String> requestBody) {
+        String newRole = requestBody.get("role");
+
+        if (newRole == null || newRole.isEmpty()) {
+            return ResponseEntity.badRequest().body("Role cannot be empty.");
+        }
+
+        userService.updateUserRole(userId, newRole);
+        return ResponseEntity.ok("User role updated successfully.");
     }
 }
