@@ -26,6 +26,8 @@ import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.UUID;
 
+import static app.mapper.DtoMapper.mapUserToUserProfileInfo;
+
 @Slf4j
 @RequiredArgsConstructor
 @Service
@@ -72,7 +74,7 @@ public class UserService {
         user.setProfilePicture("/images/uploads/" + destinationFile.getFileName());
         User updated = userRepository.save(user);
 
-        return map(updated);
+        return mapUserToUserProfileInfo(updated);
     }
 
     private User initializeUser(RegisterRequest registerRequest) {
@@ -86,19 +88,9 @@ public class UserService {
                 .build();
     }
 
-    private UserProfileInfo map(User user) {
-        UserProfileInfo userProfileInfo = new UserProfileInfo();
-        userProfileInfo.setId(user.getId());
-        userProfileInfo.setUsername(user.getUsername());
-        userProfileInfo.setEmail(user.getEmail());
-        userProfileInfo.setProfilePictureUrl(user.getProfilePicture());
-        userProfileInfo.setDateRegistered(user.getDateRegistered());
-
-        return userProfileInfo;
-    }
-
     public UserProfileInfo getUserProfileInfo(String username) {
-        return map(this.getByUsername(username));
+        User user = this.getByUsername(username);
+        return mapUserToUserProfileInfo(user);
     }
 
     public UserProfileInfo updateUsername(UUID userId, String username) {
@@ -107,7 +99,7 @@ public class UserService {
         user.setUsername(username);
         User updated = userRepository.save(user);
 
-        return map(updated);
+        return mapUserToUserProfileInfo(updated);
     }
 
     public UserProfileInfo updateEmail(UUID userId, String email) {
@@ -116,7 +108,7 @@ public class UserService {
         user.setEmail(email);
         User updated = userRepository.save(user);
 
-        return map(updated);
+        return mapUserToUserProfileInfo(updated);
     }
 
     public UserProfileInfo updatePassword(UUID userId, String password) {
@@ -124,7 +116,7 @@ public class UserService {
         user.setPassword(passwordEncoder.encode(password));
         User updated = userRepository.save(user);
 
-        return map(updated);
+        return mapUserToUserProfileInfo(updated);
     }
 
     public boolean existsByUsername(String username) {
@@ -133,10 +125,6 @@ public class UserService {
 
     public boolean existsByEmail(String email) {
         return userRepository.existsByEmail(email);
-    }
-
-    public long countUsers() {
-        return userRepository.count();
     }
 
     public List<UserWithRole> getAll() {
@@ -153,7 +141,7 @@ public class UserService {
     public UserProfileInfo getUserProfileInfoById(UUID userId) {
         User user = userRepository.findById(userId).orElseThrow(NoSuchElementException::new);
 
-        return map(user);
+        return mapUserToUserProfileInfo(user);
     }
 
     public boolean updateUserRole(UUID userId, String newRole) {
