@@ -44,7 +44,6 @@ public class AdminRestController {
         return ResponseEntity.ok(all);
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/users/{userId}/role")
     public ResponseEntity<String> updateUserRole(@PathVariable UUID userId,
                                                  @RequestBody Map<String, String> requestBody) {
@@ -61,5 +60,11 @@ public class AdminRestController {
         }
 
         return ResponseEntity.badRequest().body("Failed to update user role");
+    }
+
+    @DeleteMapping("/recipes/{recipeId}")
+    public ResponseEntity<Void> deleteRecipe(@PathVariable UUID recipeId) {
+        recipeService.delete(recipeId);
+        return ResponseEntity.noContent().build();
     }
 }
