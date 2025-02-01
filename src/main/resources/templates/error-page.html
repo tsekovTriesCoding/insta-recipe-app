@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Error</title>
+    <link rel="stylesheet" href="/css/bootstrap.min.css">
+</head>
+<body class="text-center">
+<div class="container mt-5">
+    <h2 class="text-danger">Something went wrong</h2>
+    <p th:text="${error}" class="text-muted"></p>
+    <a th:href="@{/home}" class="btn btn-primary">Go to Home</a>
+</div>
+</body>
+</html>

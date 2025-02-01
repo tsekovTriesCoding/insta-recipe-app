@@ -164,6 +164,6 @@ public class ProfileController {
                                               Model model) {
 
         model.addAttribute("error", ex.getMessage());
-        return "login"; //TODO: can do it better!
+        return "error-page";
     }
 }

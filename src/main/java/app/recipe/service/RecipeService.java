@@ -3,6 +3,8 @@ package app.recipe.service;
 import app.category.model.Category;
 import app.category.model.CategoryName;
 import app.category.service.CategoryService;
+import app.exception.RecipeNotFoundException;
+import app.mapper.DtoMapper;
 import app.recipe.model.Recipe;
 import app.recipe.repository.RecipeRepository;
 import app.user.model.User;
@@ -22,7 +24,6 @@ import java.nio.file.StandardCopyOption;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.UUID;
 
 @RequiredArgsConstructor
@@ -38,24 +39,13 @@ public class RecipeService {
 
         return recipes
                 .stream()
-                .map(this::map)
+                .map(DtoMapper::mapRecipeToRecipeShortInfo)
                 .toList();
-    }
-
-    private RecipeShortInfo map(Recipe recipe) {
-        return RecipeShortInfo.builder()
-                .id(recipe.getId())
-                .title(recipe.getTitle())
-                .description(recipe.getDescription())
-                .cookTime(recipe.getCookTime())
-                .servings(recipe.getServings())
-                .image(recipe.getImage())
-                .build();
     }
 
     @Transactional(readOnly = true)
     public RecipeDetails getDetailsById(UUID recipeId) {
-        Recipe recipe = this.getById(recipeId);
+        Recipe recipe = getById(recipeId);
 
         return RecipeDetails.builder()
                 .id(recipe.getId())
@@ -75,7 +65,8 @@ public class RecipeService {
     }
 
     public Recipe getById(UUID recipeId) {
-        return recipeRepository.findById(recipeId).orElseThrow(NoSuchElementException::new);
+        return recipeRepository.findById(recipeId).
+                orElseThrow(() -> new RecipeNotFoundException("Recipe with id " + recipeId + " not found."));
     }
 
     public Recipe create(AddRecipe recipe, String username) throws IOException {
@@ -211,18 +202,9 @@ public class RecipeService {
         recipeRepository.delete(getById(id));
     }
 
-    public long countRecipes() {
-        return recipeRepository.count();
-    }
-
     public List<RecipeForAdminPageInfo> getAllForAdmin() {
         return recipeRepository.findAll()
                 .stream()
-                .map(recipe -> RecipeForAdminPageInfo.builder()
-                        .id(recipe.getId())
-                        .title(recipe.getTitle())
-                        .author(recipe.getCreatedBy().getUsername())
-                        .createdDate(recipe.getCreatedDate())
-                        .build()).toList();
+                .map(DtoMapper::mapRecipeToRecipeForAdminPageInfo).toList();
     }
 }

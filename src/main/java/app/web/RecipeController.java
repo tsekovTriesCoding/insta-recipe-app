@@ -1,6 +1,7 @@
 package app.web;
 
 import app.category.model.CategoryName;
+import app.exception.RecipeNotFoundException;
 import app.recipe.model.Recipe;
 import app.recipe.service.RecipeService;
 import app.web.dto.AddRecipe;
@@ -45,7 +46,7 @@ public class RecipeController {
     public String recipeDetails(@PathVariable UUID id,
                                 @AuthenticationPrincipal UserDetails userDetails,
                                 Model model) {
-        RecipeDetails recipe = recipeService.getDetailsById(id);
+        RecipeDetails recipe = recipeService.getDetailsById(UUID.randomUUID());
 
         boolean isCreator = recipe.getCreator().equals(userDetails.getUsername());
 
@@ -117,5 +118,11 @@ public class RecipeController {
         recipeService.delete(id);
 
         return "redirect:/recipes/my-recipes";
+    }
+
+    @ExceptionHandler(RecipeNotFoundException.class)
+    public String handleRecipeNotFound(RecipeNotFoundException ex, Model model) {
+        model.addAttribute("error", ex.getMessage());
+        return "error-page";
     }
 }
