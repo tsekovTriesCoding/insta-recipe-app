@@ -70,7 +70,12 @@ public class AdminRestController {
             return ResponseEntity.badRequest().body("Role cannot be empty.");
         }
 
-        userService.updateUserRole(userId, newRole);
-        return ResponseEntity.ok("User role updated successfully.");
+        boolean updated = userService.updateUserRole(userId, newRole);
+
+        if (updated) {
+            return ResponseEntity.ok("User role updated successfully");
+        }
+
+        return ResponseEntity.badRequest().body("Failed to update user role");
     }
 }
