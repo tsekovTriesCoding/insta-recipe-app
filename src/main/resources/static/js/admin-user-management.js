@@ -15,7 +15,6 @@ document.addEventListener("DOMContentLoaded", function () {
                 users.forEach(user => {
                     const userRow = `
                         <tr>
-                            <td>${user.id}</td>
                             <td>${user.username}</td>
                             <td>${user.email}</td>
                             <td>${user.role}</td>
@@ -68,7 +67,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 "Content-Type": "application/json",
                 [csrfHeader]: csrfToken
             },
-            body: JSON.stringify({role: newRole},)
+            body: JSON.stringify({role: newRole})
         })
             .then(response => {
                 if (!response.ok) {
