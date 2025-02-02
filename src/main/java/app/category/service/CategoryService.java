@@ -3,6 +3,7 @@ package app.category.service;
 import app.category.model.Category;
 import app.category.model.CategoryName;
 import app.category.repository.CategoryRepository;
+import app.exception.CategoryNotFoundException;
 import app.mapper.DtoMapper;
 import app.recipe.model.Recipe;
 import app.web.dto.CategoryDetails;
@@ -11,7 +12,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.UUID;
 
 @RequiredArgsConstructor
@@ -30,11 +30,12 @@ public class CategoryService {
     public CategoryDetails getById(UUID id) {
         return categoryRepository.findById(id)
                 .map(DtoMapper::mapCategoryToCategoryDetails)
-                .orElseThrow(NoSuchElementException::new);
+                .orElseThrow(() -> new CategoryNotFoundException("Category with id " + id + " not found"));
     }
 
     public Category getByName(CategoryName categoryName) {
-        return categoryRepository.findByName(categoryName).orElseThrow(NoSuchElementException::new);
+        return categoryRepository.findByName(categoryName)
+                .orElseThrow(() -> new CategoryNotFoundException("Category with name " + categoryName + " not found"));
     }
 
     public void update(Category categoryToEdit, Recipe recipeToUpdate) {
