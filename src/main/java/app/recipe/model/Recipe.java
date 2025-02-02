@@ -19,6 +19,7 @@ import java.util.UUID;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
+@Table(name = "recipes")
 public class Recipe {
 
     @Id
@@ -32,7 +33,7 @@ public class Recipe {
     private String description;
 
     @ElementCollection
-    @CollectionTable(name = "recipe_ingredients", joinColumns = @JoinColumn(name = "recipe_id"))
+    @CollectionTable(name = "recipes_ingredients", joinColumns = @JoinColumn(name = "recipe_id"))
     private List<String> ingredients = new ArrayList<>();
 
     @Column(length = 500)
