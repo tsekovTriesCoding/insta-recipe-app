@@ -24,7 +24,10 @@ public class Category {
     @Enumerated(EnumType.STRING)
     private CategoryName name;
 
-    @Column(columnDefinition = "TEXT")
+    @Column(nullable = false)
+    private String imageUrl;
+
+    @Column(length = 800)
     private String description;
 
     @ManyToMany(mappedBy = "categories")

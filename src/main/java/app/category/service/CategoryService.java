@@ -26,6 +26,7 @@ public class CategoryService {
                 .map(category -> CategoryShort.builder()
                         .id(category.getId())
                         .name(category.getName())
+                        .imageUrl(category.getImageUrl())
                         .build()).toList();
     }
 

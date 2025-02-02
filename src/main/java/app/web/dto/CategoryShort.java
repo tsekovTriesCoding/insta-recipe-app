@@ -11,4 +11,5 @@ import java.util.UUID;
 public class CategoryShort {
     private UUID id;
     private CategoryName name;
+    private String imageUrl;
 }
