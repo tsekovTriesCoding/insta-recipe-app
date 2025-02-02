@@ -14,13 +14,12 @@ public class FirstInit implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
-        if(categoryRepository.count() == 0) {
-            for (CategoryName name : CategoryName.values()) {
-                Category category = new Category();
-                category.setName(name);
-                category.setDescription("Random Description");
-                categoryRepository.save(category);
-            }
+        if (categoryRepository.count() == 7) {
+            Category category = new Category();
+            category.setName(CategoryName.SOUPS);
+            category.setDescription("Soups are comforting and versatile dishes that can be enjoyed as a starter, main course, or even a light meal. They come in various forms, including broths, purees, and chunky stews, catering to diverse culinary traditions worldwide. Common ingredients include vegetables, meats, grains, and legumes, often simmered to develop rich flavors. Soups can be served hot or cold, with popular varieties like chicken noodle, minestrone, and gazpacho highlighting their adaptability. Whether nourishing or refreshing, soups provide a warm embrace in every bowl, making them a staple in many cuisines.");
+            category.setImageUrl("/images/soups.jpg");
+            categoryRepository.save(category);
         }
     }
 }

@@ -29,14 +29,14 @@ public class Recipe {
     @Column(nullable = false)
     private String title;
 
-    @Column(length = 500)
+    @Column(length = 1500)
     private String description;
 
     @ElementCollection
     @CollectionTable(name = "recipes_ingredients", joinColumns = @JoinColumn(name = "recipe_id"))
     private List<String> ingredients = new ArrayList<>();
 
-    @Column(length = 500)
+    @Column(length = 1500)
     private String instructions;
 
     @Column(nullable = false)
