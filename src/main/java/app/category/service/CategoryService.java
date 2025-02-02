@@ -3,8 +3,8 @@ package app.category.service;
 import app.category.model.Category;
 import app.category.model.CategoryName;
 import app.category.repository.CategoryRepository;
+import app.mapper.DtoMapper;
 import app.recipe.model.Recipe;
-import app.recipe.service.RecipeService;
 import app.web.dto.CategoryDetails;
 import app.web.dto.CategoryShort;
 import lombok.RequiredArgsConstructor;
@@ -23,21 +23,13 @@ public class CategoryService {
     public List<CategoryShort> getAll() {
         return categoryRepository.findAll()
                 .stream()
-                .map(category -> CategoryShort.builder()
-                        .id(category.getId())
-                        .name(category.getName())
-                        .imageUrl(category.getImageUrl())
-                        .build()).toList();
+                .map(DtoMapper::mapCategoryToCategoryShort)
+                .toList();
     }
 
     public CategoryDetails getById(UUID id) {
         return categoryRepository.findById(id)
-                .map(category -> CategoryDetails.builder()
-                        .id(category.getId())
-                        .name(category.getName().getValue())
-                        .description(category.getDescription())
-                        .recipes(category.getRecipes())
-                        .build())
+                .map(DtoMapper::mapCategoryToCategoryDetails)
                 .orElseThrow(NoSuchElementException::new);
     }
 

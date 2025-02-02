@@ -1,5 +1,6 @@
 package app.mapper;
 
+import app.category.model.Category;
 import app.comment.model.Comment;
 import app.recipe.model.Recipe;
 import app.user.model.User;
@@ -54,6 +55,23 @@ public class DtoMapper {
                 .content(comment.getContent())
                 .createdBy(comment.getCreator().getUsername())
                 .createdDate(comment.getCreatedDate())
+                .build();
+    }
+
+    public static CategoryShort mapCategoryToCategoryShort(Category category) {
+        return CategoryShort.builder()
+                .id(category.getId())
+                .name(category.getName())
+                .imageUrl(category.getImageUrl())
+                .build();
+    }
+
+    public static CategoryDetails mapCategoryToCategoryDetails(Category category) {
+        return CategoryDetails.builder()
+                .id(category.getId())
+                .name(category.getName().getValue())
+                .description(category.getDescription())
+                .recipes(category.getRecipes())
                 .build();
     }
 }
