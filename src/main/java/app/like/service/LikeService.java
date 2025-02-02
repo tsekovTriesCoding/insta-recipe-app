@@ -7,7 +7,6 @@ import app.like.repository.LikeRepository;
 import app.recipe.model.Recipe;
 import app.recipe.service.RecipeService;
 import app.user.model.User;
-import app.user.repository.UserRepository;
 import app.user.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;

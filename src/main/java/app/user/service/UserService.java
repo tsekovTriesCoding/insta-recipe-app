@@ -78,17 +78,6 @@ public class UserService {
         return mapUserToUserProfileInfo(updated);
     }
 
-    private User initializeUser(RegisterRequest registerRequest) {
-        return User.builder()
-                .username(registerRequest.getUsername())
-                .email(registerRequest.getEmail())
-                .password(passwordEncoder.encode(registerRequest.getPassword()))
-                .profilePicture("/images/default-profile.png")
-                .dateRegistered(LocalDateTime.now())
-                .role(Role.USER) //every new user has user role by default
-                .build();
-    }
-
     public UserProfileInfo getUserProfileInfo(String username) {
         User user = this.getByUsername(username);
         return mapUserToUserProfileInfo(user);
@@ -157,5 +146,16 @@ public class UserService {
     private User getUserById(UUID userId) {
         return userRepository.findById(userId)
                 .orElseThrow(() -> new UserNotFoundException("User with id " + userId + " not found."));
+    }
+
+    private User initializeUser(RegisterRequest registerRequest) {
+        return User.builder()
+                .username(registerRequest.getUsername())
+                .email(registerRequest.getEmail())
+                .password(passwordEncoder.encode(registerRequest.getPassword()))
+                .profilePicture("/images/default-profile.png")
+                .dateRegistered(LocalDateTime.now())
+                .role(Role.USER) //every new user has user role by default
+                .build();
     }
 }

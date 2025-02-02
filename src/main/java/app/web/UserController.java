@@ -1,7 +1,6 @@
 package app.web;
 
 import app.exception.UserAlreadyExistsException;
-import app.user.model.User;
 import app.user.service.UserService;
 import app.web.dto.RegisterRequest;
 import jakarta.servlet.http.HttpServletRequest;

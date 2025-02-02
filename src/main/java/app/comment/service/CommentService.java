@@ -2,6 +2,7 @@ package app.comment.service;
 
 import app.comment.model.Comment;
 import app.comment.repository.CommentRepository;
+import app.mapper.DtoMapper;
 import app.recipe.model.Recipe;
 import app.recipe.service.RecipeService;
 import app.user.model.User;
@@ -43,15 +44,8 @@ public class CommentService {
     public List<CommentByRecipe> getCommentsByRecipeId(UUID recipeId) {
         return commentRepository.findAllByRecipeIdOrderByCreatedDate(recipeId)
                 .stream()
-                .map(this::convertToDTO)
+                .map(DtoMapper::mapCommentToCommentByRecipe)
                 .collect(Collectors.toList());
-    }
-
-    private CommentByRecipe convertToDTO(Comment comment) {
-        return new CommentByRecipe(comment.getId(),
-                comment.getContent(),
-                comment.getCreator().getUsername(),
-                comment.getCreatedDate());
     }
 
     public boolean deleteComment(UUID commentId, String username) {
@@ -73,9 +67,5 @@ public class CommentService {
         }
 
         return false;
-    }
-
-    public long countComments() {
-        return commentRepository.count();
     }
 }

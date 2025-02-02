@@ -1,11 +1,9 @@
 package app.mapper;
 
+import app.comment.model.Comment;
 import app.recipe.model.Recipe;
 import app.user.model.User;
-import app.web.dto.RecipeForAdminPageInfo;
-import app.web.dto.RecipeShortInfo;
-import app.web.dto.UserProfileInfo;
-import app.web.dto.UserWithRole;
+import app.web.dto.*;
 import lombok.experimental.UtilityClass;
 
 @UtilityClass
@@ -47,6 +45,15 @@ public class DtoMapper {
                 .cookTime(recipe.getCookTime())
                 .servings(recipe.getServings())
                 .image(recipe.getImage())
+                .build();
+    }
+
+    public static CommentByRecipe mapCommentToCommentByRecipe(Comment comment) {
+        return CommentByRecipe.builder()
+                .id(comment.getId())
+                .content(comment.getContent())
+                .createdBy(comment.getCreator().getUsername())
+                .createdDate(comment.getCreatedDate())
                 .build();
     }
 }

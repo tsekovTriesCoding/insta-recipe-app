@@ -205,6 +205,7 @@ public class RecipeService {
     public List<RecipeForAdminPageInfo> getAllForAdmin() {
         return recipeRepository.findAll()
                 .stream()
-                .map(DtoMapper::mapRecipeToRecipeForAdminPageInfo).toList();
+                .map(DtoMapper::mapRecipeToRecipeForAdminPageInfo)
+                .toList();
     }
 }
