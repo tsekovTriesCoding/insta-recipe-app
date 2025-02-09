@@ -8,11 +8,11 @@
     <section class="recipes">
         <div class="container my-5">
             <h1 class="text-center mb-4">Recipes</h1>
-            <form class="mb-5 d-flex justify-content-center">
+            <form th:method="GET" th:action="@{/recipes/all}" class="mb-5 d-flex justify-content-center">
                 <div class="input-group" style="max-width: 500px;">
-                    <input type="text" class="form-control rounded-start" placeholder="Search recipes..."
-                           aria-label="Search recipes">
-                    <button class="btn-recipes btn btn-primary rounded-end" type="button">
+                    <input type="text" name="query" class="form-control rounded-start" placeholder="Search recipes..."
+                           aria-label="Search recipes" th:value="${query}">
+                    <button class="btn-recipes btn btn-primary rounded-end" type="submit">
                         Search
                     </button>
                 </div>

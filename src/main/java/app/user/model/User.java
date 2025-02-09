@@ -38,7 +38,8 @@ public class User {
     @Column(nullable = false)
     private LocalDateTime dateRegistered;
 
-    @Column
     private LocalDateTime dateUpdated;
+
+    private Boolean isActive;
 }
 

@@ -190,4 +190,10 @@ public class RecipeService {
                 .map(DtoMapper::mapRecipeToRecipeForAdminPageInfo)
                 .toList();
     }
+
+    public Page<RecipeShortInfo> searchRecipes(String query, Pageable pageable) {
+        Page<Recipe> recipesByTitle = recipeRepository.findAllByTitleContainingIgnoreCase(query, pageable);
+
+        return recipesByTitle.map(DtoMapper::mapRecipeToRecipeShortInfo);
+    }
 }

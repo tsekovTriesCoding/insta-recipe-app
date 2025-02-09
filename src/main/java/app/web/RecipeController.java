@@ -39,8 +39,22 @@ public class RecipeController {
     }
 
     @GetMapping("/all")
-    public String allRecipes(Model model, @PageableDefault(size = 3) Pageable pageable) {
-        Page<RecipeShortInfo> recipes = recipeService.getAll(pageable);
+    public String allRecipes(@RequestParam(value = "query", required = false) String query,
+                             Model model,
+                             @PageableDefault(size = 3) Pageable pageable) {
+
+        Page<RecipeShortInfo> recipes;
+        if (query != null && !query.trim().isEmpty()) {
+            recipes = recipeService.searchRecipes(query, pageable);
+
+            if (!recipes.hasContent()) {
+                recipes = recipeService.getAll(pageable);
+            }
+
+            model.addAttribute("query", query);
+        } else {
+            recipes = recipeService.getAll(pageable);
+        }
 
         model.addAttribute("recipes", recipes);
 
