@@ -1,5 +1,6 @@
 package app.user.service;
 
+import app.cloudinary.CloudinaryService;
 import app.exception.UserAlreadyExistsException;
 import app.exception.UserNotFoundException;
 import app.mapper.DtoMapper;
@@ -15,12 +16,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -35,6 +30,7 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final CloudinaryService cloudinaryService;
 
     public User register(RegisterRequest registerRequest) {
         if (userRepository.existsByUsername(registerRequest.getUsername())) {
@@ -59,19 +55,13 @@ public class UserService {
     }
 
     public UserProfileInfo updateProfilePicture(UUID userId,
-                                                MultipartFile file) throws IOException {
-        Path destinationFile = Paths
-                .get("src", "main", "resources", "static/images/uploads", userId + "-profile-picture.png")
-                .normalize()
-                .toAbsolutePath();
+                                                MultipartFile file) {
 
-        try (InputStream inputStream = file.getInputStream()) {
-            Files.copy(inputStream, destinationFile, StandardCopyOption.REPLACE_EXISTING);
-        }
+        String imageUrl = cloudinaryService.uploadImage(file);
 
         User user = getUserById(userId);
         user.setDateUpdated(LocalDateTime.now());
-        user.setProfilePicture("/images/uploads/" + destinationFile.getFileName());
+        user.setProfilePicture(imageUrl);
         User updated = userRepository.save(user);
 
         log.info("Successfully update profile picture for user [%s] with id [%s]".formatted(updated.getUsername(), updated.getId()));

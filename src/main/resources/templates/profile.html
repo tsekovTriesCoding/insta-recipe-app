@@ -17,7 +17,7 @@
                 </div>
 
                 <div class="mt-2 align-self-center position-relative">
-                    <img th:src="@{*{profilePictureUrl} + '?t=' + ${#dates.format(#dates.createNow(), 'yyyyMMddHHmmss')}}"
+                    <img th:src="*{profilePictureUrl}"
                          alt="Profile Picture"
                          class="rounded-circle border border-secondary"
                          style="width: 130px; height: 130px; object-fit: cover;">
