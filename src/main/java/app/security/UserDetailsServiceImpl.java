@@ -1,4 +1,4 @@
-package app.user.service;
+package app.security;
 
 import app.user.model.Role;
 import app.user.model.User;
@@ -19,9 +19,10 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        return this.userRepository.findByUsername(username)
-                .map(UserDetailsServiceImpl::map)
+        User user = this.userRepository.findByUsername(username)
                 .orElseThrow(() -> new UsernameNotFoundException("User with username " + username + " not found"));
+
+        return new CustomUserDetails(user);
     }
 
     private static UserDetails map(User user) {

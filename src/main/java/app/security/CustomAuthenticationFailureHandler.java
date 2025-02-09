@@ -1,7 +1,8 @@
-package app.config;
+package app.security;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.stereotype.Component;
@@ -16,7 +17,12 @@ public class CustomAuthenticationFailureHandler implements AuthenticationFailure
                                         HttpServletResponse response,
                                         AuthenticationException exception) throws IOException {
 
-        request.getSession().setAttribute("error", "Invalid username or password!");
+        String errorMessage = "Invalid username or password.";
+        if (exception instanceof DisabledException) {
+            errorMessage = "Your account is inactive. Please contact the admin.";
+        }
+
+        request.getSession().setAttribute("error", errorMessage);
         response.sendRedirect("/login");
     }
 }

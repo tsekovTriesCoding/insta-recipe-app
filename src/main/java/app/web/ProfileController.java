@@ -1,7 +1,7 @@
 package app.web;
 
 import app.exception.UserNotFoundException;
-import app.user.service.UserDetailsServiceImpl;
+import app.security.UserDetailsServiceImpl;
 import app.user.service.UserService;
 import app.web.dto.*;
 import jakarta.validation.Valid;

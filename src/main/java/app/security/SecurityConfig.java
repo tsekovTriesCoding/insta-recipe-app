@@ -1,4 +1,4 @@
-package app.config;
+package app.security;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
@@ -13,10 +13,12 @@ import org.springframework.security.web.SecurityFilterChain;
 @EnableWebSecurity
 public class SecurityConfig {
     private final CustomAuthenticationFailureHandler customAuthenticationFailureHandler;
+    private final UserDetailsServiceImpl customUserDetailsService;
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         return http
+                .userDetailsService(customUserDetailsService)
                 .authorizeHttpRequests(authorizeRequests -> {
                     authorizeRequests
                             .requestMatchers(PathRequest.toStaticResources().atCommonLocations()).permitAll()
