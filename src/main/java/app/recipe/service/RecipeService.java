@@ -113,19 +113,6 @@ public class RecipeService {
                 .build();
     }
 
-    private String saveImage(MultipartFile file, String recipeTitle) throws IOException {
-        Path destinationFile = Paths
-                .get("src", "main", "resources", "static/images/uploads", recipeTitle + ".png")
-                .normalize()
-                .toAbsolutePath();
-
-        try (InputStream inputStream = file.getInputStream()) {
-            Files.copy(inputStream, destinationFile, StandardCopyOption.REPLACE_EXISTING);
-        }
-
-        return destinationFile.getFileName().toString();
-    }
-
     public List<Recipe> getRecipesByCreator(String username) {
         User user = userService.getByUsername(username);
         return recipeRepository.findAllByCreatedBy(user);
