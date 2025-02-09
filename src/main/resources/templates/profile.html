@@ -66,6 +66,9 @@
                 <div class="mt-2 align-self-center position-relative">
                     <p th:text="|Date registered: ${#temporals.format(userProfileInfo.dateRegistered, 'dd MMM YYYY HH:mm')}|"></p>
                 </div>
+                <div th:if="*{dateUpdated}" class="mt-2 align-self-center position-relative">
+                    <p th:text="|Last Profile Update: ${#temporals.format(userProfileInfo.dateUpdated, 'dd MMM YYYY HH:mm')}|"></p>
+                </div>
 
             </div>
         </div>

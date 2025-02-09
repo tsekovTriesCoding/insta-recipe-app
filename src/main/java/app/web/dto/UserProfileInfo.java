@@ -18,4 +18,5 @@ public class UserProfileInfo {
     private String email;
     private String profilePictureUrl;
     private LocalDateTime dateRegistered;
+    private LocalDateTime dateUpdated;
 }
