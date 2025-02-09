@@ -20,7 +20,6 @@ public class SecurityConfig {
                 .authorizeHttpRequests(authorizeRequests -> {
                     authorizeRequests
                             .requestMatchers(PathRequest.toStaticResources().atCommonLocations()).permitAll()
-                            .requestMatchers("/images/uploads/**").permitAll()
                             .requestMatchers("/", "/users/login", "/users/register", "/about").permitAll()
                             .requestMatchers("/api/comments/**").authenticated()
                             .requestMatchers("/admin/**").hasRole("ADMIN") // this is for only the admin can access the admin pages

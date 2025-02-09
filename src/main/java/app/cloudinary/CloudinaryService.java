@@ -23,7 +23,7 @@ public class CloudinaryService {
      * @return the secure URL of the uploaded image.
      */
     public String uploadImage(MultipartFile file) {
-        // Upload options: you can specify transformation parameters if needed
+        // Upload options: I can add some option I could like... maybe custom name
         try {
             Map<?, ?> uploadResult = cloudinary.uploader().upload(file.getBytes(), ObjectUtils.emptyMap());
             return uploadResult.get("secure_url").toString();

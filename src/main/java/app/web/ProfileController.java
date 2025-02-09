@@ -18,7 +18,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import java.io.IOException;
 import java.util.UUID;
 
 @RequiredArgsConstructor
@@ -62,7 +61,7 @@ public class ProfileController {
     public ModelAndView changeMyProfilePicture(@PathVariable UUID id,
                                                @Valid ChangeProfilePicture changeProfilePicture,
                                                BindingResult bindingResult,
-                                               RedirectAttributes redirectAttributes) throws IOException {
+                                               RedirectAttributes redirectAttributes) {
 
         if (bindingResult.hasErrors()) {
             UserProfileInfo userProfileInfo = userService.getUserProfileInfoById(id);
