@@ -1,11 +1,9 @@
 package app.web;
 
-import app.exception.UserAlreadyExistsException;
 import app.exception.UserNotFoundException;
 import app.user.service.UserDetailsServiceImpl;
 import app.user.service.UserService;
 import app.web.dto.*;
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;

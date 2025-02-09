@@ -78,7 +78,6 @@ public class RecipeService {
 //        String imageUrl = saveImage(recipe.getImage(), title + "-recipe");
 
         String imageUrl = cloudinaryService.uploadImage(recipe.getImage());
-
         Recipe newRecipe = initializeRecipe(recipe, user, imageUrl);
 
         return recipeRepository.save(newRecipe);
