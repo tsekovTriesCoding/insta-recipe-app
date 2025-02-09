@@ -11,6 +11,9 @@ import app.web.dto.RecipeDetails;
 import app.web.dto.RecipeShortInfo;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
@@ -36,8 +39,8 @@ public class RecipeController {
     }
 
     @GetMapping("/all")
-    public String allRecipes(Model model) {
-        List<RecipeShortInfo> recipes = recipeService.getAll();
+    public String allRecipes(Model model, @PageableDefault(size = 3) Pageable pageable) {
+        Page<RecipeShortInfo> recipes = recipeService.getAll(pageable);
 
         model.addAttribute("recipes", recipes);
 

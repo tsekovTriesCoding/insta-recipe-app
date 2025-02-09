@@ -12,6 +12,8 @@ import app.user.model.User;
 import app.user.service.UserService;
 import app.web.dto.*;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -29,13 +31,10 @@ public class RecipeService {
     private final UserService userService;
     private final CloudinaryService cloudinaryService;
 
-    public List<RecipeShortInfo> getAll() {
-        List<Recipe> recipes = recipeRepository.findAll();
+    public Page<RecipeShortInfo> getAll(Pageable pageable) {
+        Page<Recipe> recipePage = recipeRepository.findAll(pageable);
 
-        return recipes
-                .stream()
-                .map(DtoMapper::mapRecipeToRecipeShortInfo)
-                .toList();
+        return recipePage.map(DtoMapper::mapRecipeToRecipeShortInfo);
     }
 
     @Transactional(readOnly = true)
