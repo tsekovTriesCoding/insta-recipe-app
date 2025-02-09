@@ -27,6 +27,10 @@
                         Change Picture
                     </button>
                 </div>
+                <div class="profile-status-container align-self-center mt-lg-3">
+                    <p th:if="*{isActive}" class="active-profile">ACTIVE</p>
+                    <p th:unless="*{isActive}" class="inactive-profile">INACTIVE</p>
+                </div>
                 <div class="container">
                     <div class="m-xl-4">
                         <label for="username" class="form-label fw-bold text-dark">Username</label>

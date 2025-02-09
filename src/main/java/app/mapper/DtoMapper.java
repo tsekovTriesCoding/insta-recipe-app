@@ -18,6 +18,7 @@ public class DtoMapper {
                 .profilePictureUrl(user.getProfilePicture())
                 .dateRegistered(user.getDateRegistered())
                 .dateUpdated(user.getDateUpdated())
+                .isActive(user.getIsActive())
                 .build();
     }
 

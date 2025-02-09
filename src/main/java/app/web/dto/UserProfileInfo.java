@@ -19,4 +19,5 @@ public class UserProfileInfo {
     private String profilePictureUrl;
     private LocalDateTime dateRegistered;
     private LocalDateTime dateUpdated;
+    private Boolean isActive;
 }
