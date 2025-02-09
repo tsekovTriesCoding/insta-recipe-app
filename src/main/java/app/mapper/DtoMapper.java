@@ -28,6 +28,7 @@ public class DtoMapper {
                 .username(user.getUsername())
                 .email(user.getEmail())
                 .role(user.getRole())
+                .isActive(user.getIsActive())
                 .build();
     }
 

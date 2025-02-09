@@ -18,6 +18,7 @@ document.addEventListener("DOMContentLoaded", function () {
                             <td>${user.username}</td>
                             <td>${user.email}</td>
                             <td>${user.role}</td>
+                            <td>${user.active ? 'Active' : 'Inactive'}</td>
                             <td>
                                 <button class="btn btn-warning btn-sm update-role" data-id="${user.id}">Update Role</button>
                                 <button class="btn btn-danger btn-sm delete-user" data-id="${user.id}">Delete</button>
