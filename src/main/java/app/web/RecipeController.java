@@ -69,7 +69,7 @@ public class RecipeController {
     @PostMapping("/add")
     public String addRecipe(@Valid AddRecipe addRecipe,
                             BindingResult bindingResult,
-                            @AuthenticationPrincipal UserDetails userDetails) throws IOException {
+                            @AuthenticationPrincipal UserDetails userDetails) {
 
         if (bindingResult.hasErrors()) {
             /*

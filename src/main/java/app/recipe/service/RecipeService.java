@@ -3,6 +3,7 @@ package app.recipe.service;
 import app.category.model.Category;
 import app.category.model.CategoryName;
 import app.category.service.CategoryService;
+import app.cloudinary.CloudinaryService;
 import app.exception.RecipeNotFoundException;
 import app.mapper.DtoMapper;
 import app.recipe.model.Recipe;
@@ -33,6 +34,7 @@ public class RecipeService {
     private final RecipeRepository recipeRepository;
     private final CategoryService categoryService;
     private final UserService userService;
+    private final CloudinaryService cloudinaryService;
 
     public List<RecipeShortInfo> getAll() {
         List<Recipe> recipes = recipeRepository.findAll();
@@ -69,18 +71,20 @@ public class RecipeService {
                 orElseThrow(() -> new RecipeNotFoundException("Recipe with id " + recipeId + " not found."));
     }
 
-    public Recipe create(AddRecipe recipe, String username) throws IOException {
+    public Recipe create(AddRecipe recipe, String username) {
         User user = userService.getByUsername(username);
 
-        String title = recipe.getTitle();
+//        String title = recipe.getTitle();
+//
+//        if (recipeRepository.existsByTitle(title)) {
+//            List<Recipe> allByTitle = recipeRepository.getAllByTitle(title);
+//
+//            title = title + allByTitle.size();
+//        }
+//
+//        String imageUrl = saveImage(recipe.getImage(), title + "-recipe");
 
-        if (recipeRepository.existsByTitle(title)) {
-            List<Recipe> allByTitle = recipeRepository.getAllByTitle(title);
-
-            title = title + allByTitle.size();
-        }
-
-        String imageUrl = saveImage(recipe.getImage(), title + "-recipe");
+        String imageUrl = cloudinaryService.uploadImage(recipe.getImage());
 
         Recipe newRecipe = initializeRecipe(recipe, user, imageUrl);
 
@@ -105,7 +109,7 @@ public class RecipeService {
                 .servings(recipe.getServings())
                 .cookTime(recipe.getCookTime())
                 .prepTime(recipe.getPrepTime())
-                .image("/images/uploads/" + imageUrl)
+                .image(imageUrl)
                 .build();
     }
 
@@ -147,7 +151,7 @@ public class RecipeService {
     }
 
     @Transactional
-    public void update(EditRecipe recipe) throws IOException {
+    public void update(EditRecipe recipe) {
         Recipe recipeToUpdate = this.getById(recipe.getId());
         List<Category> categories = recipe.getCategories()
                 .stream()
@@ -190,8 +194,8 @@ public class RecipeService {
         }
 
         if (recipe.getImage() != null && !recipe.getImage().isEmpty()) {
-            String s = saveImage(recipe.getImage(), recipeToUpdate.getTitle() + "-recipe");
-            recipeToUpdate.setImage(s);
+            String imageUrl = cloudinaryService.uploadImage(recipe.getImage());
+            recipeToUpdate.setImage(imageUrl);
         }
 
         recipeRepository.save(recipeToUpdate);
