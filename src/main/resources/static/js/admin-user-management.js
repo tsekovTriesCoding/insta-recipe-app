@@ -18,7 +18,7 @@ document.addEventListener("DOMContentLoaded", function () {
                             <td>${user.username}</td>
                             <td>${user.email}</td>
                             <td>${user.role}</td>
-                            <td class="status">${user.active ? 'Active' : 'Inactive'}</td>
+                            <td class="status ${user.active ? 'active-profile' : 'inactive-profile'}">${user.active ? 'Active' : 'Inactive'}</td>
                             <td>
                                 <button class="btn btn-warning btn-sm update-role" data-id="${user.id}">Update Role</button>
                                 <button class="btn btn-info btn-sm change-status" data-id="${user.id}">Change Status</button>

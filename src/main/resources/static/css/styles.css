@@ -323,3 +323,23 @@
     box-shadow: 0 4px 10px rgba(244, 67, 54, 0.2);
     transition: all 0.3s ease-in-out;
 }
+
+/*-----------------------*/
+
+.status.active-profile {
+    background-color: #e0f7e9;
+    color: #2e7d32;
+    font-weight: bold;
+    padding: 5px;
+    border-radius: 5px;
+    text-align: center;
+}
+
+.status.inactive-profile {
+    background-color: #fbe9e7;
+    color: #c62828;
+    font-weight: bold;
+    padding: 5px;
+    border-radius: 5px;
+    text-align: center;
+}
