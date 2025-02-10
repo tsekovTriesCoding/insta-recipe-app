@@ -133,6 +133,19 @@ public class UserService {
         return false;
     }
 
+    public boolean updateUserStatus(UUID userId, boolean isActive) {
+        Optional<User> userOptional = userRepository.findById(userId);
+
+        if (userOptional.isPresent()) {
+            User user = userOptional.get();
+            user.setIsActive(isActive);
+            userRepository.save(user);
+            return true;
+        }
+
+        return false;
+    }
+
     private User getUserById(UUID userId) {
         return userRepository.findById(userId)
                 .orElseThrow(() -> new UserNotFoundException("User with id " + userId + " not found."));

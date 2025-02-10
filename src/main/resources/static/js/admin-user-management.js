@@ -18,10 +18,10 @@ document.addEventListener("DOMContentLoaded", function () {
                             <td>${user.username}</td>
                             <td>${user.email}</td>
                             <td>${user.role}</td>
-                            <td>${user.active ? 'Active' : 'Inactive'}</td>
+                            <td class="status">${user.active ? 'Active' : 'Inactive'}</td>
                             <td>
                                 <button class="btn btn-warning btn-sm update-role" data-id="${user.id}">Update Role</button>
-                                <button class="btn btn-danger btn-sm delete-user" data-id="${user.id}">Delete</button>
+                                <button class="btn btn-info btn-sm change-status" data-id="${user.id}">Change Status</button>
                             </td>
                         </tr>
                     `;
@@ -32,9 +32,12 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     userTableBody.addEventListener("click", function (event) {
-        if (event.target.classList.contains("delete-user")) {
+        if (event.target.classList.contains("change-status")) {
             const userId = event.target.getAttribute("data-id");
-            deleteUser(userId);
+            const status = event.target.parentElement.parentElement.querySelector('.status').textContent;
+            const isActive = status === 'Active';
+
+            toggleUserStatus(userId, isActive);
         }
         if (event.target.classList.contains("update-role")) {
             const userId = event.target.getAttribute("data-id");
@@ -42,17 +45,29 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     });
 
-    function deleteUser(userId) {
-        if (!confirm("Are you sure you want to delete this user?")) return;
+    function toggleUserStatus(userId, isActive) {
+        const newStatus = !isActive; // Toggle the status
 
-        fetch(`/api/admin/users/${userId}`, {method: "DELETE"})
+        if (!confirm(`Are you sure you want to ${newStatus ? "activate" : "deactivate"} this user?`)) return;
+
+        const csrfToken = document.querySelector("meta[name='_csrf']").getAttribute("content");
+        const csrfHeader = document.querySelector("meta[name='_csrf_header']").getAttribute("content");
+
+        fetch(`/api/admin/users/${userId}/status`, {
+            method: "PUT",
+            headers: {
+                "Content-Type": "application/json",
+                [csrfHeader]: csrfToken
+            },
+            body: JSON.stringify({isActive: newStatus})
+        })
             .then(response => {
                 if (!response.ok) {
-                    throw new Error("Failed to delete user");
+                    throw new Error("Failed to update user status");
                 }
                 fetchUsers();
             })
-            .catch(error => console.error("Error deleting user:", error));
+            .catch(error => console.error("Error updating user status:", error));
     }
 
     function updateUserRole(userId) {

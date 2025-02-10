@@ -62,6 +62,26 @@ public class AdminRestController {
         return ResponseEntity.badRequest().body("Failed to update user role");
     }
 
+    @PutMapping("/users/{userId}/status")
+    public ResponseEntity<String> updateUserStatus(@PathVariable UUID userId,
+                                                   @RequestBody Map<String, String> requestBody) {
+
+        String newStatus = requestBody.get("isActive");
+
+        if (newStatus == null || newStatus.isEmpty()) {
+            return ResponseEntity.badRequest().body("Status cannot be empty.");
+        }
+
+        boolean updated = userService.updateUserStatus(userId, Boolean.parseBoolean(newStatus));
+
+        if (updated) {
+            return ResponseEntity.ok("User status updated successfully");
+        }
+
+        return ResponseEntity.badRequest().body("Failed to update user status");
+
+    }
+
     @DeleteMapping("/recipes/{recipeId}")
     public ResponseEntity<Void> deleteRecipe(@PathVariable UUID recipeId) {
         recipeService.delete(recipeId);
