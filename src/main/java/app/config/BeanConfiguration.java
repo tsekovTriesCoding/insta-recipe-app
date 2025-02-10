@@ -13,7 +13,7 @@ public class BeanConfiguration {
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
-    
+
     @Bean
     public WebClient.Builder webClientBuilder() {
         return WebClient.builder();
