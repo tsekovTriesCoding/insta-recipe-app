@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html class="h-100" lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/commons::head}"></head>
+<body class="d-flex flex-column h-100">
+<header th:replace="~{fragments/commons::header}"></header>
+
+<main class=" flex-shrink-0">
+    <section class="recipes">
+        <div class="container my-5 vh-100">
+            <h1 class="text-center mb-4">Favorite Recipes</h1>
+            <div class="row g-4">
+                <div th:each="recipe : ${favoriteRecipes}" class="col-md-4 d-flex align-items-stretch">
+                    <div class="card shadow border-0 w-100">
+                        <div class="card-img-top-container" style="height: 200px; overflow: hidden;">
+                            <img th:src="${recipe.image}" class="card-img-top" alt="Recipe Image"
+                                 style="object-fit: cover; width: 100%; height: 100%;">
+                        </div>
+                        <div class="card-body text-center d-flex flex-column">
+                            <h5 th:text="*{recipe.title}" class="card-title">Chocolate Lava Cake</h5>
+                            <div class="d-flex justify-content-center mb-2">
+                                <div class="me-3">
+                                    <i class="bi bi-clock custom-icon me-1"></i> <span
+                                        th:text="${recipe.cookTime}">20</span> mins
+                                </div>
+                                <div>
+                                    <i class="bi bi-person-fill custom-icon me-1"></i> <span
+                                        th:text="${recipe.servings}">4-6</span> servings
+                                </div>
+                            </div>
+                            <p th:text="${recipe.description.length() > 70 ? #strings.substring(recipe.description, 0, 70) + '...' : recipe.description}"
+                               class="card-text flex-grow-1">Rich and indulgent with a gooey center.</p>
+                            <div class="mt-auto">
+                                <a th:href="@{/recipes/{id}(id=${recipe.id})}" class="btn-recipes btn btn-primary">View
+                                    Recipe</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+</main>
+
+<footer th:replace="~{fragments/commons::footer}"></footer>
+</body>
+</html>

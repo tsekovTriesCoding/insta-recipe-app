@@ -41,7 +41,7 @@ public class FavoriteController {
         List<Recipe> favoriteRecipes = recipeService.getRecipesByIds(favoriteRecipeIds);
 
         model.addAttribute("favoriteRecipes", favoriteRecipes);
-        return "favorites";
+        return "favorite-recipes";
     }
 
     @PostMapping("/add")

@@ -49,6 +49,10 @@
                         <a class="nav-link btn btn-outline-primary px-3 py-2" th:href="@{/recipes/my-recipes}">My
                             Recipes</a>
                     </li>
+                    <li sec:authorize="${isAuthenticated()}" class="nav-item">
+                        <a class="nav-link btn btn-outline-primary px-3 py-2" th:href="@{/favorites}">My Favorite
+                            Recipes</a>
+                    </li>
                     <li sec:authorize="${!isAuthenticated()}" class="nav-item">
                         <a class="nav-link btn btn-outline-primary px-3 py-2" th:href="@{/users/login}">Login</a>
                     </li>
