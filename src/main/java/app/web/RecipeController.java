@@ -2,9 +2,11 @@ package app.web;
 
 import app.category.model.CategoryName;
 import app.exception.RecipeNotFoundException;
+import app.favorite.FavoriteServiceClient;
 import app.like.service.LikeService;
 import app.recipe.model.Recipe;
 import app.recipe.service.RecipeService;
+import app.user.service.UserService;
 import app.web.dto.AddRecipe;
 import app.web.dto.EditRecipe;
 import app.web.dto.RecipeDetails;
@@ -32,6 +34,8 @@ public class RecipeController {
 
     private final RecipeService recipeService;
     private final LikeService likeService;
+    private final UserService userService;
+    private final FavoriteServiceClient favoriteServiceClient;
 
     @ModelAttribute(name = "categories")
     public CategoryName[] categoryName() {
@@ -69,9 +73,15 @@ public class RecipeController {
         boolean isCreator = recipe.getCreator().equals(userDetails.getUsername());
         boolean hasLiked = likeService.userHasLikedRecipe(userDetails.getUsername(), id);
 
+        UUID userId = userService.getByUsername(userDetails.getUsername()).getId();
+
+        List<UUID> favoriteRecipes = favoriteServiceClient.getFavoriteRecipeIds(userId);
+        boolean isFavorite = favoriteRecipes.contains(id);
+
         model.addAttribute("recipe", recipe);
         model.addAttribute("isCreator", isCreator);
         model.addAttribute("hasLiked", hasLiked);
+        model.addAttribute("isFavorite", isFavorite);
 
         return "recipe-details";
     }

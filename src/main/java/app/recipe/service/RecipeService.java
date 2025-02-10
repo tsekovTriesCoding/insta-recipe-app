@@ -196,4 +196,8 @@ public class RecipeService {
 
         return recipesByTitle.map(DtoMapper::mapRecipeToRecipeShortInfo);
     }
+
+    public List<Recipe> getRecipesByIds(List<UUID> favoriteRecipeIds) {
+        return recipeRepository.findAllByIdIn(favoriteRecipeIds);
+    }
 }
