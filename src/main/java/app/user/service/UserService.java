@@ -146,6 +146,12 @@ public class UserService {
         return false;
     }
 
+    public void updateLastLogin(String username) {
+        User user = getByUsername(username);
+        user.setLastLogin(LocalDateTime.now());
+        userRepository.save(user);
+    }
+
     private User getUserById(UUID userId) {
         return userRepository.findById(userId)
                 .orElseThrow(() -> new UserNotFoundException("User with id " + userId + " not found."));
@@ -160,11 +166,5 @@ public class UserService {
                 .dateRegistered(LocalDateTime.now())
                 .role(Role.USER) //every new user has user role by default
                 .build();
-    }
-
-    public void updateLastLogin(String username) {
-        User user = getByUsername(username);
-        user.setLastLogin(LocalDateTime.now());
-        userRepository.save(user);
     }
 }
