@@ -41,5 +41,8 @@ public class User {
     private LocalDateTime dateUpdated;
 
     private Boolean isActive;
+
+    @Column(name = "last_login")
+    private LocalDateTime lastLogin;
 }
 

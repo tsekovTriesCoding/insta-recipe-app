@@ -161,4 +161,10 @@ public class UserService {
                 .role(Role.USER) //every new user has user role by default
                 .build();
     }
+
+    public void updateLastLogin(String username) {
+        User user = getByUsername(username);
+        user.setLastLogin(LocalDateTime.now());
+        userRepository.save(user);
+    }
 }
