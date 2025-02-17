@@ -12,4 +12,10 @@ public class GlobalExceptionHandler {
         model.addAttribute("error", ex.getMessage());
         return "error-page";
     }
+
+    @ExceptionHandler(CategoryNotFoundException.class)
+    public String handleCategoryNotFoundException(CategoryNotFoundException ex, Model model) {
+        model.addAttribute("error", ex.getMessage());
+        return "error-page";
+    }
 }

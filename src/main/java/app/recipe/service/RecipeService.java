@@ -85,7 +85,8 @@ public class RecipeService {
     private Recipe initializeRecipe(AddRecipe recipe, User creator, String imageUrl) {
         List<Category> categories = recipe.getCategories()
                 .stream()
-                .map(categoryService::getByName).toList();
+                .map(categoryService::getByName)
+                .toList();
 
         List<String> ingredients = Arrays.stream(recipe.getIngredients().split(",")).toList();
 

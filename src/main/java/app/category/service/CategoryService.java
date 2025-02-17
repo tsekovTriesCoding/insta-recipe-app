@@ -27,7 +27,7 @@ public class CategoryService {
                 .toList();
     }
 
-    //TODO:handle category nor found exception!
+    //TODO:handle category not found exception!
     public CategoryDetails getById(UUID id) {
         return categoryRepository.findById(id)
                 .map(DtoMapper::mapCategoryToCategoryDetails)
