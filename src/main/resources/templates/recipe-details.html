@@ -49,10 +49,9 @@
                 <h3>Steps</h3>
                 <p th:text="*{instructions}"></p>
 
-                <a th:href="@{/recipes/edit/{id}(id=${recipe.id})}" class="btn-recipes btn btn-primary">Edit Recipe</a>
-                <form th:method="post" th:action="@{/favorites/{action}(action=${isFavorite ? 'remove' : 'add'})}">
+                <form th:method="post" th:action="@{/favorites/{action}(action=${isFavorite ? 'remove' : 'add'})}" class="d-flex justify-content-center">
                     <input type="hidden" name="recipeId" th:value="${recipe.id}">
-                    <button type="submit" class="btn btn-primary" th:text="${isFavorite ? 'Remove from Favorites' : 'Add to Favorites'}"></button>
+                    <button type="submit" class="btn-recipes btn btn-primary" th:text="${isFavorite ? 'Remove from Favorites' : 'Add to Favorites'}"></button>
                 </form>
             </div>
         </div>
