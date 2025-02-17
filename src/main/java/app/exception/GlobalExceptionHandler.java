@@ -24,4 +24,10 @@ public class GlobalExceptionHandler {
         model.addAttribute("error", ex.getMessage());
         return "error-page";
     }
+
+    @ExceptionHandler(ImageUploadException.class)
+    public String handleImageUploadException(ImageUploadException ex, Model model) {
+        model.addAttribute("error", ex.getMessage());
+        return "error-page";
+    }
 }
