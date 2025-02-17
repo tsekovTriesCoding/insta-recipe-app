@@ -18,4 +18,10 @@ public class GlobalExceptionHandler {
         model.addAttribute("error", ex.getMessage());
         return "error-page";
     }
+
+    @ExceptionHandler(RecipeNotFoundException.class)
+    public String handleRecipeNotFoundException(RecipeNotFoundException ex, Model model) {
+        model.addAttribute("error", ex.getMessage());
+        return "error-page";
+    }
 }
