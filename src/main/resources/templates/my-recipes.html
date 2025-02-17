@@ -17,28 +17,32 @@
 
                 <div class="row g-4">
                     <div th:each="recipe : ${myRecipes}" class="col-md-4">
-                        <div class="card h-100 shadow border-2">
-                            <div class="card-img-top-container" style="height: 200px; overflow: hidden;">
-                                <img th:src="${recipe.image}" class="card-img-top" alt="Recipe Image"
-                                     style="object-fit: cover; width: 100%; height: 100%;">
+                        <div class="card h-100 shadow border-2 d-flex flex-column">
+                            <div class="card-img-container" style="height: 200px; overflow: hidden;">
+                                <img th:src="${recipe.image}" class="card-img-top img-fluid w-100 h-100 object-fit-cover"
+                                     alt="Recipe Image">
                             </div>
-                            <div class="card-body text-center">
-                                <h5 th:text="${recipe.title}" class="card-title">Spaghetti Carbonara</h5>
+                            <div class="card-body text-center d-flex flex-column">
+                                <h5 th:text="${recipe.title}" class="card-title"
+                                    style="min-height: 50px; display: flex; align-items: center; justify-content: center;">
+                                    Spaghetti Carbonara
+                                </h5>
+
                                 <p th:text="|Published on: ${#temporals.format(recipe.createdDate, 'dd MMM YYYY HH:mm')}|"
-                                   class="card-text text-muted">Published on: <strong>Dec
-                                    28, 2024</strong></p>
-                                <div class="d-flex justify-content-between">
-                                    <a th:href="@{/recipes/edit/{id}(id=${recipe.id})}" class="btn btn-primary btn-sm">Edit</a>
-                                    <form th:method="DELETE"
-                                          th:action="@{/recipes/delete/{id}(id=${recipe.id})}">
+                                   class="card-text text-muted small">Published on: <strong>Dec 28, 2024</strong></p>
+
+                                <div class="mt-auto d-flex justify-content-between">
+                                    <a th:href="@{/recipes/edit/{id}(id=${recipe.id})}" class="btn btn-primary btn-sm w-45">Edit</a>
+                                    <form th:method="DELETE" th:action="@{/recipes/delete/{id}(id=${recipe.id})}">
                                         <input type="hidden" name="_method" value="delete">
-                                        <input type="submit" class="btn btn-danger btn-sm" value="Delete"/>
+                                        <input type="submit" class="btn btn-danger btn-sm w-45" value="Delete"/>
                                     </form>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
+
             </div>
         </div>
     </section>
