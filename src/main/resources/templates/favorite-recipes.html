@@ -33,6 +33,12 @@
                                 <a th:href="@{/recipes/{id}(id=${recipe.id})}" class="btn-recipes btn btn-primary">View
                                     Recipe</a>
                             </div>
+                            <div class="mt-auto">
+                                <form th:method="DELETE" th:action="@{/favorites/remove}" class="d-flex justify-content-center">
+                                    <input type="hidden" name="recipeId" th:value="${recipe.id}">
+                                    <button type="submit" class="btn-recipes btn btn-primary">Remove from favorites</button>
+                                </form>
+                            </div>
                         </div>
                     </div>
                 </div>

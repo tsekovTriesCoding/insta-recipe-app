@@ -49,9 +49,9 @@
                 <h3>Steps</h3>
                 <p th:text="*{instructions}"></p>
 
-                <form th:method="post" th:action="@{/favorites/{action}(action=${isFavorite ? 'remove' : 'add'})}" class="d-flex justify-content-center">
+                <form th:unless="${isFavorite}" th:method="POST" th:action="@{/favorites/add}" class="d-flex justify-content-center">
                     <input type="hidden" name="recipeId" th:value="${recipe.id}">
-                    <button type="submit" class="btn-recipes btn btn-primary" th:text="${isFavorite ? 'Remove from Favorites' : 'Add to Favorites'}"></button>
+                    <button type="submit" class="btn-recipes btn btn-primary">Add to Favorites</button>
                 </form>
             </div>
         </div>
