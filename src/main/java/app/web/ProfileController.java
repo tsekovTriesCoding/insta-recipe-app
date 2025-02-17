@@ -155,12 +155,4 @@ public class ProfileController {
 
         SecurityContextHolder.getContext().setAuthentication(newAuth);
     }
-
-    @ExceptionHandler(UserNotFoundException.class)
-    public String handleUserNotFoundException(UserNotFoundException ex,
-                                              Model model) {
-
-        model.addAttribute("error", ex.getMessage());
-        return "error-page";
-    }
 }
