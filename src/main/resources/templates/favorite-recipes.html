@@ -8,7 +8,21 @@
     <section class="recipes">
         <div class="container my-5 vh-100">
             <h1 class="text-center mb-4">Favorite Recipes</h1>
+            <div th:if="${successMessage}" class="alert alert-success alert-dismissible fade show w-50 mx-auto"
+                 role="alert">
+                <p th:text="${successMessage}" class="m-0"></p>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+            <div th:if="${errorMessage}" class="alert alert-danger alert-dismissible fade show w-50 mx-auto"
+                 role="alert">
+                <p th:text="${errorMessage}" class="m-0"></p>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
             <div class="row g-4">
+                <div th:if="${#lists.isEmpty(favoriteRecipes)}" class="text-center my-5">
+                    <h3 class="text-white">No favorites yet</h3>
+                </div>
+
                 <div th:each="recipe : ${favoriteRecipes}" class="col-md-4 d-flex align-items-stretch">
                     <div class="card shadow border-0 w-100">
                         <div class="card-img-top-container" style="height: 200px; overflow: hidden;">
@@ -29,18 +43,22 @@
                             </div>
                             <p th:text="${recipe.description.length() > 70 ? #strings.substring(recipe.description, 0, 70) + '...' : recipe.description}"
                                class="card-text flex-grow-1">Rich and indulgent with a gooey center.</p>
-                            <div class="mt-auto">
-                                <a th:href="@{/recipes/{id}(id=${recipe.id})}" class="btn-recipes btn btn-primary">View
+                            <div class="mt-auto d-flex gap-2">
+                                <a th:href="@{/recipes/{id}(id=${recipe.id})}" class="btn btn-primary w-50">View
                                     Recipe</a>
-                            </div>
-                            <div class="mt-auto">
-                                <form th:method="DELETE" th:action="@{/favorites/remove}" class="d-flex justify-content-center">
+                                <form th:method="DELETE" th:action="@{/favorites/remove}" class="w-50">
                                     <input type="hidden" name="recipeId" th:value="${recipe.id}">
-                                    <button type="submit" class="btn-recipes btn btn-primary">Remove from favorites</button>
+                                    <button type="submit" class="btn btn-danger w-100">Remove from Favorites</button>
                                 </form>
                             </div>
                         </div>
                     </div>
+                </div>
+
+                <div class="d-flex justify-content-center mt-4">
+                    <a th:href="@{/recipes/all}"
+                       class="btn-recipes btn btn-lg btn-light px-5 py-3 shadow text-capitalize">See all
+                        recipes</a>
                 </div>
             </div>
         </div>
