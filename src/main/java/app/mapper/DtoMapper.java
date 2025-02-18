@@ -77,4 +77,13 @@ public class DtoMapper {
                 .recipes(category.getRecipes())
                 .build();
     }
+
+    public static CommentForAdminPage mapCommentToCommentForAdminPage(Comment comment) {
+        return CommentForAdminPage.builder()
+                .id(comment.getId())
+                .author(comment.getCreator().getUsername())
+                .content(comment.getContent())
+                .createdDate(comment.getCreatedDate())
+                .build();
+    }
 }

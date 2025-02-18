@@ -1,7 +1,9 @@
 package app.web;
 
+import app.comment.service.CommentService;
 import app.recipe.service.RecipeService;
 import app.user.service.UserService;
+import app.web.dto.CommentForAdminPage;
 import app.web.dto.RecipeForAdminPageInfo;
 import app.web.dto.UserWithRole;
 import lombok.RequiredArgsConstructor;
@@ -21,6 +23,7 @@ public class AdminRestController {
 
     private final UserService userService;
     private final RecipeService recipeService;
+    private final CommentService commentService;
 
     @GetMapping("/users")
     public ResponseEntity<List<UserWithRole>> getUsers() {
@@ -85,6 +88,23 @@ public class AdminRestController {
     @DeleteMapping("/recipes/{recipeId}")
     public ResponseEntity<Void> deleteRecipe(@PathVariable UUID recipeId) {
         recipeService.delete(recipeId);
+        return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/comments")
+    public ResponseEntity<List<CommentForAdminPage>> getComments() {
+        List<CommentForAdminPage> comments = commentService.getAll();
+
+        if (comments.isEmpty()) {
+            return ResponseEntity.noContent().build();
+        }
+
+        return ResponseEntity.ok(comments);
+    }
+
+    @DeleteMapping("/comments/{commentId}")
+    public ResponseEntity<Void> deleteComment(@PathVariable UUID commentId) {
+        commentService.delete(commentId);
         return ResponseEntity.noContent().build();
     }
 }

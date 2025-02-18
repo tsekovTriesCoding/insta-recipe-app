@@ -19,4 +19,9 @@ public class AdminViewController {
     public String adminRecipeManagement() {
         return "admin-recipe-management";
     }
+
+    @GetMapping("/comments")
+    public String adminCommentManagement() {
+        return "admin-comment-management";
+    }
 }

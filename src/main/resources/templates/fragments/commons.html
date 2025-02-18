@@ -34,6 +34,7 @@
                         <ul class="dropdown-menu" aria-labelledby="adminDropdown">
                             <li><a class="dropdown-item" th:href="@{/admin/users}">Manage Users</a></li>
                             <li><a class="dropdown-item" th:href="@{/admin/recipes}">Manage Recipes</a></li>
+                            <li><a class="dropdown-item" th:href="@{/admin/comments}">Manage Comments</a></li>
                         </ul>
                     </li>
                     <li sec:authorize="${isAuthenticated()}" class="nav-item">

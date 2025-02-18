@@ -8,6 +8,7 @@ import app.recipe.service.RecipeService;
 import app.user.model.User;
 import app.user.service.UserService;
 import app.web.dto.CommentByRecipe;
+import app.web.dto.CommentForAdminPage;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -67,5 +68,16 @@ public class CommentService {
         }
 
         return false;
+    }
+
+    public List<CommentForAdminPage> getAll() {
+        return commentRepository.findAll()
+                .stream()
+                .map(DtoMapper::mapCommentToCommentForAdminPage)
+                .collect(Collectors.toList());
+    }
+
+    public void delete(UUID commentId) {
+        commentRepository.deleteById(commentId);
     }
 }

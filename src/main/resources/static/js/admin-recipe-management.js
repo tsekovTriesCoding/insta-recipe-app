@@ -3,6 +3,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     function fetchRecipes() {
         fetch("/api/admin/recipes")
+            //TODO: check if the response is 204 no content!
             .then(response => response.json())
             .then(recipes => {
                 recipesTableBody.innerHTML = "";
