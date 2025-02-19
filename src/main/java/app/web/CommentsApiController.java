@@ -1,6 +1,7 @@
 package app.web;
 
 import app.comment.service.CommentService;
+import app.security.CustomUserDetails;
 import app.web.dto.CommentByRecipe;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -34,8 +35,8 @@ public class CommentsApiController {
 
     @DeleteMapping("/delete/{commentId}")
     public ResponseEntity<Void> deleteComment(@PathVariable UUID commentId,
-                                              @AuthenticationPrincipal UserDetails userDetails) {
-        boolean isDeleted = commentService.deleteComment(commentId, userDetails.getUsername());
+                                              @AuthenticationPrincipal CustomUserDetails customUserDetails) {
+        boolean isDeleted = commentService.deleteComment(commentId, customUserDetails.getUsername());
 
         if (isDeleted) {
             return ResponseEntity.ok().build();
