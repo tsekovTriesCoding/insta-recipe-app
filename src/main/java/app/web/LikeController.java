@@ -30,12 +30,14 @@ public class LikeController {
     @ExceptionHandler(UserCannotLikeOwnRecipeException.class)
     public String handleCannotLikeOwnRecipe(UserCannotLikeOwnRecipeException ex, Model model) {
         model.addAttribute("error", ex.getMessage());
+
         return "error-page";
     }
 
     @ExceptionHandler(RecipeAlreadyLikedException.class)
     public String handleRecipeAlreadyLiked(RecipeAlreadyLikedException ex, Model model) {
         model.addAttribute("error", ex.getMessage());
+
         return "error-page";
     }
 }

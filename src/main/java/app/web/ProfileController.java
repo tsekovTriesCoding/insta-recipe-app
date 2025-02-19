@@ -70,7 +70,7 @@ public class ProfileController {
             return modelAndView;
         }
 
-        UserProfileInfo userProfileInfo = userService.updateProfilePicture(id, changeProfilePicture.getProfilePicture());
+        userService.updateProfilePicture(id, changeProfilePicture.getProfilePicture());
         ModelAndView modelAndView = new ModelAndView("redirect:/my-profile");
         redirectAttributes.addFlashAttribute("success", "Profile picture updated successfully");
 
@@ -92,7 +92,7 @@ public class ProfileController {
             return modelAndView;
         }
 
-        UserProfileInfo userProfileInfo = userService.updateUsername(id, changeUsername.getUsername());
+        userService.updateUsername(id, changeUsername.getUsername());
         updateAuthentication(changeUsername.getUsername(), SecurityContextHolder.getContext().getAuthentication());
 
         ModelAndView modelAndView = new ModelAndView("redirect:/my-profile");
@@ -116,7 +116,7 @@ public class ProfileController {
             return modelAndView;
         }
 
-        UserProfileInfo userProfileInfo = userService.updateEmail(id, changeEmail.getEmail());
+        userService.updateEmail(id, changeEmail.getEmail());
         ModelAndView modelAndView = new ModelAndView("redirect:/my-profile");
         redirectAttributes.addFlashAttribute("success", "Email updated successfully");
 
@@ -138,7 +138,7 @@ public class ProfileController {
             return modelAndView;
         }
 
-        UserProfileInfo userProfileInfo = userService.updatePassword(id, changePassword.getPassword());
+        userService.updatePassword(id, changePassword.getPassword());
         ModelAndView modelAndView = new ModelAndView("redirect:/my-profile");
         redirectAttributes.addFlashAttribute("success", "Password updated successfully");
 

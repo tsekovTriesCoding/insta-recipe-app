@@ -63,8 +63,8 @@ public class UserService implements UserDetailsService {
                 .orElseThrow(() -> new UserNotFoundException("User with id " + userId + " not found."));
     }
 
-    public UserProfileInfo updateProfilePicture(UUID userId,
-                                                MultipartFile file) {
+    public void updateProfilePicture(UUID userId,
+                                     MultipartFile file) {
 
         String imageUrl = cloudinaryService.uploadImage(file);
 
@@ -74,7 +74,7 @@ public class UserService implements UserDetailsService {
         User updated = userRepository.save(user);
 
         log.info("Successfully update profile picture for user [%s] with id [%s]".formatted(updated.getUsername(), updated.getId()));
-        return mapUserToUserProfileInfo(updated);
+        mapUserToUserProfileInfo(updated);
     }
 
     public UserProfileInfo getUserProfileInfo(UUID userId) {
@@ -82,31 +82,31 @@ public class UserService implements UserDetailsService {
         return mapUserToUserProfileInfo(user);
     }
 
-    public UserProfileInfo updateUsername(UUID userId, String username) {
+    public void updateUsername(UUID userId, String username) {
         User user = getUserById(userId);
         user.setUsername(username);
         User updated = userRepository.save(user);
 
         log.info("Successfully update profile username for user [%s] with id [%s]".formatted(updated.getUsername(), updated.getId()));
-        return mapUserToUserProfileInfo(updated);
+        mapUserToUserProfileInfo(updated);
     }
 
-    public UserProfileInfo updateEmail(UUID userId, String email) {
+    public void updateEmail(UUID userId, String email) {
         User user = getUserById(userId);
         user.setEmail(email);
         User updated = userRepository.save(user);
 
         log.info("Successfully update profile email for user [%s] with id [%s]".formatted(updated.getUsername(), updated.getId()));
-        return mapUserToUserProfileInfo(updated);
+        mapUserToUserProfileInfo(updated);
     }
 
-    public UserProfileInfo updatePassword(UUID userId, String password) {
+    public void updatePassword(UUID userId, String password) {
         User user = getUserById(userId);
         user.setPassword(passwordEncoder.encode(password));
         User updated = userRepository.save(user);
 
         log.info("Successfully update profile password for user [%s] with id [%s]".formatted(updated.getUsername(), updated.getId()));
-        return mapUserToUserProfileInfo(updated);
+        mapUserToUserProfileInfo(updated);
     }
 
     public boolean existsByUsername(String username) {
