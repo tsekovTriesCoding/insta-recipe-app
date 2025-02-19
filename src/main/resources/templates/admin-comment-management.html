@@ -1,20 +1,18 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<head th:replace="~{fragments/commons::head}">
     <title>Admin Comment Management</title>
-    <link href="/css/styles.css" rel="stylesheet"/>
-    <link href="/css/bootstrap.min.css" rel="stylesheet">
-    <meta name="_csrf" th:content="${_csrf.token}"/>
-    <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
 </head>
 <body>
 <div class="container mt-5 d-flex justify-content-center">
     <div class="card shadow-lg p-4 w-100" style="max-width: 900px;">
         <h2 class="text-center mb-4">Comment Management</h2>
-
-        <div class="table-responsive">
+        <div th:if="${message}" class="alert alert-success alert-dismissible fade show w-50 mx-auto"
+             role="alert">
+            <p th:text="${message}" class="m-0"></p>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+        <div th:unless="${#lists.isEmpty(comments)}" class="table-responsive">
             <table id="commentsTable" class="table table-bordered table-hover table-striped text-center align-middle">
                 <thead class="table-dark">
                 <tr>
@@ -24,17 +22,27 @@
                     <th>Actions</th>
                 </tr>
                 </thead>
-                <tbody id="commentTableBody"></tbody>
+                <tbody id="commentTableBody">
+                <tr th:each="comment : ${comments}">
+                    <td th:text="${comment.author}"></td>
+                    <td th:text="${comment.content}"></td>
+                    <td th:text="${comment.createdDate}"></td>
+                    <td>
+                        <form th:action="@{'/admin/comments/' + ${comment.id}}" th:method="DELETE">
+                            <button class="btn btn-danger btn-sm delete-comment">Delete</button>
+                        </form>
+                    </td>
+                </tr>
+                </tbody>
             </table>
         </div>
 
-        <div id="noCommentsMessage" class="text-center mt-4" style="display: none;">
+        <div th:if="${#lists.isEmpty(comments)}" class="text-center mt-4">
             <h4>No comments yet.</h4>
         </div>
         <a th:href="@{/home}" class="btn btn-primary w-25 align-self-center">Go to Home</a>
     </div>
 </div>
 
-<script src="/js/admin-comment-management.js" defer></script>
 </body>
 </html>

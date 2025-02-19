@@ -47,49 +47,49 @@ public class AdminRestController {
         return ResponseEntity.ok(all);
     }
 
-    @PutMapping("/users/{userId}/role")
-    public ResponseEntity<String> updateUserRole(@PathVariable UUID userId,
-                                                 @RequestBody Map<String, String> requestBody) {
-        String newRole = requestBody.get("role");
+//    @PutMapping("/users/{userId}/role")
+//    public ResponseEntity<String> updateUserRole(@PathVariable UUID userId,
+//                                                 @RequestBody Map<String, String> requestBody) {
+//        String newRole = requestBody.get("role");
+//
+//        if (newRole == null || newRole.isEmpty()) {
+//            return ResponseEntity.badRequest().body("Role cannot be empty.");
+//        }
+//
+//        boolean updated = userService.updateUserRole(userId, newRole);
+//
+//        if (updated) {
+//            return ResponseEntity.ok("User role updated successfully");
+//        }
+//
+//        return ResponseEntity.badRequest().body("Failed to update user role");
+//    }
 
-        if (newRole == null || newRole.isEmpty()) {
-            return ResponseEntity.badRequest().body("Role cannot be empty.");
-        }
+//    @PutMapping("/users/{userId}/status")
+//    public ResponseEntity<String> updateUserStatus(@PathVariable UUID userId,
+//                                                   @RequestBody Map<String, String> requestBody) {
+//
+//        String newStatus = requestBody.get("isActive");
+//
+//        if (newStatus == null || newStatus.isEmpty()) {
+//            return ResponseEntity.badRequest().body("Status cannot be empty.");
+//        }
+//
+//        boolean updated = userService.updateUserStatus(userId, Boolean.parseBoolean(newStatus));
+//
+//        if (updated) {
+//            return ResponseEntity.ok("User status updated successfully");
+//        }
+//
+//        return ResponseEntity.badRequest().body("Failed to update user status");
+//
+//    }
 
-        boolean updated = userService.updateUserRole(userId, newRole);
-
-        if (updated) {
-            return ResponseEntity.ok("User role updated successfully");
-        }
-
-        return ResponseEntity.badRequest().body("Failed to update user role");
-    }
-
-    @PutMapping("/users/{userId}/status")
-    public ResponseEntity<String> updateUserStatus(@PathVariable UUID userId,
-                                                   @RequestBody Map<String, String> requestBody) {
-
-        String newStatus = requestBody.get("isActive");
-
-        if (newStatus == null || newStatus.isEmpty()) {
-            return ResponseEntity.badRequest().body("Status cannot be empty.");
-        }
-
-        boolean updated = userService.updateUserStatus(userId, Boolean.parseBoolean(newStatus));
-
-        if (updated) {
-            return ResponseEntity.ok("User status updated successfully");
-        }
-
-        return ResponseEntity.badRequest().body("Failed to update user status");
-
-    }
-
-    @DeleteMapping("/recipes/{recipeId}")
-    public ResponseEntity<Void> deleteRecipe(@PathVariable UUID recipeId) {
-        recipeService.delete(recipeId);
-        return ResponseEntity.noContent().build();
-    }
+//    @DeleteMapping("/recipes/{recipeId}")
+//    public ResponseEntity<Void> deleteRecipe(@PathVariable UUID recipeId) {
+//        recipeService.delete(recipeId);
+//        return ResponseEntity.noContent().build();
+//    }
 
     @GetMapping("/comments")
     public ResponseEntity<List<CommentForAdminPage>> getComments() {

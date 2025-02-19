@@ -1,19 +1,18 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Manage Recipes</title>
-    <link href="/css/bootstrap.min.css" rel="stylesheet"/>
-    <meta name="_csrf" th:content="${_csrf.token}"/>
-    <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
+<head th:replace="~{fragments/commons::head}">
+    <title>Admin Recipe Management</title>
 </head>
 <body>
 <div class="container mt-5 d-flex justify-content-center">
     <div class="card shadow-lg p-4 w-100" style="max-width: 900px;">
         <h2 class="text-center mb-4">Recipe Management</h2>
-
-        <div class="table-responsive">
+        <div th:if="${message}" class="alert alert-success alert-dismissible fade show w-50 mx-auto"
+             role="alert">
+            <p th:text="${message}" class="m-0"></p>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+        <div th:unless="${#lists.isEmpty(recipes)}" class="table-responsive">
             <table class="table table-bordered table-hover table-striped text-center align-middle">
                 <thead class="table-dark">
                 <tr>
@@ -24,13 +23,25 @@
                 </tr>
                 </thead>
                 <tbody id="recipeTableBody">
+                <tr th:each="recipe : ${recipes}">
+                    <td th:text="${recipe.title}"></td>
+                    <td th:text="${recipe.author}"></td>
+                    <td th:text="${recipe.createdDate}"></td>
+                    <td>
+                        <a th:href="@{'/recipes/' + ${recipe.id}}" class="btn btn-info btn-sm">View</a>
+                        <form th:action="@{'/admin/recipes/' + ${recipe.id}}" th:method="DELETE">
+                            <button class="btn btn-danger btn-sm delete-recipe">Delete</button>
+                        </form>
+                    </td>
+                </tr>
                 </tbody>
             </table>
+        </div>
+        <div th:if="${#lists.isEmpty(recipes)}" class="text-center mt-4">
+            <h4>No recipes yet.</h4>
         </div>
         <a th:href="@{/home}" class="btn btn-primary w-25 align-self-center">Go to Home</a>
     </div>
 </div>
-
-<script src="/js/admin-recipe-management.js" defer></script>
 </body>
 </html>

@@ -129,30 +129,26 @@ public class UserService implements UserDetailsService {
         return mapUserToUserProfileInfo(user);
     }
 
-    public boolean updateUserRole(UUID userId, String newRole) {
-        Optional<User> userOptional = userRepository.findById(userId);
+    public void updateUserRole(UUID userId) {
+        User user = getUserById(userId);
 
-        if (userOptional.isPresent()) {
-            User user = userOptional.get();
-            user.setRole(Role.valueOf(newRole.toUpperCase()));
-            userRepository.save(user);
-            return true;
+        Role newRole = null;
+
+        if (user.getRole() == Role.ADMIN) {
+            newRole = Role.USER;
+        } else if (user.getRole() == Role.USER) {
+            newRole = Role.ADMIN;
         }
 
-        return false;
+        user.setRole(newRole);
+        userRepository.save(user);
     }
 
-    public boolean updateUserStatus(UUID userId, boolean isActive) {
-        Optional<User> userOptional = userRepository.findById(userId);
+    public void updateUserStatus(UUID userId) {
+        User user = getUserById(userId);
 
-        if (userOptional.isPresent()) {
-            User user = userOptional.get();
-            user.setIsActive(isActive);
-            userRepository.save(user);
-            return true;
-        }
-
-        return false;
+        user.setIsActive(!user.getIsActive());
+        userRepository.save(user);
     }
 
     @Override
@@ -160,7 +156,7 @@ public class UserService implements UserDetailsService {
         User user = this.userRepository.findByUsername(username)
                 .orElseThrow(() -> new UsernameNotFoundException("User with username " + username + " not found"));
 
-        return new CustomUserDetails(user.getId(), user.getUsername(),user.getPassword(), user.getRole(), user.getIsActive());
+        return new CustomUserDetails(user.getId(), user.getUsername(), user.getPassword(), user.getRole(), user.getIsActive());
     }
 
     public void updateLastLogin(String username) {
