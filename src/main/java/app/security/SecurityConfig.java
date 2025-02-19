@@ -5,16 +5,17 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.web.SecurityFilterChain;
 
 @RequiredArgsConstructor
 @Configuration
-@EnableWebSecurity
+@EnableMethodSecurity
 public class SecurityConfig {
-    private final CustomAuthenticationFailureHandler customAuthenticationFailureHandler;
+
     private final UserService userService;
+    private final CustomAuthenticationFailureHandler customAuthenticationFailureHandler;
     private final CustomAuthenticationSuccessHandler customAuthenticationSuccessHandler;
 
     @Bean
@@ -26,7 +27,6 @@ public class SecurityConfig {
                             .requestMatchers(PathRequest.toStaticResources().atCommonLocations()).permitAll()
                             .requestMatchers("/", "/users/login", "/users/register", "/about").permitAll()
                             .requestMatchers("/api/comments/**").authenticated()
-                            .requestMatchers("/admin/**").hasRole("ADMIN") // this is for only the admin can access the admin pages
                             .anyRequest().authenticated();
                 })
                 .formLogin(formLogin ->

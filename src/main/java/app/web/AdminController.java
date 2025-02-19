@@ -2,7 +2,6 @@ package app.web;
 
 import app.comment.service.CommentService;
 import app.recipe.service.RecipeService;
-import app.user.model.User;
 import app.user.service.UserService;
 import app.web.dto.CommentForAdminPage;
 import app.web.dto.RecipeForAdminPageInfo;
