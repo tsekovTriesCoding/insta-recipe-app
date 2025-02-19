@@ -34,8 +34,6 @@ public class SecurityConfig {
                                 .loginPage("/users/login")
                                 .successHandler(customAuthenticationSuccessHandler)
                                 .failureHandler(customAuthenticationFailureHandler)
-//                                .usernameParameter("username")
-//                                .passwordParameter("password")
                                 .permitAll())
                 .logout(logout ->
                         logout
