@@ -1,5 +1,6 @@
 package app.security;
 
+import app.user.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
 import org.springframework.context.annotation.Bean;
@@ -13,13 +14,13 @@ import org.springframework.security.web.SecurityFilterChain;
 @EnableWebSecurity
 public class SecurityConfig {
     private final CustomAuthenticationFailureHandler customAuthenticationFailureHandler;
-    private final UserDetailsServiceImpl customUserDetailsService;
+    private final UserService userService;
     private final CustomAuthenticationSuccessHandler customAuthenticationSuccessHandler;
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         return http
-                .userDetailsService(customUserDetailsService)
+                .userDetailsService(userService)
                 .authorizeHttpRequests(authorizeRequests -> {
                     authorizeRequests
                             .requestMatchers(PathRequest.toStaticResources().atCommonLocations()).permitAll()
@@ -33,8 +34,8 @@ public class SecurityConfig {
                                 .loginPage("/users/login")
                                 .successHandler(customAuthenticationSuccessHandler)
                                 .failureHandler(customAuthenticationFailureHandler)
-                                .usernameParameter("username")
-                                .passwordParameter("password")
+//                                .usernameParameter("username")
+//                                .passwordParameter("password")
                                 .permitAll())
                 .logout(logout ->
                         logout

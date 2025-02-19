@@ -4,6 +4,7 @@ import app.cloudinary.CloudinaryService;
 import app.exception.UserAlreadyExistsException;
 import app.exception.UserNotFoundException;
 import app.mapper.DtoMapper;
+import app.security.CustomUserDetails;
 import app.user.model.Role;
 import app.user.model.User;
 import app.user.repository.UserRepository;
@@ -12,6 +13,9 @@ import app.web.dto.UserProfileInfo;
 import app.web.dto.UserWithRole;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -26,7 +30,7 @@ import static app.mapper.DtoMapper.mapUserToUserProfileInfo;
 @Slf4j
 @RequiredArgsConstructor
 @Service
-public class UserService {
+public class UserService implements UserDetailsService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
@@ -68,8 +72,8 @@ public class UserService {
         return mapUserToUserProfileInfo(updated);
     }
 
-    public UserProfileInfo getUserProfileInfo(String username) {
-        User user = this.getByUsername(username);
+    public UserProfileInfo getUserProfileInfo(UUID userId) {
+        User user = getUserById(userId);
         return mapUserToUserProfileInfo(user);
     }
 
@@ -144,6 +148,14 @@ public class UserService {
         }
 
         return false;
+    }
+
+    @Override
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        User user = this.userRepository.findByUsername(username)
+                .orElseThrow(() -> new UsernameNotFoundException("User with username " + username + " not found"));
+
+        return new CustomUserDetails(user.getId(), user.getUsername(),user.getPassword(), user.getRole(), user.getIsActive());
     }
 
     public void updateLastLogin(String username) {

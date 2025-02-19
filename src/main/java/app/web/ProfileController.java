@@ -1,7 +1,6 @@
 package app.web;
 
-import app.exception.UserNotFoundException;
-import app.security.UserDetailsServiceImpl;
+import app.security.CustomUserDetails;
 import app.user.service.UserService;
 import app.web.dto.*;
 import jakarta.validation.Valid;
@@ -26,7 +25,6 @@ import java.util.UUID;
 public class ProfileController {
 
     private final UserService userService;
-    private final UserDetailsServiceImpl userDetailsService;
 
     @ModelAttribute
     public ChangeProfilePicture changeProfilePicture() {
@@ -49,8 +47,8 @@ public class ProfileController {
     }
 
     @GetMapping()
-    public String getMyProfilePage(@AuthenticationPrincipal UserDetails userDetails, Model model) {
-        UserProfileInfo userProfileInfo = userService.getUserProfileInfo(userDetails.getUsername());
+    public String getMyProfilePage(@AuthenticationPrincipal CustomUserDetails customUserDetails, Model model) {
+        UserProfileInfo userProfileInfo = userService.getUserProfileInfo(customUserDetails.getId());
 
         model.addAttribute("userProfileInfo", userProfileInfo);
 
@@ -148,7 +146,7 @@ public class ProfileController {
     }
 
     private void updateAuthentication(String username, Object credentials) {
-        UserDetails updatedUserDetails = userDetailsService.loadUserByUsername(username);
+        UserDetails updatedUserDetails = userService.loadUserByUsername(username);
         Authentication newAuth = new UsernamePasswordAuthenticationToken(
                 updatedUserDetails, credentials, updatedUserDetails.getAuthorities()
         );
