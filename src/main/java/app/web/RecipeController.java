@@ -6,7 +6,7 @@ import app.favorite.FavoriteServiceClient;
 import app.like.service.LikeService;
 import app.recipe.model.Recipe;
 import app.recipe.service.RecipeService;
-import app.user.service.UserService;
+import app.security.CustomUserDetails;
 import app.web.dto.AddRecipe;
 import app.web.dto.EditRecipe;
 import app.web.dto.RecipeDetails;
@@ -17,7 +17,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -34,7 +33,6 @@ public class RecipeController {
 
     private final RecipeService recipeService;
     private final LikeService likeService;
-    private final UserService userService;
     private final FavoriteServiceClient favoriteServiceClient;
 
     @ModelAttribute(name = "categories")
@@ -67,15 +65,13 @@ public class RecipeController {
 
     @GetMapping("/{id}")
     public String recipeDetails(@PathVariable UUID id,
-                                @AuthenticationPrincipal UserDetails userDetails,
+                                @AuthenticationPrincipal CustomUserDetails customUserDetails,
                                 Model model) {
         RecipeDetails recipe = recipeService.getDetailsById(id);
-        boolean isCreator = recipe.getCreator().equals(userDetails.getUsername());
-        boolean hasLiked = likeService.userHasLikedRecipe(userDetails.getUsername(), id);
+        boolean isCreator = recipe.getCreator().equals(customUserDetails.getUsername());
+        boolean hasLiked = likeService.userHasLikedRecipe(customUserDetails.getId(), id);
 
-        UUID userId = userService.getByUsername(userDetails.getUsername()).getId();
-
-        List<UUID> favoriteRecipes = favoriteServiceClient.getFavoriteRecipeIds(userId);
+        List<UUID> favoriteRecipes = favoriteServiceClient.getFavoriteRecipeIds(customUserDetails.getId());
         boolean isFavorite = favoriteRecipes.contains(id);
 
         model.addAttribute("recipe", recipe);
@@ -96,7 +92,7 @@ public class RecipeController {
     @PostMapping("/add")
     public String addRecipe(@Valid AddRecipe addRecipe,
                             BindingResult bindingResult,
-                            @AuthenticationPrincipal UserDetails userDetails) {
+                            @AuthenticationPrincipal CustomUserDetails customUserDetails) {
 
         if (bindingResult.hasErrors()) {
             /*
@@ -107,7 +103,7 @@ public class RecipeController {
             return "add-recipe";
         }
 
-        Recipe newRecipe = recipeService.create(addRecipe, userDetails.getUsername());
+        Recipe newRecipe = recipeService.create(addRecipe, customUserDetails.getId());
 
         return "redirect:/recipes/" + newRecipe.getId();
     }
@@ -135,8 +131,8 @@ public class RecipeController {
     }
 
     @GetMapping("/my-recipes")
-    public String myRecipes(@AuthenticationPrincipal UserDetails userDetails, Model model) {
-        List<Recipe> myRecipes = recipeService.getRecipesByCreator(userDetails.getUsername());
+    public String myRecipes(@AuthenticationPrincipal CustomUserDetails customUserDetails, Model model) {
+        List<Recipe> myRecipes = recipeService.getRecipesByCreator(customUserDetails.getId());
 
         model.addAttribute("myRecipes", myRecipes);
 

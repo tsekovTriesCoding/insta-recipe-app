@@ -63,8 +63,8 @@ public class RecipeService {
                 orElseThrow(() -> new RecipeNotFoundException("Recipe with id " + recipeId + " not found."));
     }
 
-    public Recipe create(AddRecipe recipe, String username) {
-        User user = userService.getByUsername(username);
+    public Recipe create(AddRecipe recipe, UUID id) {
+        User user = userService.getUserById(id);
 
 //        String title = recipe.getTitle();
 //
@@ -105,8 +105,8 @@ public class RecipeService {
                 .build();
     }
 
-    public List<Recipe> getRecipesByCreator(String username) {
-        User user = userService.getByUsername(username);
+    public List<Recipe> getRecipesByCreator(UUID id) {
+        User user = userService.getUserById(id);
         return recipeRepository.findAllByCreatedBy(user);
     }
 

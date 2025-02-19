@@ -1,6 +1,7 @@
 package app.web;
 
 import app.comment.service.CommentService;
+import app.security.CustomUserDetails;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -23,7 +24,7 @@ public class CommentController {
     @PostMapping("/add/{id}")
     public String addComment(@PathVariable UUID id,
                              @RequestParam("content") String content,
-                             @AuthenticationPrincipal UserDetails userDetails,
+                             @AuthenticationPrincipal CustomUserDetails customUserDetails,
                              RedirectAttributes redirectAttributes) {
 
         if (content == null || content.isEmpty()) {
@@ -32,7 +33,7 @@ public class CommentController {
             return "redirect:/recipes/" + id;
         }
 
-        commentService.add(content, id, userDetails.getUsername());
+        commentService.add(content, id, customUserDetails.getId());
 
         return "redirect:/recipes/" + id;
     }

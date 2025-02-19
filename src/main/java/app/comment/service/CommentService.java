@@ -28,9 +28,9 @@ public class CommentService {
     private final UserService userService;
 
     @Transactional
-    public void add(String content, UUID id, String username) {
-        Recipe recipe = recipeService.getById(id);
-        User user = userService.getByUsername(username);
+    public void add(String content, UUID recipeId,UUID userId) {
+        Recipe recipe = recipeService.getById(recipeId);
+        User user = userService.getUserById(userId);
 
         Comment comment = Comment.builder()
                 .content(content)

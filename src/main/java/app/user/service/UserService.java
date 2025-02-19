@@ -53,9 +53,14 @@ public class UserService implements UserDetailsService {
         return user;
     }
 
-    public User getByUsername(String username) {
+    public User getUserByUsername(String username) {
         return userRepository.findByUsername(username)
                 .orElseThrow(() -> new UserNotFoundException("User with username " + username + " not found."));
+    }
+
+    public User getUserById(UUID userId) {
+        return userRepository.findById(userId)
+                .orElseThrow(() -> new UserNotFoundException("User with id " + userId + " not found."));
     }
 
     public UserProfileInfo updateProfilePicture(UUID userId,
@@ -159,14 +164,9 @@ public class UserService implements UserDetailsService {
     }
 
     public void updateLastLogin(String username) {
-        User user = getByUsername(username);
+        User user = getUserByUsername(username);
         user.setLastLogin(LocalDateTime.now());
         userRepository.save(user);
-    }
-
-    private User getUserById(UUID userId) {
-        return userRepository.findById(userId)
-                .orElseThrow(() -> new UserNotFoundException("User with id " + userId + " not found."));
     }
 
     private User initializeUser(RegisterRequest registerRequest) {

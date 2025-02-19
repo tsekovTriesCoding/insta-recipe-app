@@ -3,8 +3,10 @@ package app.web;
 import app.favorite.FavoriteServiceClient;
 import app.recipe.model.Recipe;
 import app.recipe.service.RecipeService;
+import app.security.CustomUserDetails;
 import app.user.model.User;
 import app.user.service.UserService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
@@ -15,26 +17,16 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import java.util.List;
 import java.util.UUID;
 
+@RequiredArgsConstructor
 @Controller
 @RequestMapping("/favorites")
 public class FavoriteController {
     private final FavoriteServiceClient favoriteServiceClient;
-    private final UserService userService;
     private final RecipeService recipeService;
 
-
-    public FavoriteController(FavoriteServiceClient favoriteServiceClient,
-                              UserService userService,
-                              RecipeService recipeService) {
-        this.favoriteServiceClient = favoriteServiceClient;
-        this.userService = userService;
-        this.recipeService = recipeService;
-    }
-
     @GetMapping
-    public String getFavoriteRecipes(Model model, @AuthenticationPrincipal UserDetails userDetails) {
-        User user = userService.getByUsername(userDetails.getUsername());
-        List<UUID> favoriteRecipeIds = favoriteServiceClient.getFavoriteRecipeIds(user.getId());
+    public String getFavoriteRecipes(Model model, @AuthenticationPrincipal CustomUserDetails customUserDetails) {
+        List<UUID> favoriteRecipeIds = favoriteServiceClient.getFavoriteRecipeIds(customUserDetails.getId());
         List<Recipe> favoriteRecipes = recipeService.getRecipesByIds(favoriteRecipeIds);
 
         model.addAttribute("favoriteRecipes", favoriteRecipes);
@@ -43,10 +35,10 @@ public class FavoriteController {
 
     @PostMapping("/add")
     public String addFavorite(@RequestParam UUID recipeId,
-                              @AuthenticationPrincipal UserDetails userDetails,
+                              @AuthenticationPrincipal CustomUserDetails customUserDetails,
                               RedirectAttributes redirectAttributes) {
-        User user = userService.getByUsername(userDetails.getUsername());
-        boolean success = favoriteServiceClient.addFavorite(user.getId(), recipeId);
+
+        boolean success = favoriteServiceClient.addFavorite(customUserDetails.getId(), recipeId);
 
         if (success) {
             redirectAttributes.addFlashAttribute("successMessage", "Recipe added to favorites!");
@@ -59,10 +51,10 @@ public class FavoriteController {
 
     @DeleteMapping("/remove")
     public String removeFavorite(@RequestParam UUID recipeId,
-                                 @AuthenticationPrincipal UserDetails userDetails,
+                                 @AuthenticationPrincipal CustomUserDetails customUserDetails,
                                  RedirectAttributes redirectAttributes) {
-        User user = userService.getByUsername(userDetails.getUsername());
-        boolean success = favoriteServiceClient.removeFavorite(user.getId(), recipeId);
+
+        boolean success = favoriteServiceClient.removeFavorite(customUserDetails.getId(), recipeId);
 
         if (success) {
             redirectAttributes.addFlashAttribute("successMessage", "Recipe removed from favorites!");

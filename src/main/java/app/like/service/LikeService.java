@@ -22,8 +22,8 @@ public class LikeService {
     private final UserService userService;
     private final RecipeService recipeService;
 
-    public void like(String username, UUID recipeId) {
-        User user = userService.getByUsername(username);
+    public void like(UUID userId, UUID recipeId) {
+        User user = userService.getUserById(userId);
         Recipe recipe = recipeService.getById(recipeId);
 
         if (recipe.getCreatedBy().getId().equals(user.getId())) {
@@ -41,8 +41,7 @@ public class LikeService {
         }
     }
 
-    public boolean userHasLikedRecipe(String username, UUID recipeId) {
-        User user = userService.getByUsername(username);
-        return likeRepository.existsByUser_IdAndRecipe_Id(user.getId(), recipeId);
+    public boolean userHasLikedRecipe(UUID userId, UUID recipeId) {
+        return likeRepository.existsByUser_IdAndRecipe_Id(userId, recipeId);
     }
 }

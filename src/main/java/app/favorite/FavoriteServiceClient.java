@@ -12,7 +12,7 @@ import java.util.stream.Collectors;
 
 @Service
 public class FavoriteServiceClient {
-    //TODO: I can use REstClient instead of the WebClient,because I use it synchronously
+    //TODO: I can use RestClient instead of the WebClient,because I use it synchronously
     private final WebClient webClient;
     private final String FAVORITES_SERVICE_URL = "http://localhost:8081/api/favorites";
 

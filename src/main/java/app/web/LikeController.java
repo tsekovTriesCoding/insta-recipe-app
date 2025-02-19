@@ -3,9 +3,9 @@ package app.web;
 import app.exception.RecipeAlreadyLikedException;
 import app.exception.UserCannotLikeOwnRecipeException;
 import app.like.service.LikeService;
+import app.security.CustomUserDetails;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -21,8 +21,8 @@ public class LikeController {
     private final LikeService likeService;
 
     @PostMapping("/like/{recipeId}")
-    public String like(@PathVariable UUID recipeId, @AuthenticationPrincipal UserDetails userDetails) {
-        likeService.like(userDetails.getUsername(), recipeId);
+    public String like(@PathVariable UUID recipeId, @AuthenticationPrincipal CustomUserDetails customUserDetails) {
+        likeService.like(customUserDetails.getId(), recipeId);
 
         return "redirect:/recipes/" + recipeId;
     }
