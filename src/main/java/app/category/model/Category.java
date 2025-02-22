@@ -32,4 +32,9 @@ public class Category {
 
     @ManyToMany(mappedBy = "categories")
     private List<Recipe> recipes;
+
+    public Category(UUID id, CategoryName name) {
+        this.id = id;
+        this.name = name;
+    }
 }
