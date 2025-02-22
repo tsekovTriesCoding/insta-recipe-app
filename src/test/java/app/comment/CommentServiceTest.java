@@ -8,6 +8,7 @@ import app.recipe.service.RecipeService;
 import app.user.model.User;
 import app.user.service.UserService;
 import app.web.dto.CommentByRecipe;
+import app.web.dto.CommentForAdminPage;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -39,7 +40,6 @@ class CommentServiceTest {
 
     @Test
     void addShouldSaveCommentWhenRecipeAndUserExist() {
-        // Arrange
         UUID recipeId = UUID.randomUUID();
         UUID userId = UUID.randomUUID();
         String content = "This recipe is amazing!";
@@ -57,10 +57,8 @@ class CommentServiceTest {
         when(recipeService.getById(recipeId)).thenReturn(recipe);
         when(userService.getUserById(userId)).thenReturn(user);
 
-        // Act
         commentService.add(content, recipeId, userId);
 
-        // Assert
         verify(commentRepository).save(argThat(comment ->
                 comment.getContent().equals(content) &&
                         comment.getRecipe().equals(recipe) &&
@@ -71,7 +69,6 @@ class CommentServiceTest {
 
     @Test
     void getCommentsByRecipeIdShouldReturnComments() {
-        // Arrange: Create test data
         UUID recipeId = UUID.randomUUID();
         UUID userId = UUID.randomUUID();
 
@@ -105,15 +102,12 @@ class CommentServiceTest {
 
         when(commentRepository.findAllByRecipeIdOrderByCreatedDate(recipeId)).thenReturn(mockComments);
 
-        // Act: Call the method
         List<CommentByRecipe> result = commentService.getCommentsByRecipeId(recipeId);
 
-        // Assert: Verify correct mapping
         assertThat(result).hasSize(2);
         assertThat(result.get(0).getContent()).isEqualTo("Great recipe!");
         assertThat(result.get(1).getContent()).isEqualTo("Delicious!");
-
-        // Verify that repository method was called once
+        
         verify(commentRepository, times(1)).findAllByRecipeIdOrderByCreatedDate(recipeId);
     }
 
@@ -228,5 +222,57 @@ class CommentServiceTest {
 
         assertThat(result).isFalse();
         verify(commentRepository, never()).delete(any());
+    }
+
+    @Test
+    void getAllShouldReturnMappedCommentList() {
+        UUID userId = UUID.randomUUID();
+        UUID recipeId = UUID.randomUUID();
+        User user = User.builder()
+                .id(userId)
+                .username("AdminUser")
+                .build();
+
+        Recipe recipe = Recipe.builder()
+                .id(recipeId)
+                .title("Pancakes")
+                .build();
+
+        LocalDateTime date1 = LocalDateTime.now().minusDays(2);
+        LocalDateTime date2 = LocalDateTime.now().minusDays(1);
+
+        Comment comment1 = Comment.builder()
+                .id(UUID.randomUUID())
+                .content("Love this!")
+                .creator(user)
+                .recipe(recipe)
+                .createdDate(date1)
+                .build();
+
+        Comment comment2 = Comment.builder()
+                .id(UUID.randomUUID())
+                .content("Amazing!")
+                .creator(user)
+                .recipe(recipe)
+                .createdDate(date2)
+                .build();
+
+        List<Comment> mockComments = List.of(comment1, comment2);
+
+        when(commentRepository.findAll()).thenReturn(mockComments);
+
+        List<CommentForAdminPage> result = commentService.getAll();
+
+        assertThat(result).hasSize(2);
+
+        assertThat(result.get(0).getContent()).isEqualTo("Love this!");
+        assertThat(result.get(0).getCreatedDate()).isEqualTo(date1);
+        assertThat(result.get(0).getAuthor()).isEqualTo("AdminUser");
+
+        assertThat(result.get(1).getContent()).isEqualTo("Amazing!");
+        assertThat(result.get(1).getCreatedDate()).isEqualTo(date2);
+        assertThat(result.get(1).getAuthor()).isEqualTo("AdminUser");
+
+        verify(commentRepository, times(1)).findAll();
     }
 }
