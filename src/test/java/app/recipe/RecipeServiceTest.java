@@ -27,7 +27,7 @@ import java.util.UUID;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
-@ExtendWith(MockitoExtension.class)  // Enables Mockito annotations
+@ExtendWith(MockitoExtension.class)
 class RecipeServiceTest {
 
     @Mock
@@ -39,11 +39,8 @@ class RecipeServiceTest {
     @Mock
     private CategoryService categoryService;
 
-    @Mock
-    private CloudinaryService cloudinaryService;
-
     @InjectMocks
-    private RecipeService recipeService;  // Injects the mocks into the service
+    private RecipeService recipeService;
 
     private UUID recipeId;
     private Recipe recipe;
