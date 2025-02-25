@@ -8,4 +8,8 @@ import java.util.UUID;
 public class FavoriteRecipe {
 
     private UUID recipeId;
+
+    public FavoriteRecipe(UUID recipeId) {
+        this.recipeId = recipeId;
+    }
 }
