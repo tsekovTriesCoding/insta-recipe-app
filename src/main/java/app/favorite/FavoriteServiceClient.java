@@ -1,6 +1,8 @@
 package app.favorite;
 
 import app.web.dto.FavoriteRecipe;
+import lombok.Setter;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -14,10 +16,13 @@ import java.util.stream.Collectors;
 public class FavoriteServiceClient {
     //TODO: I can use RestClient instead of the WebClient,because I use it synchronously
     private final WebClient webClient;
-    private final String FAVORITES_SERVICE_URL = "http://localhost:8081/api/favorites";
 
-    public FavoriteServiceClient(WebClient.Builder webClientBuilder) {
-        this.webClient = webClientBuilder.baseUrl(FAVORITES_SERVICE_URL).build();
+//    @Setter
+//    @Value("${favorites.service.url}")
+//    private String favoritesServiceUrl;
+
+    public FavoriteServiceClient(WebClient webClient) {
+        this.webClient = webClient;
     }
 
     public List<UUID> getFavoriteRecipeIds(UUID userId) {
@@ -25,7 +30,8 @@ public class FavoriteServiceClient {
             List<FavoriteRecipe> response = webClient.get()
                     .uri("/{userId}", userId)
                     .retrieve()
-                    .bodyToMono(new ParameterizedTypeReference<List<FavoriteRecipe>>() {})
+                    .bodyToMono(new ParameterizedTypeReference<List<FavoriteRecipe>>() {
+                    })
                     .block();
 
             return response.stream()
