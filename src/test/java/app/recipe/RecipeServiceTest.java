@@ -11,12 +11,18 @@ import app.recipe.service.RecipeService;
 import app.user.model.User;
 import app.user.service.UserService;
 import app.web.dto.AddRecipe;
+import app.web.dto.RecipeDetails;
+import app.web.dto.RecipeShortInfo;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -38,6 +44,9 @@ class RecipeServiceTest {
 
     @Mock
     private CategoryService categoryService;
+
+    @Mock
+    private CloudinaryService cloudinaryService;
 
     @InjectMocks
     private RecipeService recipeService;
@@ -69,6 +78,50 @@ class RecipeServiceTest {
                 .comments(new ArrayList<>())
                 .build();
     }
+
+    @Test
+    void testGetAllRecipes() {
+        Pageable pageable = PageRequest.of(0, 5);
+
+        List<Recipe> recipes = List.of(recipe);
+
+        Page<Recipe> recipePage = new PageImpl<>(recipes, pageable, recipes.size());
+
+        when(recipeRepository.findAll(pageable)).thenReturn(recipePage);
+
+        Page<RecipeShortInfo> result = recipeService.getAll(pageable);
+
+        assertNotNull(result);
+        assertEquals(1, result.getTotalElements());
+        assertEquals("Test Recipe", result.getContent().get(0).getTitle());
+
+        verify(recipeRepository).findAll(pageable);
+    }
+
+
+    @Test
+    void testGetDetailsById() {
+        when(recipeRepository.findById(recipeId)).thenReturn(Optional.of(recipe));
+
+        RecipeDetails recipeDetails = recipeService.getDetailsById(recipeId);
+
+        assertNotNull(recipeDetails);
+        assertEquals(recipeId, recipeDetails.getId());
+        assertEquals("Test Recipe", recipeDetails.getTitle());
+        assertEquals("A delicious test recipe", recipeDetails.getDescription());
+        assertEquals("Salt, Pepper", String.join(", ", recipeDetails.getIngredients()));
+        assertEquals("Mix and cook", recipeDetails.getInstructions());
+        assertEquals(30, recipeDetails.getCookTime());
+        assertEquals(10, recipeDetails.getPrepTime());
+        assertEquals(user, recipeDetails.getCreatedBy());
+        assertEquals(2, recipeDetails.getServings());
+        assertEquals("test-image-url", recipeDetails.getImage());
+        assertEquals(0, recipeDetails.getComments().size());
+        assertEquals(0, recipeDetails.getLikes());
+
+        verify(recipeRepository, times(1)).findById(recipeId);
+    }
+
 
     @Test
     void getByIdShouldReturnRecipeWhenRecipeExists() {
@@ -103,6 +156,7 @@ class RecipeServiceTest {
         when(userService.getUserById(user.getId())).thenReturn(user);
         when(categoryService.getByName(CategoryName.MAIN_COURSE)).thenReturn(Category.builder().name(CategoryName.MAIN_COURSE).build());
         when(recipeRepository.save(any(Recipe.class))).thenReturn(recipe);
+        when(cloudinaryService.uploadImage(any())).thenReturn("https://mock-image-url.com/image.jpg");
 
         Recipe createdRecipe = recipeService.create(addRecipe, user.getId());
 
