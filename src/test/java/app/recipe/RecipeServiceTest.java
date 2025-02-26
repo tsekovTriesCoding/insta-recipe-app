@@ -361,7 +361,7 @@ class RecipeServiceTest {
 
         assertEquals(id2, result.get(1).getId());
         assertEquals("Chicken Curry", result.get(1).getTitle());
-        
+
         verify(recipeRepository, times(1)).findAllByIdIn(favoriteRecipeIds);
     }
 }
