@@ -18,9 +18,13 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
+
+import static app.mapper.DtoMapper.mapRecipeToEditRecipe;
 
 @RequiredArgsConstructor
 @Service
@@ -113,20 +117,7 @@ public class RecipeService {
     public EditRecipe getAddRecipeById(UUID id) {
         Recipe recipe = this.getById(id);
 
-        List<CategoryName> categories = recipe.getCategories().stream().map(Category::getName).toList();
-        String ingredients = String.join(",", recipe.getIngredients());
-
-        return EditRecipe.builder()
-                .id(id)
-                .title(recipe.getTitle())
-                .description(recipe.getDescription())
-                .categories(categories)
-                .ingredients(ingredients)
-                .instructions(recipe.getInstructions())
-                .servings(recipe.getServings())
-                .cookTime(recipe.getCookTime())
-                .prepTime(recipe.getPrepTime())
-                .build();
+        return mapRecipeToEditRecipe(recipe);
     }
 
     @Transactional
@@ -135,7 +126,7 @@ public class RecipeService {
         List<Category> categories = recipe.getCategories()
                 .stream()
                 .map(categoryService::getByName)
-                .toList();
+                .collect(Collectors.toList());;
 
         if (!recipe.getTitle().equals(recipeToUpdate.getTitle())) {
             recipeToUpdate.setTitle(recipe.getTitle());
@@ -152,8 +143,8 @@ public class RecipeService {
         }
 
         if (!recipe.getIngredients().equals(String.join(",", recipeToUpdate.getIngredients()))) {
-            recipeToUpdate.getIngredients().clear();
-            recipeToUpdate.getIngredients().addAll(List.of(recipe.getIngredients().split(",")));
+            List<String> updatedIngredients = new ArrayList<>(List.of(recipe.getIngredients().split(",")));
+            recipeToUpdate.setIngredients(updatedIngredients);
         }
 
         if (!recipe.getInstructions().equals(recipeToUpdate.getInstructions())) {

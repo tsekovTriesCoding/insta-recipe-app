@@ -1,11 +1,14 @@
 package app.mapper;
 
 import app.category.model.Category;
+import app.category.model.CategoryName;
 import app.comment.model.Comment;
 import app.recipe.model.Recipe;
 import app.user.model.User;
 import app.web.dto.*;
 import lombok.experimental.UtilityClass;
+
+import java.util.List;
 
 @UtilityClass
 public class DtoMapper {
@@ -84,6 +87,23 @@ public class DtoMapper {
                 .author(comment.getCreator().getUsername())
                 .content(comment.getContent())
                 .createdDate(comment.getCreatedDate())
+                .build();
+    }
+
+    public static EditRecipe mapRecipeToEditRecipe(Recipe recipe) {
+        List<CategoryName> categories = recipe.getCategories().stream().map(Category::getName).toList();
+        String ingredients = String.join(",", recipe.getIngredients());
+
+        return EditRecipe.builder()
+                .id(recipe.getId())
+                .title(recipe.getTitle())
+                .description(recipe.getDescription())
+                .categories(categories)
+                .ingredients(ingredients)
+                .instructions(recipe.getInstructions())
+                .servings(recipe.getServings())
+                .cookTime(recipe.getCookTime())
+                .prepTime(recipe.getPrepTime())
                 .build();
     }
 }

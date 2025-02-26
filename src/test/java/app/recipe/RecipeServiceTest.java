@@ -10,19 +10,20 @@ import app.recipe.repository.RecipeRepository;
 import app.recipe.service.RecipeService;
 import app.user.model.User;
 import app.user.service.UserService;
-import app.web.dto.AddRecipe;
-import app.web.dto.RecipeDetails;
-import app.web.dto.RecipeShortInfo;
+import app.web.dto.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.mock.web.MockMultipartFile;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -122,6 +123,90 @@ class RecipeServiceTest {
         verify(recipeRepository, times(1)).findById(recipeId);
     }
 
+    @Test
+    void testGetRecipesByCreator() {
+        List<Recipe> expectedRecipes = List.of(recipe);
+        UUID userId = UUID.randomUUID();
+
+        when(userService.getUserById(userId)).thenReturn(user);
+        when(recipeRepository.findAllByCreatedBy(user)).thenReturn(expectedRecipes);
+
+        List<Recipe> result = recipeService.getRecipesByCreator(userId);
+
+        assertNotNull(result);
+        assertEquals(1, result.size());
+        assertEquals("Test Recipe", result.get(0).getTitle());
+
+        verify(userService).getUserById(userId);
+        verify(recipeRepository).findAllByCreatedBy(user);
+    }
+
+    @Test
+    void testGetAddRecipeById() {
+        when(recipeRepository.findById(recipeId)).thenReturn(Optional.of(recipe));
+
+        EditRecipe result = recipeService.getAddRecipeById(recipeId);
+
+        assertNotNull(result);
+        assertEquals(recipeId, result.getId());
+        assertEquals("Test Recipe", result.getTitle());
+        assertEquals("A delicious test recipe", result.getDescription());
+        assertEquals("Salt,Pepper", result.getIngredients());
+        assertEquals("Mix and cook", result.getInstructions());
+        assertEquals(2, result.getServings());
+        assertEquals(30, result.getCookTime());
+        assertEquals(10, result.getPrepTime());
+
+        verify(recipeRepository).findById(recipeId);
+    }
+
+    @Test
+    void testUpdateRecipe() {
+        Category category = Category.builder()
+                .id(UUID.randomUUID())
+                .name(CategoryName.MAIN_COURSE)
+                .recipes(List.of(recipe))
+                .build();
+
+        recipe.setCategories(List.of(Category.builder().name(CategoryName.DESSERTS).build()));
+        recipe.setIngredients(List.of("Salt", "Pepper"));
+        recipe.setInstructions("Old Instructions");
+
+        MockMultipartFile img = new MockMultipartFile("image", "new-image-url", "image/jpeg", new byte[]{1, 2, 3});
+
+        EditRecipe updatedRecipe = EditRecipe.builder()
+                .id(recipeId)
+                .title("New Title")
+                .description("New Description")
+                .categories(List.of(CategoryName.MAIN_COURSE))
+                .ingredients("Salt,Pepper,Sugar")
+                .instructions("New Instructions")
+                .servings(4)
+                .cookTime(45)
+                .prepTime(15)
+                .image(img)
+                .build();
+
+        when(recipeRepository.findById(recipeId)).thenReturn(Optional.of(recipe));
+        when(categoryService.getByName(CategoryName.MAIN_COURSE)).thenReturn(category);
+        when(cloudinaryService.uploadImage(any())).thenReturn("https://mock-image-url.com/image.jpg");
+
+        recipeService.update(updatedRecipe);
+
+        assertEquals("New Title", recipe.getTitle());
+        assertEquals("New Description", recipe.getDescription());
+        assertEquals(List.of("Salt", "Pepper", "Sugar"), recipe.getIngredients());
+        assertEquals("New Instructions", recipe.getInstructions());
+        assertEquals(4, recipe.getServings());
+        assertEquals(45, recipe.getCookTime());
+        assertEquals(15, recipe.getPrepTime());
+        assertEquals("https://mock-image-url.com/image.jpg", recipe.getImage());
+
+        // Verify repository interactions
+        verify(recipeRepository).save(recipe);
+        verify(categoryService).getByName(CategoryName.MAIN_COURSE);
+        verify(cloudinaryService).uploadImage(any());
+    }
 
     @Test
     void getByIdShouldReturnRecipeWhenRecipeExists() {
@@ -181,5 +266,102 @@ class RecipeServiceTest {
         recipeService.delete(recipeId);
 
         verify(recipeRepository, times(1)).delete(recipe);
+    }
+
+    @Test
+    void testGetAllForAdmin() {
+        Recipe recipe2 = new Recipe();
+        recipe2.setId(UUID.randomUUID());
+        recipe2.setTitle("Recipe 2");
+        recipe2.setDescription("Description 2");
+        recipe2.setCreatedBy(user);
+        recipe2.setCreatedDate(LocalDateTime.now());
+
+        List<Recipe> recipeList = List.of(recipe, recipe2);
+
+        when(recipeRepository.findAll()).thenReturn(recipeList);
+
+        List<RecipeForAdminPageInfo> result = recipeService.getAllForAdmin();
+
+        assertNotNull(result);
+        assertEquals(2, result.size());
+
+        assertEquals(recipe.getId(), result.get(0).getId());
+        assertEquals(recipe.getTitle(), result.get(0).getTitle());
+        assertEquals(recipe.getCreatedBy().getUsername(), result.get(0).getAuthor());
+        assertEquals(recipe.getCreatedBy().getUsername(), result.get(0).getAuthor());
+        assertEquals(recipe.getCreatedDate(), result.get(0).getCreatedDate());
+
+        assertEquals(recipe2.getId(), result.get(1).getId());
+        assertEquals(recipe2.getTitle(), result.get(1).getTitle());
+        assertEquals(recipe2.getCreatedBy().getUsername(), result.get(1).getAuthor());
+        assertEquals(recipe2.getCreatedBy().getUsername(), result.get(1).getAuthor());
+        assertEquals(recipe2.getCreatedDate(), result.get(1).getCreatedDate());
+
+        verify(recipeRepository, times(1)).findAll();
+    }
+
+    @Test
+    void testSearchRecipes() {
+        String query = "pasta";
+        Pageable pageable = PageRequest.of(0, 2);
+
+        Recipe recipe2 = new Recipe();
+        recipe2.setId(UUID.randomUUID());
+        recipe2.setTitle("Pasta Alfredo");
+        recipe2.setDescription("Cheesy and creamy.");
+        recipe2.setCookTime(2);
+        recipe2.setPrepTime(10);
+        recipe2.setServings(1);
+
+        List<Recipe> recipeList = List.of(recipe, recipe2);
+        Page<Recipe> recipePage = new PageImpl<>(recipeList, pageable, recipeList.size());
+
+        when(recipeRepository.findAllByTitleContainingIgnoreCase(query, pageable)).thenReturn(recipePage);
+
+        Page<RecipeShortInfo> result = recipeService.searchRecipes(query, pageable);
+
+        assertNotNull(result);
+        assertEquals(2, result.getContent().size());
+
+        assertEquals(recipe.getId(), result.getContent().get(0).getId());
+        assertEquals(recipe.getTitle(), result.getContent().get(0).getTitle());
+
+        assertEquals(recipe2.getId(), result.getContent().get(1).getId());
+        assertEquals(recipe2.getTitle(), result.getContent().get(1).getTitle());
+
+        verify(recipeRepository, times(1)).findAllByTitleContainingIgnoreCase(query, pageable);
+    }
+
+    @Test
+    void testGetRecipesByIds() {
+        UUID id1 = UUID.randomUUID();
+        UUID id2 = UUID.randomUUID();
+        List<UUID> favoriteRecipeIds = List.of(id1, id2);
+
+        Recipe recipe1 = new Recipe();
+        recipe1.setId(id1);
+        recipe1.setTitle("Spaghetti Bolognese");
+
+        Recipe recipe2 = new Recipe();
+        recipe2.setId(id2);
+        recipe2.setTitle("Chicken Curry");
+
+        List<Recipe> expectedRecipes = List.of(recipe1, recipe2);
+
+        when(recipeRepository.findAllByIdIn(favoriteRecipeIds)).thenReturn(expectedRecipes);
+
+        List<Recipe> result = recipeService.getRecipesByIds(favoriteRecipeIds);
+
+        assertNotNull(result);
+        assertEquals(2, result.size());
+
+        assertEquals(id1, result.get(0).getId());
+        assertEquals("Spaghetti Bolognese", result.get(0).getTitle());
+
+        assertEquals(id2, result.get(1).getId());
+        assertEquals("Chicken Curry", result.get(1).getTitle());
+        
+        verify(recipeRepository, times(1)).findAllByIdIn(favoriteRecipeIds);
     }
 }
