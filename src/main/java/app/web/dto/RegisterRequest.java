@@ -3,8 +3,14 @@ package app.web.dto;
 import app.vallidation.annotation.UniqueEmail;
 import app.vallidation.annotation.UniqueUsername;
 import jakarta.validation.constraints.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 @Data
 public class RegisterRequest {
 

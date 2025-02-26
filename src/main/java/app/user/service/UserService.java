@@ -22,7 +22,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 import static app.mapper.DtoMapper.mapUserToUserProfileInfo;
@@ -36,7 +35,7 @@ public class UserService implements UserDetailsService {
     private final PasswordEncoder passwordEncoder;
     private final CloudinaryService cloudinaryService;
 
-    public User register(RegisterRequest registerRequest) {
+    public void register(RegisterRequest registerRequest) {
         if (userRepository.existsByUsername(registerRequest.getUsername())) {
             throw new UserAlreadyExistsException("User with username " + registerRequest.getUsername() + " already exists.");
         }
@@ -50,7 +49,6 @@ public class UserService implements UserDetailsService {
         log.info("Successfully create new user account for username [%s] and email [%s], with id [%s]"
                 .formatted(user.getUsername(), user.getEmail(), user.getId()));
 
-        return user;
     }
 
     public User getUserByUsername(String username) {
