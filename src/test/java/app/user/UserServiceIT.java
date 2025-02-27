@@ -2,11 +2,14 @@ package app.user;
 
 import app.cloudinary.CloudinaryService;
 import app.exception.UserAlreadyExistsException;
+import app.exception.UserNotFoundException;
 import app.user.model.Role;
 import app.user.model.User;
 import app.user.repository.UserRepository;
 import app.user.service.UserService;
 import app.web.dto.RegisterRequest;
+import app.web.dto.UserWithRole;
+import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -19,6 +22,7 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -26,7 +30,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 @AutoConfigureMockMvc
-@Transactional
+@Transactional // Rolls back changes after each test
 public class UserServiceIT {
 
     @Autowired
@@ -181,5 +185,93 @@ public class UserServiceIT {
         User updatedUser = userRepository.findById(testUserId).orElseThrow();
         assertNotNull(updatedUser);
         assertTrue(passwordEncoder.matches(newPassword, updatedUser.getPassword()));
+    }
+
+    @Test
+    public void testGetAllShouldReturnAllUsers() {
+        User user1 = User.builder()
+                .username("user1")
+                .email("email@example1.com")
+                .password("password")
+                .role(Role.ADMIN)
+                .dateRegistered(LocalDateTime.now())
+                .isActive(true)
+                .build();
+
+        userRepository.save(user1);
+
+        User user2 = User.builder()
+                .username("user2")
+                .email("email@example2.com")
+                .password("password")
+                .role(Role.USER)
+                .dateRegistered(LocalDateTime.now())
+                .isActive(true)
+                .build();
+
+        userRepository.save(user2);
+
+        List<UserWithRole> users = userService.getAll();
+
+        assertNotNull(users);
+        assertEquals(2, users.size());
+
+        assertTrue(users.stream().anyMatch(u -> u.getUsername().equals("user1") && u.getRole().equals(Role.ADMIN)));
+        assertTrue(users.stream().anyMatch(u -> u.getUsername().equals("user2") && u.getRole().equals(Role.USER)));
+    }
+
+    @Test
+    public void testGetAllShouldReturnEmptyListWhenNoUsers() {
+        List<UserWithRole> users = userService.getAll();
+
+        assertNotNull(users);
+        assertTrue(users.isEmpty());
+    }
+
+    @Test
+    public void testUpdateUserRoleShouldToggleRoleFroAdminToUser() {
+        User user = User.builder()
+                .username("otherusername")
+                .email("email@example.com")
+                .password(passwordEncoder.encode("oldPassword"))
+                .role(Role.ADMIN)
+                .dateRegistered(LocalDateTime.now())
+                .build();
+
+        userRepository.save(user);
+
+        userService.updateUserRole(user.getId());
+
+        User updatedUser = userRepository.findById(user.getId()).orElseThrow();
+        assertNotNull(updatedUser);
+        assertEquals(Role.USER, updatedUser.getRole());
+    }
+
+    @Test
+    public void testUpdateUserRoleShouldToggleRoleFromUserToAdmin() {
+        User user = User.builder()
+                .username("otherusername")
+                .email("email@example.com")
+                .password(passwordEncoder.encode("oldPassword"))
+                .role(Role.USER)
+                .dateRegistered(LocalDateTime.now())
+                .build();
+
+        userRepository.save(user);
+
+        userService.updateUserRole(user.getId());
+
+        User updatedUser = userRepository.findById(user.getId()).orElseThrow();
+        assertNotNull(updatedUser);
+        assertEquals(Role.ADMIN, updatedUser.getRole());
+    }
+
+    @Test
+    public void testUpdateUserRoleShouldThrowExceptionWhenUserNotFound() {
+        UUID nonExistentUserId = UUID.randomUUID();
+
+        assertThrows(UserNotFoundException.class, () -> {
+            userService.updateUserRole(nonExistentUserId);
+        });
     }
 }
