@@ -16,6 +16,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.Optional;
@@ -25,6 +26,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 @AutoConfigureMockMvc
+@Transactional
 public class UserServiceIT {
 
     @Autowired
@@ -48,8 +50,6 @@ public class UserServiceIT {
                 .email("email@example.com")
                 .password("password")
                 .build();
-
-        userRepository.deleteAll();
     }
 
 
@@ -95,7 +95,7 @@ public class UserServiceIT {
     }
 
     @Test
-    public void testUpdateProfilePicture_Success() {
+    public void testUpdateProfilePictureSuccess() {
         User user = User.builder()
                 .username("otherusername")
                 .email("email@example.com")
@@ -117,5 +117,69 @@ public class UserServiceIT {
         assertNotNull(updatedUser.getProfilePicture());
         assertEquals(imageUrl, updatedUser.getProfilePicture());
         assertNotNull(updatedUser.getDateUpdated());
+    }
+
+    @Test
+    public void testUpdateUsernameSuccess() {
+        User user = User.builder()
+                .username("otherusername")
+                .email("email@example.com")
+                .password("password")
+                .role(Role.ADMIN)
+                .dateRegistered(LocalDateTime.now())
+                .build();
+        String newUsername = "newUsername";
+
+        User testUser = userRepository.save(user);
+        UUID testUserId = testUser.getId();
+
+        userService.updateUsername(testUserId, newUsername);
+
+        User updatedUser = userRepository.findById(testUserId).orElseThrow();
+        assertNotNull(updatedUser);
+        assertEquals(newUsername, updatedUser.getUsername());
+    }
+
+    @Test
+    public void testUpdateEmailSuccess() {
+        User user = User.builder()
+                .username("otherusername")
+                .email("email@example.com")
+                .password("password")
+                .role(Role.ADMIN)
+                .dateRegistered(LocalDateTime.now())
+                .build();
+        String newEmail = "newemail@example.com";
+
+        User testUser = userRepository.save(user);
+        UUID testUserId = testUser.getId();
+
+        userService.updateEmail(testUserId, newEmail);
+
+        User updatedUser = userRepository.findById(testUserId).orElseThrow();
+        assertNotNull(updatedUser);
+        assertEquals(newEmail, updatedUser.getEmail());
+    }
+
+    @Test
+    public void testUpdatePasswordSuccess() {
+        User user = User.builder()
+                .username("otherusername")
+                .email("email@example.com")
+                .password(passwordEncoder.encode("oldPassword"))
+                .role(Role.ADMIN)
+                .dateRegistered(LocalDateTime.now())
+                .build();
+        String newPassword = "newSecurePassword";
+
+        User testUser = userRepository.save(user);
+        UUID testUserId = testUser.getId();
+
+        userService.updatePassword(testUserId, newPassword);
+
+
+        User updatedUser = userRepository.findById(testUserId).orElseThrow();
+        assertNotNull(updatedUser);
+        assertTrue(passwordEncoder.matches(newPassword, updatedUser.getPassword()));
     }
 }
