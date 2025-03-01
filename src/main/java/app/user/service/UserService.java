@@ -1,5 +1,6 @@
 package app.user.service;
 
+import app.activity.ActivityLogService;
 import app.cloudinary.CloudinaryService;
 import app.exception.UserAlreadyExistsException;
 import app.exception.UserNotFoundException;
@@ -34,6 +35,7 @@ public class UserService implements UserDetailsService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final CloudinaryService cloudinaryService;
+    private final ActivityLogService activityLogService;
 
     public void register(RegisterRequest registerRequest) {
         if (userRepository.existsByUsername(registerRequest.getUsername())) {
@@ -46,9 +48,10 @@ public class UserService implements UserDetailsService {
 
         User user = userRepository.save(initializeUser(registerRequest));
 
+        activityLogService.logActivity("You have successfully registered" , user.getId());
+
         log.info("Successfully create new user account for username [%s] and email [%s], with id [%s]"
                 .formatted(user.getUsername(), user.getEmail(), user.getId()));
-
     }
 
     public User getUserByUsername(String username) {
@@ -71,6 +74,8 @@ public class UserService implements UserDetailsService {
         user.setProfilePicture(imageUrl);
         User updated = userRepository.save(user);
 
+        activityLogService.logActivity("You have successfully updated your profile picture", updated.getId());
+
         log.info("Successfully update profile picture for user [%s] with id [%s]".formatted(updated.getUsername(), updated.getId()));
         mapUserToUserProfileInfo(updated);
     }
@@ -85,6 +90,8 @@ public class UserService implements UserDetailsService {
         user.setUsername(username);
         User updated = userRepository.save(user);
 
+        activityLogService.logActivity("You have successfully updated your username", updated.getId());
+
         log.info("Successfully update profile username for user [%s] with id [%s]".formatted(updated.getUsername(), updated.getId()));
         mapUserToUserProfileInfo(updated);
     }
@@ -94,6 +101,8 @@ public class UserService implements UserDetailsService {
         user.setEmail(email);
         User updated = userRepository.save(user);
 
+        activityLogService.logActivity("You have successfully updated your email", updated.getId());
+
         log.info("Successfully update profile email for user [%s] with id [%s]".formatted(updated.getUsername(), updated.getId()));
         mapUserToUserProfileInfo(updated);
     }
@@ -102,6 +111,8 @@ public class UserService implements UserDetailsService {
         User user = getUserById(userId);
         user.setPassword(passwordEncoder.encode(password));
         User updated = userRepository.save(user);
+
+        activityLogService.logActivity("You have successfully updated your password", updated.getId());
 
         log.info("Successfully update profile password for user [%s] with id [%s]".formatted(updated.getUsername(), updated.getId()));
         mapUserToUserProfileInfo(updated);

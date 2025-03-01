@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html class="h-100" lang="en">
+<head th:replace="~{fragments/commons::head}">
+    <title>About Us</title>
+</head>
+<body class="d-flex flex-column h-100">
+<header th:replace="~{fragments/commons::header}"></header>
+
+<main class="flex-shrink-0">
+    <section class="about-us-section py-5 flex-column">
+        <div class="container pb-5">
+            <div>
+                <h2 class="text-center mb-4">Activity Log</h2>
+                <div class="d-flex justify-content-end mb-3">
+                    <form th:action="@{'/my-profile/' + ${userId} + '/activity-log/clear'}" th:method="DELETE">
+                        <button type="submit" class="btn btn-danger">Clear My Logs</button>
+                    </form>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-bordered table-hover text-center">
+                        <thead class="table-dark">
+                        <tr>
+                            <th>Activity</th>
+                            <th>Date</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr th:each="log : ${activityLog}">
+                            <td th:text="${log.action}">Recipe Added</td>
+                            <td th:text="${#temporals.format(log.createdOn, 'yyyy-MM-dd HH:mm:ss')}">2024-02-10 15:30:00</td>
+                        </tr>
+                        <tr th:if="${#lists.isEmpty(activityLog)}">
+                            <td colspan="2" class="text-muted">No activity recorded yet.</td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </div>
+    </section>
+</main>
+
+<footer th:replace="~{fragments/commons::footer}"></footer>
+</body>
+</html>

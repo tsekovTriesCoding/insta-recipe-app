@@ -1,5 +1,6 @@
 package app.category.service;
 
+import app.activity.ActivityLogService;
 import app.category.model.Category;
 import app.category.model.CategoryName;
 import app.category.repository.CategoryRepository;
@@ -19,6 +20,7 @@ import java.util.UUID;
 public class CategoryService {
 
     private final CategoryRepository categoryRepository;
+    private final ActivityLogService activityLogService;
 
     public List<CategoryShort> getAll() {
         return categoryRepository.findAll()
@@ -43,9 +45,15 @@ public class CategoryService {
         if (recipeToUpdate.getCategories().contains(categoryToEdit)) {
             categoryToEdit.getRecipes().remove(recipeToUpdate);
             recipeToUpdate.getCategories().remove(categoryToEdit);
+
+            activityLogService.logActivity("You have successfully remove category %s for recipe %s"
+                    .formatted(categoryToEdit.getName(), recipeToUpdate.getTitle()), recipeToUpdate.getCreatedBy().getId());
         } else {
             categoryToEdit.getRecipes().add(recipeToUpdate);
             recipeToUpdate.getCategories().add(categoryToEdit);
+
+            activityLogService.logActivity("You have successfully added category %s for recipe %s"
+                    .formatted(categoryToEdit.getName(), recipeToUpdate.getTitle()), recipeToUpdate.getCreatedBy().getId());
         }
 
         categoryRepository.save(categoryToEdit);

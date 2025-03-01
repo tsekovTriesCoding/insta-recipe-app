@@ -22,7 +22,6 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
-import java.io.IOException;
 import java.util.List;
 import java.util.UUID;
 
@@ -119,7 +118,7 @@ public class RecipeController {
 
     @PostMapping("/edit/{id}")
     public String editRecipe(@Valid EditRecipe editRecipe,
-                             BindingResult bindingResult) throws IOException {
+                             BindingResult bindingResult) {
 
         if (bindingResult.hasErrors()) {
             return "edit-recipe";

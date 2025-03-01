@@ -1,5 +1,6 @@
 package app.comment.service;
 
+import app.activity.ActivityLogService;
 import app.comment.model.Comment;
 import app.comment.repository.CommentRepository;
 import app.mapper.DtoMapper;
@@ -26,6 +27,7 @@ public class CommentService {
     private final CommentRepository commentRepository;
     private final RecipeService recipeService;
     private final UserService userService;
+    private final ActivityLogService activityLogService;
 
     @Transactional
     public void add(String content, UUID recipeId,UUID userId) {
@@ -40,6 +42,9 @@ public class CommentService {
                 .build();
 
         commentRepository.save(comment);
+
+        activityLogService.logActivity("You have successfully added comment for recipe %s - with content: [%s]"
+                .formatted(recipe.getTitle(), comment.getContent()), user.getId());
     }
 
     public List<CommentByRecipe> getCommentsByRecipeId(UUID recipeId) {
@@ -60,10 +65,19 @@ public class CommentService {
         Recipe recipe = comment.getRecipe();
 
         // Check if the user is the comment creator or the recipe creator
-        if (comment.getCreator().getUsername().equals(username) ||
-                recipe.getCreatedBy().getUsername().equals(username)) {
-
+        if (comment.getCreator().getUsername().equals(username)) {
             commentRepository.delete(comment);
+
+            activityLogService.logActivity("You have successfully deleted comment for recipe %s - with content: [%s]"
+                    .formatted(recipe.getTitle(), comment.getContent()), comment.getCreator().getId());
+
+            return true;
+        } else if (recipe.getCreatedBy().getUsername().equals(username)) {
+            commentRepository.delete(comment);
+
+            activityLogService.logActivity("You have successfully deleted comment for recipe %s - with content: [%s]"
+                    .formatted(recipe.getTitle(), comment.getContent()), recipe.getCreatedBy().getId());
+
             return true;
         }
 

@@ -1,5 +1,6 @@
 package app.recipe.service;
 
+import app.activity.ActivityLogService;
 import app.category.model.Category;
 import app.category.model.CategoryName;
 import app.category.service.CategoryService;
@@ -34,6 +35,7 @@ public class RecipeService {
     private final CategoryService categoryService;
     private final UserService userService;
     private final CloudinaryService cloudinaryService;
+    private final ActivityLogService activityLogService;
 
     public Page<RecipeShortInfo> getAll(Pageable pageable) {
         Page<Recipe> recipePage = recipeRepository.findAll(pageable);
@@ -67,7 +69,7 @@ public class RecipeService {
                 orElseThrow(() -> new RecipeNotFoundException("Recipe with id " + recipeId + " not found."));
     }
 
-    public Recipe create(AddRecipe recipe, UUID id) {
+    public Recipe create(AddRecipe addRecipe, UUID id) {
         User user = userService.getUserById(id);
 
 //        String title = recipe.getTitle();
@@ -80,10 +82,14 @@ public class RecipeService {
 //
 //        String imageUrl = saveImage(recipe.getImage(), title + "-recipe");
 
-        String imageUrl = cloudinaryService.uploadImage(recipe.getImage());
-        Recipe newRecipe = initializeRecipe(recipe, user, imageUrl);
+        String imageUrl = cloudinaryService.uploadImage(addRecipe.getImage());
+        Recipe newRecipe = initializeRecipe(addRecipe, user, imageUrl);
 
-        return recipeRepository.save(newRecipe);
+        Recipe recipe = recipeRepository.save(newRecipe);
+
+        activityLogService.logActivity("You have successfully added recipe %s".formatted(recipe.getTitle()), user.getId());
+
+        return recipe;
     }
 
     private Recipe initializeRecipe(AddRecipe recipe, User creator, String imageUrl) {
@@ -121,19 +127,19 @@ public class RecipeService {
     }
 
     @Transactional
-    public void update(EditRecipe recipe) {
-        Recipe recipeToUpdate = this.getById(recipe.getId());
-        List<Category> categories = recipe.getCategories()
+    public void update(EditRecipe editRecipe) {
+        Recipe recipeToUpdate = getById(editRecipe.getId());
+        List<Category> categories = editRecipe.getCategories()
                 .stream()
                 .map(categoryService::getByName)
                 .collect(Collectors.toList());;
 
-        if (!recipe.getTitle().equals(recipeToUpdate.getTitle())) {
-            recipeToUpdate.setTitle(recipe.getTitle());
+        if (!editRecipe.getTitle().equals(recipeToUpdate.getTitle())) {
+            recipeToUpdate.setTitle(editRecipe.getTitle());
         }
 
-        if (!recipe.getDescription().equals(recipeToUpdate.getDescription())) {
-            recipeToUpdate.setDescription(recipe.getDescription());
+        if (!editRecipe.getDescription().equals(recipeToUpdate.getDescription())) {
+            recipeToUpdate.setDescription(editRecipe.getDescription());
         }
 
         if (!categories.equals(recipeToUpdate.getCategories())) {
@@ -142,38 +148,43 @@ public class RecipeService {
             });
         }
 
-        if (!recipe.getIngredients().equals(String.join(",", recipeToUpdate.getIngredients()))) {
-            List<String> updatedIngredients = new ArrayList<>(List.of(recipe.getIngredients().split(",")));
+        if (!editRecipe.getIngredients().equals(String.join(",", recipeToUpdate.getIngredients()))) {
+            List<String> updatedIngredients = new ArrayList<>(List.of(editRecipe.getIngredients().split(",")));
             recipeToUpdate.setIngredients(updatedIngredients);
         }
 
-        if (!recipe.getInstructions().equals(recipeToUpdate.getInstructions())) {
-            recipeToUpdate.setInstructions(recipe.getInstructions());
+        if (!editRecipe.getInstructions().equals(recipeToUpdate.getInstructions())) {
+            recipeToUpdate.setInstructions(editRecipe.getInstructions());
         }
 
-        if (!recipe.getServings().equals(recipeToUpdate.getServings())) {
-            recipeToUpdate.setServings(recipe.getServings());
+        if (!editRecipe.getServings().equals(recipeToUpdate.getServings())) {
+            recipeToUpdate.setServings(editRecipe.getServings());
         }
 
-        if (!recipe.getCookTime().equals(recipeToUpdate.getCookTime())) {
-            recipeToUpdate.setCookTime(recipe.getCookTime());
+        if (!editRecipe.getCookTime().equals(recipeToUpdate.getCookTime())) {
+            recipeToUpdate.setCookTime(editRecipe.getCookTime());
         }
 
-        if (recipe.getPrepTime() != null && !recipe.getPrepTime().equals(recipeToUpdate.getPrepTime())) {
-            recipeToUpdate.setPrepTime(recipe.getPrepTime());
+        if (editRecipe.getPrepTime() != null && !editRecipe.getPrepTime().equals(recipeToUpdate.getPrepTime())) {
+            recipeToUpdate.setPrepTime(editRecipe.getPrepTime());
         }
 
-        if (recipe.getImage() != null && !recipe.getImage().isEmpty()) {
-            String imageUrl = cloudinaryService.uploadImage(recipe.getImage());
+        if (editRecipe.getImage() != null && !editRecipe.getImage().isEmpty()) {
+            String imageUrl = cloudinaryService.uploadImage(editRecipe.getImage());
             recipeToUpdate.setImage(imageUrl);
         }
 
-        recipeRepository.save(recipeToUpdate);
+        Recipe recipe = recipeRepository.save(recipeToUpdate);
+
+        activityLogService.logActivity("You have successfully updated recipe %s".formatted(recipe.getTitle()), recipeToUpdate.getCreatedBy().getId());
     }
 
     public void delete(UUID id) {
         //TODO: remove the picture from the uploads files...
-        recipeRepository.delete(getById(id));
+        Recipe recipe = getById(id);
+        recipeRepository.delete(recipe);
+
+        activityLogService.logActivity("You have successfully deleted recipe %s".formatted(id), recipe.getCreatedBy().getId());
     }
 
     public List<RecipeForAdminPageInfo> getAllForAdmin() {

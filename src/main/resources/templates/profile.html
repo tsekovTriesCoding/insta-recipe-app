@@ -78,6 +78,9 @@
                     <p th:text="|Last Profile Update: ${#temporals.format(userProfileInfo.dateUpdated, 'dd MMM YYYY HH:mm')}|"></p>
                 </div>
 
+                <div class="d-flex justify-content-center mt-4">
+                    <a th:href="@{'/my-profile/' + ${userProfileInfo.id} + '/activity-log'} " class="btn btn-lg btn-light px-5 py-3 shadow text-capitalize">Activity Log</a>
+                </div>
             </div>
         </div>
     </section>

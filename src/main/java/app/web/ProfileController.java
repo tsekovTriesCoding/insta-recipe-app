@@ -1,5 +1,7 @@
 package app.web;
 
+import app.activity.ActivityLogResponse;
+import app.activity.ActivityLogService;
 import app.security.CustomUserDetails;
 import app.user.service.UserService;
 import app.web.dto.*;
@@ -17,6 +19,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.util.List;
 import java.util.UUID;
 
 @RequiredArgsConstructor
@@ -25,6 +28,7 @@ import java.util.UUID;
 public class ProfileController {
 
     private final UserService userService;
+    private final ActivityLogService activityLogService;
 
     @ModelAttribute
     public ChangeProfilePicture changeProfilePicture() {
@@ -152,5 +156,26 @@ public class ProfileController {
         );
 
         SecurityContextHolder.getContext().setAuthentication(newAuth);
+    }
+
+    @GetMapping("/{id}/activity-log")
+    public ModelAndView activityLog(@PathVariable UUID id) {
+        ModelAndView modelAndView = new ModelAndView("activity-log");
+
+        List<ActivityLogResponse> activityLog = activityLogService.getActivityLog(id);
+
+        modelAndView.addObject("activityLog", activityLog);
+        modelAndView.addObject("userId", id);
+
+        return modelAndView;
+    }
+
+    @DeleteMapping("/{id}/activity-log/clear")
+    public ModelAndView clearActivityLog(@PathVariable UUID id) {
+        ModelAndView modelAndView = new ModelAndView("redirect:/my-profile/" + id + "/activity-log");
+
+        activityLogService.deleteLogsByUserId(id);
+
+        return modelAndView;
     }
 }

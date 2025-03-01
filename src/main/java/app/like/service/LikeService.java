@@ -1,5 +1,6 @@
 package app.like.service;
 
+import app.activity.ActivityLogService;
 import app.exception.RecipeAlreadyLikedException;
 import app.exception.UserCannotLikeOwnRecipeException;
 import app.like.model.Like;
@@ -21,6 +22,7 @@ public class LikeService {
     private final LikeRepository likeRepository;
     private final UserService userService;
     private final RecipeService recipeService;
+    private final ActivityLogService activityLogService;
 
     public void like(UUID userId, UUID recipeId) {
         User user = userService.getUserById(userId);
@@ -36,6 +38,8 @@ public class LikeService {
             like.setRecipe(recipe);
 
             likeRepository.save(like);
+
+            activityLogService.logActivity("You have successfully liked recipe %s".formatted(recipe.getTitle()), user.getId());
         } catch (DataIntegrityViolationException e) {
             throw new RecipeAlreadyLikedException("You have already liked this recipe");
         }
