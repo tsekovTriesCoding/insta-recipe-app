@@ -1,6 +1,7 @@
 package app.web;
 
 import app.comment.service.CommentService;
+import app.mapper.DtoMapper;
 import app.recipe.service.RecipeService;
 import app.user.service.UserService;
 import app.web.dto.CommentForAdminPage;
@@ -14,6 +15,7 @@ import org.springframework.web.servlet.ModelAndView;
 
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @Controller
@@ -27,7 +29,10 @@ public class AdminController {
 
     @GetMapping("/users")
     public ModelAndView adminUserManagement(@RequestParam(value = "message", required = false) String message) {
-        List<UserWithRole> users = userService.getAll();
+        List<UserWithRole> users = userService.getAll()
+                .stream()
+                .map(DtoMapper::mapUserToUserWithRole)
+                .collect(Collectors.toList());
 
         ModelAndView modelAndView = new ModelAndView("admin-user-management");
         modelAndView.addObject("users", users);

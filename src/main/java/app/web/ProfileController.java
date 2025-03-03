@@ -2,7 +2,9 @@ package app.web;
 
 import app.activity.ActivityLogResponse;
 import app.activity.ActivityLogService;
+import app.mapper.DtoMapper;
 import app.security.CustomUserDetails;
+import app.user.model.User;
 import app.user.service.UserService;
 import app.web.dto.*;
 import jakarta.validation.Valid;
@@ -52,7 +54,8 @@ public class ProfileController {
 
     @GetMapping()
     public String getMyProfilePage(@AuthenticationPrincipal CustomUserDetails customUserDetails, Model model) {
-        UserProfileInfo userProfileInfo = userService.getUserProfileInfo(customUserDetails.getId());
+        User user = userService.getUserById(customUserDetails.getId());
+        UserProfileInfo userProfileInfo = DtoMapper.mapUserToUserProfileInfo(user);
 
         model.addAttribute("userProfileInfo", userProfileInfo);
 
@@ -66,7 +69,8 @@ public class ProfileController {
                                                RedirectAttributes redirectAttributes) {
 
         if (bindingResult.hasErrors()) {
-            UserProfileInfo userProfileInfo = userService.getUserProfileInfoById(id);
+            User user = userService.getUserById(id);
+            UserProfileInfo userProfileInfo = DtoMapper.mapUserToUserProfileInfo(user);
 
             ModelAndView modelAndView = new ModelAndView("profile", "userProfileInfo", userProfileInfo);
             modelAndView.addObject("changeProfilePicture", changeProfilePicture);
@@ -88,7 +92,8 @@ public class ProfileController {
                                                 RedirectAttributes redirectAttributes) {
 
         if (bindingResult.hasErrors()) {
-            UserProfileInfo userProfileInfo = userService.getUserProfileInfoById(id);
+            User user = userService.getUserById(id);
+            UserProfileInfo userProfileInfo = DtoMapper.mapUserToUserProfileInfo(user);
 
             ModelAndView modelAndView = new ModelAndView("profile", "userProfileInfo", userProfileInfo);
             modelAndView.addObject("changeUsername", changeUsername);
@@ -112,7 +117,8 @@ public class ProfileController {
                                              RedirectAttributes redirectAttributes) {
 
         if (bindingResult.hasErrors()) {
-            UserProfileInfo userProfileInfo = userService.getUserProfileInfoById(id);
+            User user = userService.getUserById(id);
+            UserProfileInfo userProfileInfo = DtoMapper.mapUserToUserProfileInfo(user);
 
             ModelAndView modelAndView = new ModelAndView("profile", "userProfileInfo", userProfileInfo);
             modelAndView.addObject("changeEmail", changeEmail);
@@ -134,7 +140,8 @@ public class ProfileController {
                                                 RedirectAttributes redirectAttributes) {
 
         if (bindingResult.hasErrors()) {
-            UserProfileInfo userProfileInfo = userService.getUserProfileInfoById(id);
+            User user = userService.getUserById(id);
+            UserProfileInfo userProfileInfo = DtoMapper.mapUserToUserProfileInfo(user);
 
             ModelAndView modelAndView = new ModelAndView("profile", "userProfileInfo", userProfileInfo);
             modelAndView.addObject("changePassword", changePassword);

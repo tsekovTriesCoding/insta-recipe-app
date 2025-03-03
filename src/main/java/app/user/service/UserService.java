@@ -4,14 +4,11 @@ import app.activity.ActivityLogService;
 import app.cloudinary.CloudinaryService;
 import app.exception.UserAlreadyExistsException;
 import app.exception.UserNotFoundException;
-import app.mapper.DtoMapper;
 import app.security.CustomUserDetails;
 import app.user.model.Role;
 import app.user.model.User;
 import app.user.repository.UserRepository;
 import app.web.dto.RegisterRequest;
-import app.web.dto.UserProfileInfo;
-import app.web.dto.UserWithRole;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -24,8 +21,6 @@ import org.springframework.web.multipart.MultipartFile;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
-
-import static app.mapper.DtoMapper.mapUserToUserProfileInfo;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -77,12 +72,6 @@ public class UserService implements UserDetailsService {
         activityLogService.logActivity("You have successfully updated your profile picture", updated.getId());
 
         log.info("Successfully update profile picture for user [%s] with id [%s]".formatted(updated.getUsername(), updated.getId()));
-        mapUserToUserProfileInfo(updated);
-    }
-
-    public UserProfileInfo getUserProfileInfo(UUID userId) {
-        User user = getUserById(userId);
-        return mapUserToUserProfileInfo(user);
     }
 
     public void updateUsername(UUID userId, String username) {
@@ -93,7 +82,6 @@ public class UserService implements UserDetailsService {
         activityLogService.logActivity("You have successfully updated your username", updated.getId());
 
         log.info("Successfully update profile username for user [%s] with id [%s]".formatted(updated.getUsername(), updated.getId()));
-        mapUserToUserProfileInfo(updated);
     }
 
     public void updateEmail(UUID userId, String email) {
@@ -104,7 +92,6 @@ public class UserService implements UserDetailsService {
         activityLogService.logActivity("You have successfully updated your email", updated.getId());
 
         log.info("Successfully update profile email for user [%s] with id [%s]".formatted(updated.getUsername(), updated.getId()));
-        mapUserToUserProfileInfo(updated);
     }
 
     public void updatePassword(UUID userId, String password) {
@@ -115,7 +102,6 @@ public class UserService implements UserDetailsService {
         activityLogService.logActivity("You have successfully updated your password", updated.getId());
 
         log.info("Successfully update profile password for user [%s] with id [%s]".formatted(updated.getUsername(), updated.getId()));
-        mapUserToUserProfileInfo(updated);
     }
 
     public boolean existsByUsername(String username) {
@@ -126,16 +112,8 @@ public class UserService implements UserDetailsService {
         return userRepository.existsByEmail(email);
     }
 
-    public List<UserWithRole> getAll() {
-        return userRepository.findAll()
-                .stream()
-                .map(DtoMapper::mapUserToUserWithRole)
-                .toList();
-    }
-
-    public UserProfileInfo getUserProfileInfoById(UUID userId) {
-        User user = getUserById(userId);
-        return mapUserToUserProfileInfo(user);
+    public List<User> getAll() {
+        return userRepository.findAll();
     }
 
     public void updateUserRole(UUID userId) {
