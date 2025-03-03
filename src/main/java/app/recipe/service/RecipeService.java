@@ -2,7 +2,6 @@ package app.recipe.service;
 
 import app.activity.ActivityLogService;
 import app.category.model.Category;
-import app.category.model.CategoryName;
 import app.category.service.CategoryService;
 import app.cloudinary.CloudinaryService;
 import app.exception.RecipeNotFoundException;
