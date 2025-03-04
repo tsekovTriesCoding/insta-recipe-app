@@ -84,7 +84,10 @@ public class AdminController {
 
     @GetMapping("/comments")
     public ModelAndView adminCommentManagement(@RequestParam(value = "message", required = false) String message) {
-        List<CommentForAdminPage> comments = commentService.getAll();
+        List<CommentForAdminPage> comments = commentService.getAll()
+                .stream()
+                .map(DtoMapper::mapCommentToCommentForAdminPage)
+                .toList();
 
         ModelAndView modelAndView = new ModelAndView("admin-comment-management");
         modelAndView.addObject("comments", comments);

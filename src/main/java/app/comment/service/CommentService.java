@@ -84,11 +84,8 @@ public class CommentService {
         return false;
     }
 
-    public List<CommentForAdminPage> getAll() {
-        return commentRepository.findAll()
-                .stream()
-                .map(DtoMapper::mapCommentToCommentForAdminPage)
-                .collect(Collectors.toList());
+    public List<Comment> getAll() {
+        return commentRepository.findAll();
     }
 
     public void delete(UUID commentId) {
