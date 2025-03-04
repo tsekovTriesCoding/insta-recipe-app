@@ -1,6 +1,7 @@
 package app.web;
 
 import app.category.service.CategoryService;
+import app.mapper.DtoMapper;
 import app.web.dto.CategoryDetails;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
@@ -20,7 +21,7 @@ public class CategoryController {
 
     @GetMapping("/{id}")
     public String categoryView(Model model, @PathVariable UUID id) {
-        CategoryDetails categoryDetails = categoryService.getById(id);
+        CategoryDetails categoryDetails = DtoMapper.mapCategoryToCategoryDetails(categoryService.getById(id));
         model.addAttribute("categoryDetails", categoryDetails);
         return "category";
     }

@@ -1,6 +1,7 @@
 package app.web;
 
 import app.category.service.CategoryService;
+import app.mapper.DtoMapper;
 import app.web.dto.CategoryShort;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
@@ -23,7 +24,11 @@ public class HomeController {
     @GetMapping("/home")
     public String getHomePage(Model model) {
 
-        List<CategoryShort> categories = categoryService.getAll();
+        List<CategoryShort> categories = categoryService.getAll()
+                .stream()
+                .map(DtoMapper::mapCategoryToCategoryShort)
+                .toList();
+
         model.addAttribute("categories", categories);
 
         return "/home";

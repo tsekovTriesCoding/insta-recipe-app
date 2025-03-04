@@ -8,7 +8,6 @@ import app.exception.CategoryNotFoundException;
 import app.mapper.DtoMapper;
 import app.recipe.model.Recipe;
 import app.web.dto.CategoryDetails;
-import app.web.dto.CategoryShort;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -22,18 +21,13 @@ public class CategoryService {
     private final CategoryRepository categoryRepository;
     private final ActivityLogService activityLogService;
 
-    public List<CategoryShort> getAll() {
-        return categoryRepository.findAll()
-                .stream()
-                .map(DtoMapper::mapCategoryToCategoryShort)
-                .toList();
+    public List<Category> getAll() {
+        return categoryRepository.findAll();
     }
 
     //TODO:handle category not found exception!
-    public CategoryDetails getById(UUID id) {
-        return categoryRepository.findById(id)
-                .map(DtoMapper::mapCategoryToCategoryDetails)
-                .orElseThrow(() -> new CategoryNotFoundException("Category with id " + id + " not found"));
+    public Category getById(UUID id) {
+        return categoryRepository.findById(id).orElseThrow(() -> new CategoryNotFoundException("Category with id " + id + " not found"));
     }
 
     public Category getByName(CategoryName categoryName) {
