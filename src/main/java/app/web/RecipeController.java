@@ -4,6 +4,7 @@ import app.category.model.CategoryName;
 import app.exception.RecipeNotFoundException;
 import app.favorite.FavoriteServiceClient;
 import app.like.service.LikeService;
+import app.mapper.DtoMapper;
 import app.recipe.model.Recipe;
 import app.recipe.service.RecipeService;
 import app.security.CustomUserDetails;
@@ -24,6 +25,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @Controller
@@ -46,15 +48,15 @@ public class RecipeController {
 
         Page<RecipeShortInfo> recipes;
         if (query != null && !query.trim().isEmpty()) {
-            recipes = recipeService.searchRecipes(query, pageable);
+            recipes = recipeService.searchRecipes(query, pageable).map(DtoMapper::mapRecipeToRecipeShortInfo);
 
             if (!recipes.hasContent()) {
-                recipes = recipeService.getAll(pageable);
+                recipes = recipeService.getAll(pageable).map(DtoMapper::mapRecipeToRecipeShortInfo);
             }
 
             model.addAttribute("query", query);
         } else {
-            recipes = recipeService.getAll(pageable);
+            recipes = recipeService.getAll(pageable).map(DtoMapper::mapRecipeToRecipeShortInfo);
         }
 
         model.addAttribute("recipes", recipes);
@@ -66,7 +68,7 @@ public class RecipeController {
     public String recipeDetails(@PathVariable UUID id,
                                 @AuthenticationPrincipal CustomUserDetails customUserDetails,
                                 Model model) {
-        RecipeDetails recipe = recipeService.getDetailsById(id);
+        RecipeDetails recipe = DtoMapper.mapRecipeToRecipeDetails(recipeService.getById(id));
         boolean isCreator = recipe.getCreator().equals(customUserDetails.getUsername());
         boolean hasLiked = likeService.userHasLikedRecipe(customUserDetails.getId(), id);
 
@@ -109,7 +111,7 @@ public class RecipeController {
 
     @GetMapping("/edit/{id}")
     public String editRecipe(@PathVariable UUID id, Model model) {
-        EditRecipe editRecipe = recipeService.getAddRecipeById(id);
+        EditRecipe editRecipe = DtoMapper.mapRecipeToEditRecipe(recipeService.getById(id));
 
         model.addAttribute("editRecipe", editRecipe);
 

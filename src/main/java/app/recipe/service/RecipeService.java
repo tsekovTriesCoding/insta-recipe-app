@@ -36,31 +36,8 @@ public class RecipeService {
     private final CloudinaryService cloudinaryService;
     private final ActivityLogService activityLogService;
 
-    public Page<RecipeShortInfo> getAll(Pageable pageable) {
-        Page<Recipe> recipePage = recipeRepository.findAll(pageable);
-
-        return recipePage.map(DtoMapper::mapRecipeToRecipeShortInfo);
-    }
-
-    @Transactional(readOnly = true)
-    public RecipeDetails getDetailsById(UUID recipeId) {
-        Recipe recipe = getById(recipeId);
-
-        return RecipeDetails.builder()
-                .id(recipe.getId())
-                .title(recipe.getTitle())
-                .description(recipe.getDescription())
-                .ingredients(recipe.getIngredients())
-                .instructions(recipe.getInstructions())
-                .createdDate(recipe.getCreatedDate())
-                .cookTime(recipe.getCookTime())
-                .prepTime(recipe.getPrepTime())
-                .createdBy(recipe.getCreatedBy())
-                .servings(recipe.getServings())
-                .image(recipe.getImage())
-                .comments(recipe.getComments())
-                .likes(recipe.getLikes().size())
-                .build();
+    public Page<Recipe> getAll(Pageable pageable) {
+        return recipeRepository.findAll(pageable);
     }
 
     public Recipe getById(UUID recipeId) {
@@ -119,19 +96,14 @@ public class RecipeService {
         return recipeRepository.findAllByCreatedBy(user);
     }
 
-    public EditRecipe getAddRecipeById(UUID id) {
-        Recipe recipe = this.getById(id);
-
-        return mapRecipeToEditRecipe(recipe);
-    }
-
     @Transactional
     public void update(EditRecipe editRecipe) {
         Recipe recipeToUpdate = getById(editRecipe.getId());
         List<Category> categories = editRecipe.getCategories()
                 .stream()
                 .map(categoryService::getByName)
-                .collect(Collectors.toList());;
+                .collect(Collectors.toList());
+        ;
 
         if (!editRecipe.getTitle().equals(recipeToUpdate.getTitle())) {
             recipeToUpdate.setTitle(editRecipe.getTitle());
@@ -186,17 +158,12 @@ public class RecipeService {
         activityLogService.logActivity("You have successfully deleted recipe %s".formatted(id), recipe.getCreatedBy().getId());
     }
 
-    public List<RecipeForAdminPageInfo> getAllForAdmin() {
-        return recipeRepository.findAll()
-                .stream()
-                .map(DtoMapper::mapRecipeToRecipeForAdminPageInfo)
-                .toList();
+    public List<Recipe> getAllForAdmin() {
+        return recipeRepository.findAll();
     }
 
-    public Page<RecipeShortInfo> searchRecipes(String query, Pageable pageable) {
-        Page<Recipe> recipesByTitle = recipeRepository.findAllByTitleContainingIgnoreCase(query, pageable);
-
-        return recipesByTitle.map(DtoMapper::mapRecipeToRecipeShortInfo);
+    public Page<Recipe> searchRecipes(String query, Pageable pageable) {
+        return recipeRepository.findAllByTitleContainingIgnoreCase(query, pageable);
     }
 
     public List<Recipe> getRecipesByIds(List<UUID> favoriteRecipeIds) {

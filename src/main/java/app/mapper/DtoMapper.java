@@ -106,4 +106,22 @@ public class DtoMapper {
                 .prepTime(recipe.getPrepTime())
                 .build();
     }
+
+    public static RecipeDetails mapRecipeToRecipeDetails(Recipe recipe) {
+        return RecipeDetails.builder()
+                .id(recipe.getId())
+                .title(recipe.getTitle())
+                .description(recipe.getDescription())
+                .ingredients(recipe.getIngredients())
+                .instructions(recipe.getInstructions())
+                .createdDate(recipe.getCreatedDate())
+                .cookTime(recipe.getCookTime())
+                .prepTime(recipe.getPrepTime())
+                .createdBy(recipe.getCreatedBy())
+                .servings(recipe.getServings())
+                .image(recipe.getImage())
+                .comments(recipe.getComments())
+                .likes(recipe.getLikes().size())
+                .build();
+    }
 }

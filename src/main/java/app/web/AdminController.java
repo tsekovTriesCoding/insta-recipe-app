@@ -60,7 +60,10 @@ public class AdminController {
 
     @GetMapping("/recipes")
     public ModelAndView adminRecipeManagement(@RequestParam(value = "message", required = false) String message) {
-        List<RecipeForAdminPageInfo> recipes = recipeService.getAllForAdmin();
+        List<RecipeForAdminPageInfo> recipes = recipeService.getAllForAdmin()
+                .stream()
+                .map(DtoMapper::mapRecipeToRecipeForAdminPageInfo)
+                .toList();
 
         ModelAndView modelAndView = new ModelAndView("admin-recipe-management");
         modelAndView.addObject("recipes", recipes);
