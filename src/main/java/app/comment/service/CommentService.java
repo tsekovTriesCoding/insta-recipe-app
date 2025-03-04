@@ -47,11 +47,8 @@ public class CommentService {
                 .formatted(recipe.getTitle(), comment.getContent()), user.getId());
     }
 
-    public List<CommentByRecipe> getCommentsByRecipeId(UUID recipeId) {
-        return commentRepository.findAllByRecipeIdOrderByCreatedDate(recipeId)
-                .stream()
-                .map(DtoMapper::mapCommentToCommentByRecipe)
-                .collect(Collectors.toList());
+    public List<Comment> getCommentsByRecipeId(UUID recipeId) {
+        return commentRepository.findAllByRecipeIdOrderByCreatedDate(recipeId);
     }
 
     public boolean deleteComment(UUID commentId, String username) {

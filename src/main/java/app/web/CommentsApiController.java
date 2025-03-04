@@ -1,6 +1,7 @@
 package app.web;
 
 import app.comment.service.CommentService;
+import app.mapper.DtoMapper;
 import app.security.CustomUserDetails;
 import app.web.dto.CommentByRecipe;
 import lombok.RequiredArgsConstructor;
@@ -22,7 +23,10 @@ public class CommentsApiController {
 
     @GetMapping("/{recipeId}")
     public ResponseEntity<List<CommentByRecipe>> getCommentsByRecipe(@PathVariable UUID recipeId) {
-        List<CommentByRecipe> comments = commentService.getCommentsByRecipeId(recipeId);
+        List<CommentByRecipe> comments = commentService.getCommentsByRecipeId(recipeId)
+                .stream()
+                .map(DtoMapper::mapCommentToCommentByRecipe)
+                .toList();
 
         // If no comments found, return 204 No Content
         if (comments.isEmpty()) {
