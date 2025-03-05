@@ -2,6 +2,7 @@ package app.favorite.service;
 
 import app.activitylog.service.ActivityLogService;
 import app.exception.AlreadyFavoritedException;
+import app.exception.FavoriteNotFoundException;
 import app.favorite.model.Favorite;
 import app.favorite.repository.FavoriteRepository;
 import app.recipe.model.Recipe;
@@ -25,7 +26,7 @@ public class FavoriteService {
     private final ActivityLogService activityLogService;
 
     @Transactional
-    public void favoriteRecipeByUser(UUID userId, UUID recipeId) {
+    public void addRecipeToFavorites(UUID userId, UUID recipeId) {
         User user = userService.getUserById(userId);
         Recipe recipe = recipeService.getById(recipeId);
 
@@ -44,9 +45,9 @@ public class FavoriteService {
     }
 
     @Transactional
-    public boolean unfavoriteRecipeByUser(UUID userId, UUID recipeId) {
+    public boolean removeRecipeFromFavorites(UUID userId, UUID recipeId) {
         Favorite favorite = favoriteRepository.findByUserIdAndRecipeId(userId, recipeId)
-                .orElseThrow(() -> new IllegalStateException("Favorite recipe with id " + recipeId + " not found"));
+                .orElseThrow(() -> new FavoriteNotFoundException(recipeId));
 
         favoriteRepository.delete(favorite);
 

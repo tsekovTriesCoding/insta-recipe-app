@@ -19,7 +19,10 @@ public class ActivityLogService {
     private final ActivityLogClient activityLogClient;
 
     public void logActivity(String action, UUID userId) {
-        ActivityLogRequest request = new ActivityLogRequest(userId, action);
+        ActivityLogRequest request = ActivityLogRequest.builder()
+                .userId(userId)
+                .action(action)
+                .build();
 
         activityLogClient.logActivity(request);
 

@@ -1,6 +1,7 @@
 package app.web;
 
 import app.exception.AlreadyFavoritedException;
+import app.exception.FavoriteNotFoundException;
 import app.favorite.service.FavoriteService;
 import app.recipe.model.Recipe;
 import app.security.CustomUserDetails;
@@ -34,7 +35,7 @@ public class FavoriteController {
                               @AuthenticationPrincipal CustomUserDetails customUserDetails,
                               RedirectAttributes redirectAttributes) {
 
-        favoriteService.favoriteRecipeByUser(customUserDetails.getId(), recipeId);
+        favoriteService.addRecipeToFavorites(customUserDetails.getId(), recipeId);
 
         redirectAttributes.addFlashAttribute("successMessage", "Recipe added to favorites!");
 
@@ -46,7 +47,7 @@ public class FavoriteController {
                                  @AuthenticationPrincipal CustomUserDetails customUserDetails,
                                  RedirectAttributes redirectAttributes) {
 
-        boolean success = favoriteService.unfavoriteRecipeByUser(customUserDetails.getId(), recipeId);
+        boolean success = favoriteService.removeRecipeFromFavorites(customUserDetails.getId(), recipeId);
 
         if (success) {
             redirectAttributes.addFlashAttribute("successMessage", "Recipe removed from favorites!");
@@ -59,6 +60,13 @@ public class FavoriteController {
 
     @ExceptionHandler(AlreadyFavoritedException.class)
     public String handleAlreadyFavoritedException(AlreadyFavoritedException ex, Model model) {
+        model.addAttribute("error", ex.getMessage());
+
+        return "error-page";
+    }
+
+    @ExceptionHandler(FavoriteNotFoundException.class)
+    public String handleFavoriteNotFoundException(FavoriteNotFoundException ex, Model model) {
         model.addAttribute("error", ex.getMessage());
 
         return "error-page";
