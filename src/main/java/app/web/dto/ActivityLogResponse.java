@@ -1,4 +1,4 @@
-package app.activity;
+package app.web.dto;
 
 import lombok.Builder;
 import lombok.Data;

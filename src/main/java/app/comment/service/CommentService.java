@@ -1,6 +1,6 @@
 package app.comment.service;
 
-import app.activity.ActivityLogService;
+import app.activitylog.service.ActivityLogService;
 import app.comment.model.Comment;
 import app.comment.repository.CommentRepository;
 import app.recipe.model.Recipe;

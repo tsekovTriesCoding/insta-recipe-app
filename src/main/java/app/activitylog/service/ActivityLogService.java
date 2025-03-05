@@ -1,5 +1,8 @@
-package app.activity;
+package app.activitylog.service;
 
+import app.web.dto.ActivityLogRequest;
+import app.web.dto.ActivityLogResponse;
+import app.activitylog.client.ActivityLogClient;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;

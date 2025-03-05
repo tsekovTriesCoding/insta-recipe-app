@@ -1,6 +1,6 @@
 package app.favorite.service;
 
-import app.activity.ActivityLogService;
+import app.activitylog.service.ActivityLogService;
 import app.exception.AlreadyFavoritedException;
 import app.favorite.model.Favorite;
 import app.favorite.repository.FavoriteRepository;

@@ -1,6 +1,6 @@
 package app.like.service;
 
-import app.activity.ActivityLogService;
+import app.activitylog.service.ActivityLogService;
 import app.exception.RecipeAlreadyLikedException;
 import app.exception.UserCannotLikeOwnRecipeException;
 import app.like.model.Like;

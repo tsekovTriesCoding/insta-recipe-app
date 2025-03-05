@@ -1,11 +1,9 @@
 package app.user.service;
 
-import app.activity.ActivityLogService;
+import app.activitylog.service.ActivityLogService;
 import app.cloudinary.CloudinaryService;
 import app.exception.UserAlreadyExistsException;
 import app.exception.UserNotFoundException;
-import app.recipe.model.Recipe;
-import app.recipe.service.RecipeService;
 import app.security.CustomUserDetails;
 import app.user.model.Role;
 import app.user.model.User;

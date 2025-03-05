@@ -1,6 +1,6 @@
 package app.recipe.service;
 
-import app.activity.ActivityLogService;
+import app.activitylog.service.ActivityLogService;
 import app.category.model.Category;
 import app.category.service.CategoryService;
 import app.cloudinary.CloudinaryService;

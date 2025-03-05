@@ -1,13 +1,11 @@
 package app.category.service;
 
-import app.activity.ActivityLogService;
+import app.activitylog.service.ActivityLogService;
 import app.category.model.Category;
 import app.category.model.CategoryName;
 import app.category.repository.CategoryRepository;
 import app.exception.CategoryNotFoundException;
-import app.mapper.DtoMapper;
 import app.recipe.model.Recipe;
-import app.web.dto.CategoryDetails;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
