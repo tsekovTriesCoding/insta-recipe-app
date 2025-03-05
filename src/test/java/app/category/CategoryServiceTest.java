@@ -56,13 +56,13 @@ public class CategoryServiceTest {
                 .build();
 
         // Act
-        List<CategoryShort> result = categoryService.getAll();
+        List<Category> result = categoryService.getAll();
 
         // Assert
         assertThat(result).hasSize(2);
-        assertThat(result).extracting(CategoryShort::getId)
+        assertThat(result).extracting(Category::getId)
                 .containsExactly(categoryShort1.getId(), categoryShort2.getId());
-        assertThat(result).extracting(CategoryShort::getName)
+        assertThat(result).extracting(Category::getName)
                 .containsExactly(categoryShort1.getName(), categoryShort2.getName());
 
         // Verify that repository.findAll() was called once

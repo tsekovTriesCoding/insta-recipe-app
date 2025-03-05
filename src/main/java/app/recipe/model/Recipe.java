@@ -2,12 +2,12 @@ package app.recipe.model;
 
 import app.category.model.Category;
 import app.comment.model.Comment;
+import app.favorite.model.Favorite;
 import app.like.model.Like;
 import app.user.model.User;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;

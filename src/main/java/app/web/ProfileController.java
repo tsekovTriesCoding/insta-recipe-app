@@ -156,15 +156,6 @@ public class ProfileController {
         return modelAndView;
     }
 
-    private void updateAuthentication(String username, Object credentials) {
-        UserDetails updatedUserDetails = userService.loadUserByUsername(username);
-        Authentication newAuth = new UsernamePasswordAuthenticationToken(
-                updatedUserDetails, credentials, updatedUserDetails.getAuthorities()
-        );
-
-        SecurityContextHolder.getContext().setAuthentication(newAuth);
-    }
-
     @GetMapping("/{id}/activity-log")
     public ModelAndView activityLog(@PathVariable UUID id) {
         ModelAndView modelAndView = new ModelAndView("activity-log");
@@ -184,5 +175,14 @@ public class ProfileController {
         activityLogService.deleteLogsByUserId(id);
 
         return modelAndView;
+    }
+
+    private void updateAuthentication(String username, Object credentials) {
+        UserDetails updatedUserDetails = userService.loadUserByUsername(username);
+        Authentication newAuth = new UsernamePasswordAuthenticationToken(
+                updatedUserDetails, credentials, updatedUserDetails.getAuthorities()
+        );
+
+        SecurityContextHolder.getContext().setAuthentication(newAuth);
     }
 }

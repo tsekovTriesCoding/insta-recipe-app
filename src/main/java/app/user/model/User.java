@@ -1,9 +1,11 @@
 package app.user.model;
 
+import app.favorite.model.Favorite;
 import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
 
 @Builder
@@ -12,7 +14,7 @@ import java.util.UUID;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-@Table(name = "users")
+@Table(name = "users",uniqueConstraints = @UniqueConstraint(columnNames = {"user_id", "recipe_id"}))
 public class User {
 
     @Id

@@ -4,6 +4,8 @@ import app.activity.ActivityLogService;
 import app.cloudinary.CloudinaryService;
 import app.exception.UserAlreadyExistsException;
 import app.exception.UserNotFoundException;
+import app.recipe.model.Recipe;
+import app.recipe.service.RecipeService;
 import app.security.CustomUserDetails;
 import app.user.model.Role;
 import app.user.model.User;
@@ -43,7 +45,7 @@ public class UserService implements UserDetailsService {
 
         User user = userRepository.save(initializeUser(registerRequest));
 
-        activityLogService.logActivity("You have successfully registered" , user.getId());
+        activityLogService.logActivity("You have successfully registered", user.getId());
 
         log.info("Successfully create new user account for username [%s] and email [%s], with id [%s]"
                 .formatted(user.getUsername(), user.getEmail(), user.getId()));
@@ -160,6 +162,11 @@ public class UserService implements UserDetailsService {
                 .profilePicture("/images/default-profile.png")
                 .dateRegistered(LocalDateTime.now())
                 .role(Role.USER) //every new user has user role by default
+                .isActive(true)
                 .build();
+    }
+
+    public void saveUser(User user) {
+        userRepository.save(user);
     }
 }

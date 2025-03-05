@@ -3,13 +3,10 @@ package app.comment.service;
 import app.activity.ActivityLogService;
 import app.comment.model.Comment;
 import app.comment.repository.CommentRepository;
-import app.mapper.DtoMapper;
 import app.recipe.model.Recipe;
 import app.recipe.service.RecipeService;
 import app.user.model.User;
 import app.user.service.UserService;
-import app.web.dto.CommentByRecipe;
-import app.web.dto.CommentForAdminPage;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -18,7 +15,6 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @Service

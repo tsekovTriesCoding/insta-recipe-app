@@ -2,10 +2,10 @@ package app.web;
 
 import app.category.model.CategoryName;
 import app.exception.RecipeNotFoundException;
-import app.favorite.FavoriteServiceClient;
 import app.like.service.LikeService;
 import app.mapper.DtoMapper;
 import app.recipe.model.Recipe;
+import app.favorite.service.FavoriteService;
 import app.recipe.service.RecipeService;
 import app.security.CustomUserDetails;
 import app.web.dto.AddRecipe;
@@ -25,7 +25,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @Controller
@@ -34,7 +33,7 @@ public class RecipeController {
 
     private final RecipeService recipeService;
     private final LikeService likeService;
-    private final FavoriteServiceClient favoriteServiceClient;
+    private final FavoriteService favoriteService;
 
     @ModelAttribute(name = "categories")
     public CategoryName[] categoryName() {
@@ -71,9 +70,7 @@ public class RecipeController {
         RecipeDetails recipe = DtoMapper.mapRecipeToRecipeDetails(recipeService.getById(id));
         boolean isCreator = recipe.getCreator().equals(customUserDetails.getUsername());
         boolean hasLiked = likeService.userHasLikedRecipe(customUserDetails.getId(), id);
-
-        List<UUID> favoriteRecipes = favoriteServiceClient.getFavoriteRecipeIds(customUserDetails.getId());
-        boolean isFavorite = favoriteRecipes.contains(id);
+        boolean isFavorite = favoriteService.isFavorite(customUserDetails.getId(), recipe.getId());
 
         model.addAttribute("recipe", recipe);
         model.addAttribute("isCreator", isCreator);

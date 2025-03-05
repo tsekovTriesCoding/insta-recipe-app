@@ -1,8 +1,8 @@
 package app.web;
 
-import app.favorite.FavoriteServiceClient;
+import app.exception.AlreadyFavoritedException;
+import app.favorite.service.FavoriteService;
 import app.recipe.model.Recipe;
-import app.recipe.service.RecipeService;
 import app.security.CustomUserDetails;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -18,15 +18,14 @@ import java.util.UUID;
 @Controller
 @RequestMapping("/favorites")
 public class FavoriteController {
-    private final FavoriteServiceClient favoriteServiceClient;
-    private final RecipeService recipeService;
+
+    private final FavoriteService favoriteService;
 
     @GetMapping
     public String getFavoriteRecipes(Model model, @AuthenticationPrincipal CustomUserDetails customUserDetails) {
-        List<UUID> favoriteRecipeIds = favoriteServiceClient.getFavoriteRecipeIds(customUserDetails.getId());
-        List<Recipe> favoriteRecipes = recipeService.getRecipesByIds(favoriteRecipeIds);
+        List<Recipe> userFavoriteRecipes = favoriteService.getUserFavoriteRecipes(customUserDetails.getId());
 
-        model.addAttribute("favoriteRecipes", favoriteRecipes);
+        model.addAttribute("favoriteRecipes", userFavoriteRecipes);
         return "favorite-recipes";
     }
 
@@ -35,13 +34,9 @@ public class FavoriteController {
                               @AuthenticationPrincipal CustomUserDetails customUserDetails,
                               RedirectAttributes redirectAttributes) {
 
-        boolean success = favoriteServiceClient.addFavorite(customUserDetails.getId(), recipeId);
+        favoriteService.favoriteRecipeByUser(customUserDetails.getId(), recipeId);
 
-        if (success) {
-            redirectAttributes.addFlashAttribute("successMessage", "Recipe added to favorites!");
-        } else {
-            redirectAttributes.addFlashAttribute("errorMessage", "Failed to add favorite.");
-        }
+        redirectAttributes.addFlashAttribute("successMessage", "Recipe added to favorites!");
 
         return "redirect:/recipes/" + recipeId;
     }
@@ -51,7 +46,7 @@ public class FavoriteController {
                                  @AuthenticationPrincipal CustomUserDetails customUserDetails,
                                  RedirectAttributes redirectAttributes) {
 
-        boolean success = favoriteServiceClient.removeFavorite(customUserDetails.getId(), recipeId);
+        boolean success = favoriteService.unfavoriteRecipeByUser(customUserDetails.getId(), recipeId);
 
         if (success) {
             redirectAttributes.addFlashAttribute("successMessage", "Recipe removed from favorites!");
@@ -60,5 +55,12 @@ public class FavoriteController {
         }
 
         return "redirect:/favorites";
+    }
+
+    @ExceptionHandler(AlreadyFavoritedException.class)
+    public String handleAlreadyFavoritedException(AlreadyFavoritedException ex, Model model) {
+        model.addAttribute("error", ex.getMessage());
+
+        return "error-page";
     }
 }

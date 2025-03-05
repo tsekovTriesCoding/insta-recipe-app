@@ -5,12 +5,12 @@ import app.category.model.Category;
 import app.category.service.CategoryService;
 import app.cloudinary.CloudinaryService;
 import app.exception.RecipeNotFoundException;
-import app.mapper.DtoMapper;
 import app.recipe.model.Recipe;
 import app.recipe.repository.RecipeRepository;
 import app.user.model.User;
 import app.user.service.UserService;
-import app.web.dto.*;
+import app.web.dto.AddRecipe;
+import app.web.dto.EditRecipe;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -23,8 +23,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
-
-import static app.mapper.DtoMapper.mapRecipeToEditRecipe;
 
 @RequiredArgsConstructor
 @Service
