@@ -4,6 +4,7 @@ import app.activitylog.annotation.LogActivity;
 import app.category.model.Category;
 import app.category.service.CategoryService;
 import app.cloudinary.CloudinaryService;
+import app.cloudinary.ImageUploadResult;
 import app.exception.RecipeNotFoundException;
 import app.recipe.model.Recipe;
 import app.recipe.repository.RecipeRepository;
@@ -46,8 +47,10 @@ public class RecipeService {
     public Recipe create(AddRecipe addRecipe, UUID id) {
         User user = userService.getUserById(id);
 
-        String imageUrl = cloudinaryService.uploadImage(addRecipe.getImage());
-        Recipe newRecipe = initializeRecipe(addRecipe, user, imageUrl);
+        // Upload new image
+        ImageUploadResult uploadResult = cloudinaryService.uploadImage(addRecipe.getImage());
+        Recipe newRecipe = initializeRecipe(addRecipe, user, uploadResult.getImageUrl());
+        newRecipe.setImagePublicId(uploadResult.getPublicId());
 
         return recipeRepository.save(newRecipe);
     }
@@ -125,8 +128,12 @@ public class RecipeService {
         }
 
         if (editRecipe.getImage() != null && !editRecipe.getImage().isEmpty()) {
-            String imageUrl = cloudinaryService.uploadImage(editRecipe.getImage());
-            recipeToUpdate.setImage(imageUrl);
+            // Delete old image from Cloudinary
+            cloudinaryService.deleteImage(recipeToUpdate.getImagePublicId());
+            // Upload new image
+            ImageUploadResult uploadResult = cloudinaryService.uploadImage(editRecipe.getImage());
+            recipeToUpdate.setImage(uploadResult.getImageUrl());
+            recipeToUpdate.setImagePublicId(uploadResult.getPublicId());
         }
 
         return recipeRepository.save(recipeToUpdate);

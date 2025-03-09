@@ -2,6 +2,7 @@ package app.user.service;
 
 import app.activitylog.annotation.LogActivity;
 import app.cloudinary.CloudinaryService;
+import app.cloudinary.ImageUploadResult;
 import app.exception.UserAlreadyExistsException;
 import app.exception.UserNotFoundException;
 import app.security.CustomUserDetails;
@@ -59,16 +60,21 @@ public class UserService implements UserDetailsService {
 
     @LogActivity(activity = "'You have successfully updated your profile picture'")
     public void updateProfilePicture(UUID userId,
-                                     MultipartFile file) {
-
-        String imageUrl = cloudinaryService.uploadImage(file);
-
+                                     MultipartFile newImage) {
         User user = getUserById(userId);
+
+        if (user.getImagePublicId() != null) {
+            cloudinaryService.deleteImage(user.getImagePublicId());
+        }
+        // Upload new image
+        ImageUploadResult uploadResult = cloudinaryService.uploadImage(newImage);
+
         user.setDateUpdated(LocalDateTime.now());
-        user.setProfilePicture(imageUrl);
+        user.setProfilePicture(uploadResult.getImageUrl());
+        user.setImagePublicId(uploadResult.getPublicId());
         User updated = userRepository.save(user);
 
-        log.info("Successfully update profile picture for user [%s] with id [%s]".formatted(updated.getUsername(), updated.getId()));
+        log.info("Successfully updated profile picture for user [{}] with id [{}]", user.getUsername(), user.getId());
     }
 
     @LogActivity(activity = "'You have successfully updated your username to ' + #username")

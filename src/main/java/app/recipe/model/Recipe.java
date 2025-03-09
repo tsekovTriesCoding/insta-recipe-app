@@ -42,13 +42,12 @@ public class Recipe {
     @Column(nullable = false)
     private LocalDateTime createdDate;
 
-    @Column
     private LocalDateTime updatedDate;
 
-    @Column
     private String image;
 
-    @Column
+    private String imagePublicId;
+
     private Integer prepTime;
 
     @Column(nullable = false)

@@ -28,8 +28,9 @@ public class User {
     @Column(nullable = false)
     private String password;
 
-    @Column
     private String profilePicture;
+
+    private String imagePublicId;
 
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
@@ -45,4 +46,3 @@ public class User {
     @Column(name = "last_login")
     private LocalDateTime lastLogin;
 }
-
