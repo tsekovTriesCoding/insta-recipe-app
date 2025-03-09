@@ -46,14 +46,14 @@ public class AdminController {
 
     @PutMapping("/users/change-role/{userId}")
     public ModelAndView changeUserRole(@PathVariable UUID userId) {
-        userService.updateUserRole(userId);
+        userService.changeUserRole(userId);
 
         return new ModelAndView("redirect:/admin/users", "message", "You have successfully changed the user's role");
     }
 
     @PutMapping("/users/change-status/{userId}")
     public ModelAndView changeUserStatus(@PathVariable UUID userId) {
-        userService.updateUserStatus(userId);
+        userService.changeUserStatus(userId);
 
         return new ModelAndView("redirect:/admin/users", "message", "You have successfully changed the user's status");
     }

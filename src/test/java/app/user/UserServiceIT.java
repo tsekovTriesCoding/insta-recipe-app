@@ -9,7 +9,6 @@ import app.user.repository.UserRepository;
 import app.user.service.UserService;
 import app.web.dto.RegisterRequest;
 import app.web.dto.UserWithRole;
-import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -240,7 +239,7 @@ public class UserServiceIT {
 
         userRepository.save(user);
 
-        userService.updateUserRole(user.getId());
+        userService.changeUserRole(user.getId());
 
         User updatedUser = userRepository.findById(user.getId()).orElseThrow();
         assertNotNull(updatedUser);
@@ -259,7 +258,7 @@ public class UserServiceIT {
 
         userRepository.save(user);
 
-        userService.updateUserRole(user.getId());
+        userService.changeUserRole(user.getId());
 
         User updatedUser = userRepository.findById(user.getId()).orElseThrow();
         assertNotNull(updatedUser);
@@ -271,7 +270,7 @@ public class UserServiceIT {
         UUID nonExistentUserId = UUID.randomUUID();
 
         assertThrows(UserNotFoundException.class, () -> {
-            userService.updateUserRole(nonExistentUserId);
+            userService.changeUserRole(nonExistentUserId);
         });
     }
 }

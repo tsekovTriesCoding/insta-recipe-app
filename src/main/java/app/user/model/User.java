@@ -1,11 +1,9 @@
 package app.user.model;
 
-import app.favorite.model.Favorite;
 import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.UUID;
 
 @Builder

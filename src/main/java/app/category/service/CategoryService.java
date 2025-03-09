@@ -38,7 +38,7 @@ public class CategoryService {
             categoryToEdit.getRecipes().remove(recipeToUpdate);
             recipeToUpdate.getCategories().remove(categoryToEdit);
 
-            activityLogService.logActivity("You have successfully remove category %s for recipe %s"
+            activityLogService.logActivity("You have successfully removed category %s from recipe %s"
                     .formatted(categoryToEdit.getName(), recipeToUpdate.getTitle()), recipeToUpdate.getCreatedBy().getId());
         } else {
             categoryToEdit.getRecipes().add(recipeToUpdate);

@@ -1,6 +1,6 @@
 package app.favorite.service;
 
-import app.activitylog.service.ActivityLogService;
+import app.activitylog.annotation.LogActivity;
 import app.exception.AlreadyFavoritedException;
 import app.exception.FavoriteNotFoundException;
 import app.favorite.model.Favorite;
@@ -23,8 +23,8 @@ public class FavoriteService {
     private final FavoriteRepository favoriteRepository;
     private final UserService userService;
     private final RecipeService recipeService;
-    private final ActivityLogService activityLogService;
 
+    @LogActivity(activity = "'You have successfully added recipe with id: ' + #recipeId + ' to your favorites'")
     @Transactional
     public void addRecipeToFavorites(UUID userId, UUID recipeId) {
         User user = userService.getUserById(userId);
@@ -40,10 +40,9 @@ public class FavoriteService {
                 .build();
 
         favoriteRepository.save(favorite);
-
-        activityLogService.logActivity("You have successfully added recipe %s to you favorites".formatted(recipe.getTitle()), user.getId());
     }
 
+    @LogActivity(activity = "'You have successfully removed recipe with id: ' + #recipeId + ' from your favorites'")
     @Transactional
     public boolean removeRecipeFromFavorites(UUID userId, UUID recipeId) {
         Favorite favorite = favoriteRepository.findByUserIdAndRecipeId(userId, recipeId)
@@ -51,10 +50,7 @@ public class FavoriteService {
 
         favoriteRepository.delete(favorite);
 
-        Recipe recipe = recipeService.getById(favorite.getRecipe().getId());
-
-        activityLogService.logActivity("You have successfully deleted recipe %s from your favorites"
-                .formatted(recipe.getTitle()), favorite.getUser().getId());
+        recipeService.getById(favorite.getRecipe().getId());
 
         return true;
     }

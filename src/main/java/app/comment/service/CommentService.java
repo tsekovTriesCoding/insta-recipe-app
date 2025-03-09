@@ -1,6 +1,6 @@
 package app.comment.service;
 
-import app.activitylog.service.ActivityLogService;
+import app.activitylog.annotation.LogActivity;
 import app.comment.model.Comment;
 import app.comment.repository.CommentRepository;
 import app.recipe.model.Recipe;
@@ -23,30 +23,28 @@ public class CommentService {
     private final CommentRepository commentRepository;
     private final RecipeService recipeService;
     private final UserService userService;
-    private final ActivityLogService activityLogService;
 
+    @LogActivity(activity = "'Added comment with content: ' + #result.content")
     @Transactional
-    public void add(String content, UUID recipeId,UUID userId) {
+    public Comment add(String content, UUID recipeId, UUID userId) {
         Recipe recipe = recipeService.getById(recipeId);
         User user = userService.getUserById(userId);
 
         Comment comment = Comment.builder()
-                .content(content)
+                .content(content.trim())
                 .recipe(recipe)
                 .creator(user)
                 .createdDate(LocalDateTime.now())
                 .build();
 
-        commentRepository.save(comment);
-
-        activityLogService.logActivity("You have successfully added comment for recipe %s - with content: [%s]"
-                .formatted(recipe.getTitle(), comment.getContent()), user.getId());
+       return commentRepository.save(comment);
     }
 
     public List<Comment> getCommentsByRecipeId(UUID recipeId) {
         return commentRepository.findAllByRecipeIdOrderByCreatedDate(recipeId);
     }
 
+    @LogActivity(activity = "'You have successfully removed comment with id: ' + #commentId")
     public boolean deleteComment(UUID commentId, String username) {
         Optional<Comment> commentOpt = commentRepository.findById(commentId);
 
@@ -60,17 +58,9 @@ public class CommentService {
         // Check if the user is the comment creator or the recipe creator
         if (comment.getCreator().getUsername().equals(username)) {
             commentRepository.delete(comment);
-
-            activityLogService.logActivity("You have successfully deleted comment for recipe %s - with content: [%s]"
-                    .formatted(recipe.getTitle(), comment.getContent()), comment.getCreator().getId());
-
             return true;
         } else if (recipe.getCreatedBy().getUsername().equals(username)) {
             commentRepository.delete(comment);
-
-            activityLogService.logActivity("You have successfully deleted comment for recipe %s - with content: [%s]"
-                    .formatted(recipe.getTitle(), comment.getContent()), recipe.getCreatedBy().getId());
-
             return true;
         }
 

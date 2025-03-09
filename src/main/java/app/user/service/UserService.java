@@ -1,6 +1,6 @@
 package app.user.service;
 
-import app.activitylog.service.ActivityLogService;
+import app.activitylog.annotation.LogActivity;
 import app.cloudinary.CloudinaryService;
 import app.exception.UserAlreadyExistsException;
 import app.exception.UserNotFoundException;
@@ -30,8 +30,8 @@ public class UserService implements UserDetailsService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final CloudinaryService cloudinaryService;
-    private final ActivityLogService activityLogService;
 
+    @LogActivity(activity = "'You have successfully registered with username: ' + #result.username")
     public void register(RegisterRequest registerRequest) {
         if (userRepository.existsByUsername(registerRequest.getUsername())) {
             throw new UserAlreadyExistsException("User with username " + registerRequest.getUsername() + " already exists.");
@@ -42,8 +42,6 @@ public class UserService implements UserDetailsService {
         }
 
         User user = userRepository.save(initializeUser(registerRequest));
-
-        activityLogService.logActivity("You have successfully registered", user.getId());
 
         log.info("Successfully create new user account for username [%s] and email [%s], with id [%s]"
                 .formatted(user.getUsername(), user.getEmail(), user.getId()));
@@ -59,6 +57,7 @@ public class UserService implements UserDetailsService {
                 .orElseThrow(() -> new UserNotFoundException("User with id " + userId + " not found."));
     }
 
+    @LogActivity(activity = "'You have successfully updated your profile picture'")
     public void updateProfilePicture(UUID userId,
                                      MultipartFile file) {
 
@@ -69,37 +68,32 @@ public class UserService implements UserDetailsService {
         user.setProfilePicture(imageUrl);
         User updated = userRepository.save(user);
 
-        activityLogService.logActivity("You have successfully updated your profile picture", updated.getId());
-
         log.info("Successfully update profile picture for user [%s] with id [%s]".formatted(updated.getUsername(), updated.getId()));
     }
 
+    @LogActivity(activity = "'You have successfully updated your username to ' + #username")
     public void updateUsername(UUID userId, String username) {
         User user = getUserById(userId);
         user.setUsername(username);
         User updated = userRepository.save(user);
 
-        activityLogService.logActivity("You have successfully updated your username", updated.getId());
-
         log.info("Successfully update profile username for user [%s] with id [%s]".formatted(updated.getUsername(), updated.getId()));
     }
 
+    @LogActivity(activity = "'You have successfully updated your email to ' + #email")
     public void updateEmail(UUID userId, String email) {
         User user = getUserById(userId);
         user.setEmail(email);
         User updated = userRepository.save(user);
 
-        activityLogService.logActivity("You have successfully updated your email", updated.getId());
-
         log.info("Successfully update profile email for user [%s] with id [%s]".formatted(updated.getUsername(), updated.getId()));
     }
 
+    @LogActivity(activity = "'You have successfully updated your password'")
     public void updatePassword(UUID userId, String password) {
         User user = getUserById(userId);
         user.setPassword(passwordEncoder.encode(password));
         User updated = userRepository.save(user);
-
-        activityLogService.logActivity("You have successfully updated your password", updated.getId());
 
         log.info("Successfully update profile password for user [%s] with id [%s]".formatted(updated.getUsername(), updated.getId()));
     }
@@ -116,7 +110,7 @@ public class UserService implements UserDetailsService {
         return userRepository.findAll();
     }
 
-    public void updateUserRole(UUID userId) {
+    public void changeUserRole(UUID userId) {
         User user = getUserById(userId);
 
         Role newRole = null;
@@ -131,7 +125,7 @@ public class UserService implements UserDetailsService {
         userRepository.save(user);
     }
 
-    public void updateUserStatus(UUID userId) {
+    public void changeUserStatus(UUID userId) {
         User user = getUserById(userId);
 
         user.setIsActive(!user.getIsActive());
@@ -162,9 +156,5 @@ public class UserService implements UserDetailsService {
                 .role(Role.USER) //every new user has user role by default
                 .isActive(true)
                 .build();
-    }
-
-    public void saveUser(User user) {
-        userRepository.save(user);
     }
 }

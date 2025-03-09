@@ -26,7 +26,7 @@ public class ActivityLogService {
 
         activityLogClient.logActivity(request);
 
-        log.info("Successfully logged activity - {} for user with id {}", action, userId);
+        log.info("Successfully logged activity - {}", action);
     }
 
     public List<ActivityLogResponse> getActivityLog(UUID userId) {

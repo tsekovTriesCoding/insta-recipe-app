@@ -1,6 +1,6 @@
 package app.recipe.service;
 
-import app.activitylog.service.ActivityLogService;
+import app.activitylog.annotation.LogActivity;
 import app.category.model.Category;
 import app.category.service.CategoryService;
 import app.cloudinary.CloudinaryService;
@@ -32,7 +32,6 @@ public class RecipeService {
     private final CategoryService categoryService;
     private final UserService userService;
     private final CloudinaryService cloudinaryService;
-    private final ActivityLogService activityLogService;
 
     public Page<Recipe> getAll(Pageable pageable) {
         return recipeRepository.findAll(pageable);
@@ -43,27 +42,14 @@ public class RecipeService {
                 orElseThrow(() -> new RecipeNotFoundException("Recipe with id " + recipeId + " not found."));
     }
 
+    @LogActivity(activity = "'You have successfully added recipe ' + #result.title")
     public Recipe create(AddRecipe addRecipe, UUID id) {
         User user = userService.getUserById(id);
-
-//        String title = recipe.getTitle();
-//
-//        if (recipeRepository.existsByTitle(title)) {
-//            List<Recipe> allByTitle = recipeRepository.getAllByTitle(title);
-//
-//            title = title + allByTitle.size();
-//        }
-//
-//        String imageUrl = saveImage(recipe.getImage(), title + "-recipe");
 
         String imageUrl = cloudinaryService.uploadImage(addRecipe.getImage());
         Recipe newRecipe = initializeRecipe(addRecipe, user, imageUrl);
 
-        Recipe recipe = recipeRepository.save(newRecipe);
-
-        activityLogService.logActivity("You have successfully added recipe %s".formatted(recipe.getTitle()), user.getId());
-
-        return recipe;
+        return recipeRepository.save(newRecipe);
     }
 
     private Recipe initializeRecipe(AddRecipe recipe, User creator, String imageUrl) {
@@ -94,14 +80,14 @@ public class RecipeService {
         return recipeRepository.findAllByCreatedBy(user);
     }
 
+    @LogActivity(activity = "'You have successfully updated recipe ' + #result.title")
     @Transactional
-    public void update(EditRecipe editRecipe) {
+    public Recipe update(EditRecipe editRecipe) {
         Recipe recipeToUpdate = getById(editRecipe.getId());
         List<Category> categories = editRecipe.getCategories()
                 .stream()
                 .map(categoryService::getByName)
                 .collect(Collectors.toList());
-        ;
 
         if (!editRecipe.getTitle().equals(recipeToUpdate.getTitle())) {
             recipeToUpdate.setTitle(editRecipe.getTitle());
@@ -143,17 +129,14 @@ public class RecipeService {
             recipeToUpdate.setImage(imageUrl);
         }
 
-        Recipe recipe = recipeRepository.save(recipeToUpdate);
-
-        activityLogService.logActivity("You have successfully updated recipe %s".formatted(recipe.getTitle()), recipeToUpdate.getCreatedBy().getId());
+        return recipeRepository.save(recipeToUpdate);
     }
 
+    @LogActivity(activity = "'You have successfully deleted recipe ' + #title")
     public void delete(UUID id) {
         //TODO: remove the picture from the uploads files...
         Recipe recipe = getById(id);
         recipeRepository.delete(recipe);
-
-        activityLogService.logActivity("You have successfully deleted recipe %s".formatted(id), recipe.getCreatedBy().getId());
     }
 
     public List<Recipe> getAllForAdmin() {
