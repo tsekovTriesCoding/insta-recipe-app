@@ -141,8 +141,10 @@ public class RecipeService {
 
     @LogActivity(activity = "'You have successfully deleted recipe ' + #title")
     public void delete(UUID id) {
-        //TODO: remove the picture from the uploads files...
         Recipe recipe = getById(id);
+
+        cloudinaryService.deleteImage(recipe.getImagePublicId());
+
         recipeRepository.delete(recipe);
     }
 
