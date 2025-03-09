@@ -1,8 +1,8 @@
 package app.user.service;
 
 import app.activitylog.annotation.LogActivity;
-import app.cloudinary.CloudinaryService;
-import app.cloudinary.ImageUploadResult;
+import app.cloudinary.service.CloudinaryService;
+import app.cloudinary.dto.ImageUploadResult;
 import app.exception.UserAlreadyExistsException;
 import app.exception.UserNotFoundException;
 import app.security.CustomUserDetails;

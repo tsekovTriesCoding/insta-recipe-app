@@ -1,7 +1,7 @@
 package app.activitylog.service;
 
-import app.web.dto.ActivityLogRequest;
-import app.web.dto.ActivityLogResponse;
+import app.activitylog.dto.ActivityLogRequest;
+import app.activitylog.dto.ActivityLogResponse;
 import app.activitylog.client.ActivityLogClient;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

@@ -1,6 +1,6 @@
 package app.user;
 
-import app.cloudinary.CloudinaryService;
+import app.cloudinary.service.CloudinaryService;
 import app.exception.UserAlreadyExistsException;
 import app.exception.UserNotFoundException;
 import app.user.model.Role;
@@ -8,7 +8,6 @@ import app.user.model.User;
 import app.user.repository.UserRepository;
 import app.user.service.UserService;
 import app.web.dto.RegisterRequest;
-import app.web.dto.UserWithRole;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;

@@ -1,5 +1,6 @@
-package app.cloudinary;
+package app.cloudinary.service;
 
+import app.cloudinary.dto.ImageUploadResult;
 import app.exception.ImageUploadException;
 import com.cloudinary.Cloudinary;
 import com.cloudinary.utils.ObjectUtils;

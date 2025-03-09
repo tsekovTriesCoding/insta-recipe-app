@@ -1,6 +1,6 @@
 package app.web;
 
-import app.web.dto.ActivityLogResponse;
+import app.activitylog.dto.ActivityLogResponse;
 import app.activitylog.service.ActivityLogService;
 import app.mapper.DtoMapper;
 import app.security.CustomUserDetails;

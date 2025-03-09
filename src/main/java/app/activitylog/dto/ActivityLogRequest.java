@@ -1,15 +1,13 @@
-package app.web.dto;
+package app.activitylog.dto;
 
 import lombok.Builder;
 import lombok.Data;
 
-import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Data
 @Builder
-public class ActivityLogResponse {
+public class ActivityLogRequest {
     private UUID userId;
     private String action;
-    private LocalDateTime createdOn;
 }

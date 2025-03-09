@@ -1,4 +1,4 @@
-package app.cloudinary;
+package app.cloudinary.dto;
 
 import lombok.Data;
 

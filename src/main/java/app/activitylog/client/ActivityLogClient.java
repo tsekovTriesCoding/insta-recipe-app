@@ -1,7 +1,7 @@
 package app.activitylog.client;
 
-import app.web.dto.ActivityLogRequest;
-import app.web.dto.ActivityLogResponse;
+import app.activitylog.dto.ActivityLogRequest;
+import app.activitylog.dto.ActivityLogResponse;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
