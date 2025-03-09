@@ -108,10 +108,10 @@ class CommentServiceTest {
         when(commentRepository.findAllByRecipeIdOrderByCreatedDate(recipeId))
                 .thenReturn(List.of(comment1, comment2));
 
-        List<CommentByRecipe> result = commentService.getCommentsByRecipeId(recipeId);
+        List<Comment> result = commentService.getCommentsByRecipeId(recipeId);
 
         assertThat(result).hasSize(2)
-                .extracting(CommentByRecipe::getContent)
+                .extracting(Comment::getContent)
                 .containsExactly("Great recipe!", "Delicious!");
 
         verify(commentRepository).findAllByRecipeIdOrderByCreatedDate(recipeId);
@@ -161,7 +161,7 @@ class CommentServiceTest {
     void shouldReturnAllMappedCommentsForAdminPage() {
         when(commentRepository.findAll()).thenReturn(List.of(comment1, comment2));
 
-        List<CommentForAdminPage> result = commentService.getAll();
+        List<Comment> result = commentService.getAll();
 
         assertThat(result).hasSize(2);
         assertThat(result.get(0).getContent()).isEqualTo(comment1.getContent());
@@ -174,7 +174,7 @@ class CommentServiceTest {
     void shouldReturnEmptyListWhenNoCommentsExist() {
         when(commentRepository.findAll()).thenReturn(List.of());
 
-        List<CommentForAdminPage> result = commentService.getAll();
+        List<Comment> result = commentService.getAll();
 
         assertThat(result).isEmpty();
         verify(commentRepository).findAll();

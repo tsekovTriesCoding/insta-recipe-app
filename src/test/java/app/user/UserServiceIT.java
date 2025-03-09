@@ -210,7 +210,7 @@ public class UserServiceIT {
 
         userRepository.save(user2);
 
-        List<UserWithRole> users = userService.getAll();
+        List<User> users = userService.getAll();
 
         assertNotNull(users);
         assertEquals(2, users.size());
@@ -221,7 +221,7 @@ public class UserServiceIT {
 
     @Test
     public void testGetAllShouldReturnEmptyListWhenNoUsers() {
-        List<UserWithRole> users = userService.getAll();
+        List<User> users = userService.getAll();
 
         assertNotNull(users);
         assertTrue(users.isEmpty());

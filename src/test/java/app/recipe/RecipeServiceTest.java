@@ -90,7 +90,7 @@ class RecipeServiceTest {
 
         when(recipeRepository.findAll(pageable)).thenReturn(recipePage);
 
-        Page<RecipeShortInfo> result = recipeService.getAll(pageable);
+        Page<Recipe> result = recipeService.getAll(pageable);
 
         assertNotNull(result);
         assertEquals(1, result.getTotalElements());
@@ -104,21 +104,21 @@ class RecipeServiceTest {
     void testGetDetailsById() {
         when(recipeRepository.findById(recipeId)).thenReturn(Optional.of(recipe));
 
-        RecipeDetails recipeDetails = recipeService.getDetailsById(recipeId);
+        Recipe recipeById = recipeService.getById(recipeId);
 
-        assertNotNull(recipeDetails);
-        assertEquals(recipeId, recipeDetails.getId());
-        assertEquals("Test Recipe", recipeDetails.getTitle());
-        assertEquals("A delicious test recipe", recipeDetails.getDescription());
-        assertEquals("Salt, Pepper", String.join(", ", recipeDetails.getIngredients()));
-        assertEquals("Mix and cook", recipeDetails.getInstructions());
-        assertEquals(30, recipeDetails.getCookTime());
-        assertEquals(10, recipeDetails.getPrepTime());
-        assertEquals(user, recipeDetails.getCreatedBy());
-        assertEquals(2, recipeDetails.getServings());
-        assertEquals("test-image-url", recipeDetails.getImage());
-        assertEquals(0, recipeDetails.getComments().size());
-        assertEquals(0, recipeDetails.getLikes());
+        assertNotNull(recipeById);
+        assertEquals(recipeId, recipeById.getId());
+        assertEquals("Test Recipe", recipeById.getTitle());
+        assertEquals("A delicious test recipe", recipeById.getDescription());
+        assertEquals("Salt, Pepper", String.join(", ", recipeById.getIngredients()));
+        assertEquals("Mix and cook", recipeById.getInstructions());
+        assertEquals(30, recipeById.getCookTime());
+        assertEquals(10, recipeById.getPrepTime());
+        assertEquals(user, recipeById.getCreatedBy());
+        assertEquals(2, recipeById.getServings());
+        assertEquals("test-image-url", recipeById.getImage());
+        assertEquals(0, recipeById.getComments().size());
+        assertEquals(0, recipeById.getLikes().size());
 
         verify(recipeRepository, times(1)).findById(recipeId);
     }
@@ -145,13 +145,13 @@ class RecipeServiceTest {
     void testGetAddRecipeById() {
         when(recipeRepository.findById(recipeId)).thenReturn(Optional.of(recipe));
 
-        EditRecipe result = recipeService.getAddRecipeById(recipeId);
+        Recipe result = recipeService.getById(recipeId);
 
         assertNotNull(result);
         assertEquals(recipeId, result.getId());
         assertEquals("Test Recipe", result.getTitle());
         assertEquals("A delicious test recipe", result.getDescription());
-        assertEquals("Salt,Pepper", result.getIngredients());
+        assertEquals("Salt,Pepper", String.join(",", result.getIngredients()));
         assertEquals("Mix and cook", result.getInstructions());
         assertEquals(2, result.getServings());
         assertEquals(30, result.getCookTime());
@@ -281,21 +281,20 @@ class RecipeServiceTest {
 
         when(recipeRepository.findAll()).thenReturn(recipeList);
 
-        List<RecipeForAdminPageInfo> result = recipeService.getAllForAdmin();
+        List<Recipe> result = recipeService.getAllForAdmin();
 
         assertNotNull(result);
         assertEquals(2, result.size());
 
         assertEquals(recipe.getId(), result.get(0).getId());
         assertEquals(recipe.getTitle(), result.get(0).getTitle());
-        assertEquals(recipe.getCreatedBy().getUsername(), result.get(0).getAuthor());
-        assertEquals(recipe.getCreatedBy().getUsername(), result.get(0).getAuthor());
+        assertEquals(recipe.getCreatedBy().getUsername(), result.get(0).getCreatedBy().getUsername());
         assertEquals(recipe.getCreatedDate(), result.get(0).getCreatedDate());
 
         assertEquals(recipe2.getId(), result.get(1).getId());
         assertEquals(recipe2.getTitle(), result.get(1).getTitle());
-        assertEquals(recipe2.getCreatedBy().getUsername(), result.get(1).getAuthor());
-        assertEquals(recipe2.getCreatedBy().getUsername(), result.get(1).getAuthor());
+        assertEquals(recipe2.getCreatedBy().getUsername(), result.get(1).getCreatedBy().getUsername());
+        assertEquals(recipe2.getCreatedBy().getUsername(), result.get(1).getCreatedBy().getUsername());
         assertEquals(recipe2.getCreatedDate(), result.get(1).getCreatedDate());
 
         verify(recipeRepository, times(1)).findAll();
@@ -319,7 +318,7 @@ class RecipeServiceTest {
 
         when(recipeRepository.findAllByTitleContainingIgnoreCase(query, pageable)).thenReturn(recipePage);
 
-        Page<RecipeShortInfo> result = recipeService.searchRecipes(query, pageable);
+        Page<Recipe> result = recipeService.searchRecipes(query, pageable);
 
         assertNotNull(result);
         assertEquals(2, result.getContent().size());

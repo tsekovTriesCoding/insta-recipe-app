@@ -91,7 +91,7 @@ public class CategoryServiceTest {
         when(categoryRepository.findById(categoryId)).thenReturn(Optional.of(category));
 
         // Act: Call the service method
-        CategoryDetails result = categoryService.getById(categoryId);
+        Category result = categoryService.getById(categoryId);
 
         // Assert: Verify mapping works correctly
         assertThat(result).isNotNull();
