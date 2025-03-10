@@ -1,10 +1,12 @@
 package app.activitylog.service;
 
+import app.activitylog.event.ActivityLogEvent;
 import app.activitylog.dto.ActivityLogRequest;
 import app.activitylog.dto.ActivityLogResponse;
 import app.activitylog.client.ActivityLogClient;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.event.EventListener;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
@@ -18,15 +20,16 @@ public class ActivityLogService {
 
     private final ActivityLogClient activityLogClient;
 
-    public void logActivity(String action, UUID userId) {
+    @EventListener
+    public void handleActivityLogEvent(ActivityLogEvent event) {
         ActivityLogRequest request = ActivityLogRequest.builder()
-                .userId(userId)
-                .action(action)
+                .userId(event.getUserId())
+                .action(event.getAction())
                 .build();
 
         activityLogClient.logActivity(request);
 
-        log.info("Successfully logged activity - {}", action);
+        log.info("Successfully logged activity via event - {}", event.getAction());
     }
 
     public List<ActivityLogResponse> getActivityLog(UUID userId) {

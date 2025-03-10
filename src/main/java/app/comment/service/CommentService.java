@@ -1,6 +1,6 @@
 package app.comment.service;
 
-import app.activitylog.annotation.LogActivity;
+import app.activitylog.event.ActivityLogEvent;
 import app.comment.model.Comment;
 import app.comment.repository.CommentRepository;
 import app.recipe.model.Recipe;
@@ -8,6 +8,7 @@ import app.recipe.service.RecipeService;
 import app.user.model.User;
 import app.user.service.UserService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -23,10 +24,10 @@ public class CommentService {
     private final CommentRepository commentRepository;
     private final RecipeService recipeService;
     private final UserService userService;
+    private final ApplicationEventPublisher eventPublisher;
 
-    @LogActivity(activity = "'Added comment with content: ' + #result.content")
     @Transactional
-    public Comment add(String content, UUID recipeId, UUID userId) {
+    public void add(String content, UUID recipeId, UUID userId) {
         Recipe recipe = recipeService.getById(recipeId);
         User user = userService.getUserById(userId);
 
@@ -37,14 +38,16 @@ public class CommentService {
                 .createdDate(LocalDateTime.now())
                 .build();
 
-       return commentRepository.save(comment);
+        commentRepository.save(comment);
+
+        eventPublisher.publishEvent(new ActivityLogEvent(user.getId(),
+                "You have successfully commented [%s], on recipe: %s".formatted(comment.getContent(), recipe.getTitle())));
     }
 
     public List<Comment> getCommentsByRecipeId(UUID recipeId) {
         return commentRepository.findAllByRecipeIdOrderByCreatedDate(recipeId);
     }
 
-    @LogActivity(activity = "'You have successfully removed comment with id: ' + #commentId")
     public boolean deleteComment(UUID commentId, String username) {
         Optional<Comment> commentOpt = commentRepository.findById(commentId);
 
@@ -58,9 +61,17 @@ public class CommentService {
         // Check if the user is the comment creator or the recipe creator
         if (comment.getCreator().getUsername().equals(username)) {
             commentRepository.delete(comment);
+
+            eventPublisher.publishEvent(new ActivityLogEvent(comment.getCreator().getId(),
+                    "You have successfully removed your comment [%s], from recipe: %s".formatted(comment.getContent(), recipe.getTitle())));
+
             return true;
         } else if (recipe.getCreatedBy().getUsername().equals(username)) {
             commentRepository.delete(comment);
+
+            eventPublisher.publishEvent(new ActivityLogEvent(recipe.getCreatedBy().getId(),
+                    "You have successfully removed comment [%s], from your recipe: %s".formatted(comment.getContent(), recipe.getTitle())));
+
             return true;
         }
 

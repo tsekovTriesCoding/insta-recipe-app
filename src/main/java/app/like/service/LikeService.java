@@ -1,6 +1,6 @@
 package app.like.service;
 
-import app.activitylog.annotation.LogActivity;
+import app.activitylog.event.ActivityLogEvent;
 import app.exception.RecipeAlreadyLikedException;
 import app.exception.UserCannotLikeOwnRecipeException;
 import app.like.model.Like;
@@ -10,6 +10,7 @@ import app.recipe.service.RecipeService;
 import app.user.model.User;
 import app.user.service.UserService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 
@@ -22,8 +23,8 @@ public class LikeService {
     private final LikeRepository likeRepository;
     private final UserService userService;
     private final RecipeService recipeService;
+    private final ApplicationEventPublisher eventPublisher;
 
-    @LogActivity(activity = "'You have successfully liked recipe with id: ' + #recipeId")
     public void like(UUID userId, UUID recipeId) {
         User user = userService.getUserById(userId);
         Recipe recipe = recipeService.getById(recipeId);
@@ -39,6 +40,7 @@ public class LikeService {
 
             likeRepository.save(like);
 
+            eventPublisher.publishEvent(new ActivityLogEvent(user.getId(), "You have successfully liked recipe: " + recipe.getTitle()));
         } catch (DataIntegrityViolationException e) {
             throw new RecipeAlreadyLikedException("You have already liked this recipe");
         }

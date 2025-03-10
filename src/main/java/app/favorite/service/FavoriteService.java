@@ -1,6 +1,6 @@
 package app.favorite.service;
 
-import app.activitylog.annotation.LogActivity;
+import app.activitylog.event.ActivityLogEvent;
 import app.exception.AlreadyFavoritedException;
 import app.exception.FavoriteNotFoundException;
 import app.favorite.model.Favorite;
@@ -10,6 +10,7 @@ import app.recipe.service.RecipeService;
 import app.user.model.User;
 import app.user.service.UserService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -23,8 +24,8 @@ public class FavoriteService {
     private final FavoriteRepository favoriteRepository;
     private final UserService userService;
     private final RecipeService recipeService;
+    private final ApplicationEventPublisher eventPublisher;
 
-    @LogActivity(activity = "'You have successfully added recipe with id: ' + #recipeId + ' to your favorites'")
     @Transactional
     public void addRecipeToFavorites(UUID userId, UUID recipeId) {
         User user = userService.getUserById(userId);
@@ -40,9 +41,10 @@ public class FavoriteService {
                 .build();
 
         favoriteRepository.save(favorite);
+
+        eventPublisher.publishEvent(new ActivityLogEvent(user.getId(), "You have successfully added recipe: " + recipe.getTitle() + " to your favorites"));
     }
 
-    @LogActivity(activity = "'You have successfully removed recipe with id: ' + #recipeId + ' from your favorites'")
     @Transactional
     public boolean removeRecipeFromFavorites(UUID userId, UUID recipeId) {
         Favorite favorite = favoriteRepository.findByUserIdAndRecipeId(userId, recipeId)
@@ -50,7 +52,10 @@ public class FavoriteService {
 
         favoriteRepository.delete(favorite);
 
-        recipeService.getById(favorite.getRecipe().getId());
+        Recipe recipe = recipeService.getById(favorite.getRecipe().getId());
+
+        eventPublisher.publishEvent(new ActivityLogEvent(recipe.getCreatedBy().getId(),
+                "You have successfully removed recipe: " + recipe.getTitle() + " from your favorites"));
 
         return true;
     }
