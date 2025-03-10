@@ -1,9 +1,10 @@
 package app.activitylog.service;
 
-import app.activitylog.event.ActivityLogEvent;
+import app.activitylog.client.ActivityLogClient;
 import app.activitylog.dto.ActivityLogRequest;
 import app.activitylog.dto.ActivityLogResponse;
-import app.activitylog.client.ActivityLogClient;
+import app.activitylog.event.ActivityLogEvent;
+import feign.FeignException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.event.EventListener;
@@ -22,14 +23,19 @@ public class ActivityLogService {
 
     @EventListener
     public void handleActivityLogEvent(ActivityLogEvent event) {
-        ActivityLogRequest request = ActivityLogRequest.builder()
-                .userId(event.getUserId())
-                .action(event.getAction())
-                .build();
+        try {
+            ActivityLogRequest request = ActivityLogRequest.builder()
+                    .userId(event.getUserId())
+                    .action(event.getAction())
+                    .build();
 
-        activityLogClient.logActivity(request);
-
-        log.info("Successfully logged activity via event - {}", event.getAction());
+            activityLogClient.logActivity(request);
+            log.info("Successfully logged activity - {}", event.getAction());
+        } catch (FeignException e) {
+            log.error("Failed to log activity due to service unavailability: {}", e.getMessage());
+        } catch (Exception e) {
+            log.error("Unexpected error while logging activity: {}", e.getMessage(), e);
+        }
     }
 
     public List<ActivityLogResponse> getActivityLog(UUID userId) {
