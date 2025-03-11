@@ -63,4 +63,6 @@ Visit: ```http://localhost:8080```
 The app logs user activities (like recipe creation, comments, favorites) using events.
 
 A separate microservice stores logs via a Feign Client.
- 
+
+## 📜 License
+This project is licensed under the MIT License.
