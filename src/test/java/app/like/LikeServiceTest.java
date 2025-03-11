@@ -1,5 +1,6 @@
 package app.like;
 
+import app.activitylog.event.ActivityLogEvent;
 import app.exception.RecipeAlreadyLikedException;
 import app.exception.UserCannotLikeOwnRecipeException;
 import app.like.model.Like;
@@ -12,9 +13,12 @@ import app.user.service.UserService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.dao.DataIntegrityViolationException;
 
 import java.util.UUID;
@@ -28,10 +32,15 @@ class LikeServiceTest {
 
     @Mock
     private LikeRepository likeRepository;
+
     @Mock
     private UserService userService;
+
     @Mock
     private RecipeService recipeService;
+
+    @Mock
+    private ApplicationEventPublisher eventPublisher;
 
     @InjectMocks
     private LikeService likeService;
@@ -62,11 +71,21 @@ class LikeServiceTest {
         when(recipeService.getById(recipeId)).thenReturn(recipe);
         when(likeRepository.save(any(Like.class))).thenReturn(new Like());
 
+        ArgumentCaptor<ActivityLogEvent> eventCaptor = ArgumentCaptor.forClass(ActivityLogEvent.class);
+
         likeService.like(userId, recipeId);
 
         verify(userService).getUserById(userId);
         verify(recipeService).getById(recipeId);
         verify(likeRepository).save(any(Like.class));
+
+        Mockito.verify(eventPublisher, Mockito.times(1)).publishEvent(eventCaptor.capture());
+
+        ActivityLogEvent capturedEvent = eventCaptor.getValue();
+        String expectedAction = "You have successfully liked recipe: %s".formatted(recipe.getTitle());
+
+        assertEquals(userId, capturedEvent.getUserId());
+        assertEquals(expectedAction, capturedEvent.getAction());
     }
 
     @Test

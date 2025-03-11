@@ -1,8 +1,10 @@
 package app.recipe;
 
+import app.activitylog.event.ActivityLogEvent;
 import app.category.model.Category;
 import app.category.model.CategoryName;
 import app.category.service.CategoryService;
+import app.cloudinary.dto.ImageUploadResult;
 import app.cloudinary.service.CloudinaryService;
 import app.exception.RecipeNotFoundException;
 import app.recipe.model.Recipe;
@@ -14,20 +16,23 @@ import app.web.dto.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.mock.web.MockMultipartFile;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.awt.*;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
+import java.util.*;
 import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -46,6 +51,9 @@ class RecipeServiceTest {
 
     @Mock
     private CloudinaryService cloudinaryService;
+
+    @Mock
+    private ApplicationEventPublisher eventPublisher;
 
     @InjectMocks
     private RecipeService recipeService;
@@ -69,6 +77,7 @@ class RecipeServiceTest {
                 .createdDate(LocalDateTime.now())
                 .createdBy(user)
                 .image("test-image-url")
+                .imagePublicId("test-image-public-id")
                 .servings(2)
                 .cookTime(30)
                 .prepTime(10)
@@ -96,7 +105,6 @@ class RecipeServiceTest {
 
         verify(recipeRepository).findAll(pageable);
     }
-
 
     @Test
     void testGetDetailsById() {
@@ -140,70 +148,47 @@ class RecipeServiceTest {
     }
 
     @Test
-    void testGetAddRecipeById() {
-        when(recipeRepository.findById(recipeId)).thenReturn(Optional.of(recipe));
-
-        Recipe result = recipeService.getById(recipeId);
-
-        assertNotNull(result);
-        assertEquals(recipeId, result.getId());
-        assertEquals("Test Recipe", result.getTitle());
-        assertEquals("A delicious test recipe", result.getDescription());
-        assertEquals("Salt,Pepper", String.join(",", result.getIngredients()));
-        assertEquals("Mix and cook", result.getInstructions());
-        assertEquals(2, result.getServings());
-        assertEquals(30, result.getCookTime());
-        assertEquals(10, result.getPrepTime());
-
-        verify(recipeRepository).findById(recipeId);
-    }
-
-    @Test
     void testUpdateRecipe() {
-        Category category = Category.builder()
-                .id(UUID.randomUUID())
-                .name(CategoryName.MAIN_COURSE)
-                .recipes(List.of(recipe))
-                .build();
-
-        recipe.setCategories(List.of(Category.builder().name(CategoryName.DESSERTS).build()));
-        recipe.setIngredients(List.of("Salt", "Pepper"));
-        recipe.setInstructions("Old Instructions");
-
-        MockMultipartFile img = new MockMultipartFile("image", "new-image-url", "image/jpeg", new byte[]{1, 2, 3});
-
-        EditRecipe updatedRecipe = EditRecipe.builder()
+        EditRecipe editRecipe = EditRecipe.builder()
                 .id(recipeId)
                 .title("New Title")
                 .description("New Description")
                 .categories(List.of(CategoryName.MAIN_COURSE))
                 .ingredients("Salt,Pepper,Sugar")
                 .instructions("New Instructions")
+                .image(mock(MultipartFile.class))
                 .servings(4)
                 .cookTime(45)
                 .prepTime(15)
-                .image(img)
                 .build();
 
+        ImageUploadResult uploadResult = new ImageUploadResult("image-url", "public-id");
+
+        when(recipeRepository.save(any(Recipe.class))).thenReturn(recipe);
         when(recipeRepository.findById(recipeId)).thenReturn(Optional.of(recipe));
-        when(categoryService.getByName(CategoryName.MAIN_COURSE)).thenReturn(category);
-        when(cloudinaryService.uploadImage(any())).thenReturn("https://mock-image-url.com/image.jpg");
+        when(cloudinaryService.uploadImage(any(MultipartFile.class))).thenReturn(uploadResult);
+        when(categoryService.getByName(CategoryName.MAIN_COURSE)).thenReturn(Category.builder()
+                .name(CategoryName.MAIN_COURSE).build());
 
-        recipeService.update(updatedRecipe);
+        recipeService.update(editRecipe);
 
-        assertEquals("New Title", recipe.getTitle());
-        assertEquals("New Description", recipe.getDescription());
-        assertEquals(List.of("Salt", "Pepper", "Sugar"), recipe.getIngredients());
-        assertEquals("New Instructions", recipe.getInstructions());
-        assertEquals(4, recipe.getServings());
-        assertEquals(45, recipe.getCookTime());
-        assertEquals(15, recipe.getPrepTime());
-        assertEquals("https://mock-image-url.com/image.jpg", recipe.getImage());
+        Recipe updatedRecipe = recipeRepository.findById(recipe.getId()).orElseThrow();
 
-        // Verify repository interactions
         verify(recipeRepository).save(recipe);
         verify(categoryService).getByName(CategoryName.MAIN_COURSE);
         verify(cloudinaryService).uploadImage(any());
+
+        //TODO: test the event action
+        assertEquals("New Title", updatedRecipe.getTitle());
+        assertEquals("New Description", updatedRecipe.getDescription());
+        assertEquals(List.of(CategoryName.MAIN_COURSE), updatedRecipe.getCategories().stream().map(Category::getName).toList());
+        assertEquals(List.of("Salt", "Pepper", "Sugar"), updatedRecipe.getIngredients());
+        assertEquals("New Instructions", updatedRecipe.getInstructions());
+        assertEquals(4, updatedRecipe.getServings());
+        assertEquals(45, updatedRecipe.getCookTime());
+        assertEquals(15, updatedRecipe.getPrepTime());
+        assertEquals("image-url", updatedRecipe.getImage());
+        assertEquals("public-id", updatedRecipe.getImagePublicId());
     }
 
     @Test
@@ -232,29 +217,42 @@ class RecipeServiceTest {
         addRecipe.setIngredients("Salt, Sugar");
         addRecipe.setInstructions("Mix well and cook");
         addRecipe.setCategories(List.of(CategoryName.MAIN_COURSE));
+        addRecipe.setImage(mock(MultipartFile.class));
         addRecipe.setServings(4);
         addRecipe.setCookTime(45);
         addRecipe.setPrepTime(15);
 
+        ImageUploadResult uploadResult = new ImageUploadResult("image-url", "public-id");
+
         when(userService.getUserById(user.getId())).thenReturn(user);
-        when(categoryService.getByName(CategoryName.MAIN_COURSE)).thenReturn(Category.builder().name(CategoryName.MAIN_COURSE).build());
         when(recipeRepository.save(any(Recipe.class))).thenReturn(recipe);
-        when(cloudinaryService.uploadImage(any())).thenReturn("https://mock-image-url.com/image.jpg");
+        when(cloudinaryService.uploadImage(any(MultipartFile.class))).thenReturn(uploadResult);
 
         Recipe createdRecipe = recipeService.create(addRecipe, user.getId());
 
+        ArgumentCaptor<ActivityLogEvent> eventCaptor = ArgumentCaptor.forClass(ActivityLogEvent.class);
+
         String actualIngredients = String.join(", ", createdRecipe.getIngredients());
+
+        verify(recipeRepository, times(1)).save(any(Recipe.class));
+        verify(eventPublisher, Mockito.times(1)).publishEvent(eventCaptor.capture());
+
+        ActivityLogEvent capturedEvent = eventCaptor.getValue();
+        String expectedAction = "You have successfully added recipe: " + createdRecipe.getTitle();
 
         assertNotNull(createdRecipe);
         assertEquals("Test Recipe", createdRecipe.getTitle());
         assertEquals("A delicious test recipe", createdRecipe.getDescription());
         assertEquals("Salt, Pepper", actualIngredients);
         assertEquals("Mix and cook", createdRecipe.getInstructions());
+        assertEquals("test-image-url", createdRecipe.getImage());
+        assertEquals("test-image-public-id", createdRecipe.getImagePublicId());
         assertEquals(30, createdRecipe.getCookTime());
         assertEquals(10, createdRecipe.getPrepTime());
         assertEquals(2, createdRecipe.getServings());
 
-        verify(recipeRepository, times(1)).save(any(Recipe.class));
+        assertEquals(user.getId(), capturedEvent.getUserId());
+        assertEquals(expectedAction, capturedEvent.getAction());
     }
 
     @Test

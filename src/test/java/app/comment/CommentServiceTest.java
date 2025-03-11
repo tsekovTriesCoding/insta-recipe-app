@@ -1,8 +1,6 @@
 package app.comment;
 
-import static org.mockito.Mockito.*;
-import static org.assertj.core.api.Assertions.*;
-
+import app.activitylog.event.ActivityLogEvent;
 import app.comment.model.Comment;
 import app.comment.repository.CommentRepository;
 import app.comment.service.CommentService;
@@ -10,19 +8,24 @@ import app.recipe.model.Recipe;
 import app.recipe.service.RecipeService;
 import app.user.model.User;
 import app.user.service.UserService;
-import app.web.dto.CommentByRecipe;
-import app.web.dto.CommentForAdminPage;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.context.ApplicationEventPublisher;
 
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class CommentServiceTest {
@@ -35,6 +38,9 @@ class CommentServiceTest {
 
     @Mock
     private UserService userService;
+
+    @Mock
+    private ApplicationEventPublisher eventPublisher;
 
     @InjectMocks
     private CommentService commentService;
@@ -93,6 +99,8 @@ class CommentServiceTest {
         when(recipeService.getById(recipeId)).thenReturn(recipe);
         when(userService.getUserById(userId)).thenReturn(user);
 
+        ArgumentCaptor<ActivityLogEvent> eventCaptor = ArgumentCaptor.forClass(ActivityLogEvent.class);
+
         commentService.add(content, recipeId, userId);
 
         verify(commentRepository).save(argThat(comment ->
@@ -101,6 +109,14 @@ class CommentServiceTest {
                         comment.getCreator().equals(user) &&
                         comment.getCreatedDate() != null
         ));
+
+        Mockito.verify(eventPublisher, Mockito.times(1)).publishEvent(eventCaptor.capture());
+
+        ActivityLogEvent capturedEvent = eventCaptor.getValue();
+        String expectedAction = "You have successfully commented [%s], on recipe: %s".formatted(content, recipe.getTitle());
+
+        assertEquals(userId, capturedEvent.getUserId());
+        assertEquals(expectedAction, capturedEvent.getAction());
     }
 
     @Test
@@ -133,8 +149,18 @@ class CommentServiceTest {
 
         boolean result = commentService.deleteComment(commentId, "JohnDoe");
 
-        assertThat(result).isTrue();
+        ArgumentCaptor<ActivityLogEvent> eventCaptor = ArgumentCaptor.forClass(ActivityLogEvent.class);
+
         verify(commentRepository).delete(comment1);
+
+        Mockito.verify(eventPublisher, Mockito.times(1)).publishEvent(eventCaptor.capture());
+
+        ActivityLogEvent capturedEvent = eventCaptor.getValue();
+        String expectedAction = "You have successfully removed your comment [%s], from recipe: %s".formatted("Great recipe!", recipe.getTitle());
+
+        assertThat(result).isTrue();
+        assertEquals(userId, capturedEvent.getUserId());
+        assertEquals(expectedAction, capturedEvent.getAction());
     }
 
     @Test
@@ -145,6 +171,8 @@ class CommentServiceTest {
 
         assertThat(result).isTrue();
         verify(commentRepository).delete(comment1);
+
+        Mockito.verify(eventPublisher, Mockito.times(1)).publishEvent(Mockito.any(ActivityLogEvent.class));
     }
 
     @Test
@@ -158,7 +186,7 @@ class CommentServiceTest {
     }
 
     @Test
-    void shouldReturnAllMappedCommentsForAdminPage() {
+    void shouldReturnAllCommentsForAdminPage() {
         when(commentRepository.findAll()).thenReturn(List.of(comment1, comment2));
 
         List<Comment> result = commentService.getAll();

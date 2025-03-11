@@ -1,5 +1,6 @@
 package app.cloudinary;
 
+import app.cloudinary.dto.ImageUploadResult;
 import app.cloudinary.service.CloudinaryService;
 import app.exception.ImageUploadException;
 import com.cloudinary.Cloudinary;
@@ -10,15 +11,16 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.mock.web.MockMultipartFile;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.Map;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.Mockito.*;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.lenient;
 
 @ExtendWith(MockitoExtension.class)
 class CloudinaryServiceTest {
@@ -34,32 +36,62 @@ class CloudinaryServiceTest {
 
     @BeforeEach
     void setUp() {
-        when(cloudinary.uploader()).thenReturn(uploader);
+        lenient().when(cloudinary.uploader()).thenReturn(uploader); // Prevents the exception while still keeping the stubbing
     }
 
     @Test
-    void uploadImageShouldReturnSecureUrlWhenUploadIsSuccessful() throws Exception {
-        // Arrange: Create a mock file
-        MockMultipartFile file = new MockMultipartFile("image", "test.jpg", "image/jpeg", "test data".getBytes());
+    public void testUploadImageShouldReturnImageUploadResult() throws Exception {
+        MultipartFile mockFile = new MockMultipartFile("file", "test.jpg", "image/jpeg", "dummy data".getBytes());
+        Map<String, Object> fakeUploadResult = Map.of(
+                "secure_url", "https://res.cloudinary.com/demo/image/upload/sample.jpg",
+                "public_id", "sample_public_id"
+        );
 
-        Map<String, String> fakeUploadResult = Map.of("secure_url", "https://cloudinary.com/test.jpg");
-        when(uploader.upload(any(byte[].class), eq(ObjectUtils.emptyMap()))).thenReturn(fakeUploadResult);
+        Mockito.when(uploader.upload(Mockito.any(byte[].class), Mockito.anyMap()))
+                .thenReturn(fakeUploadResult);
 
-        // Act: Call the upload method
-        String imageUrl = cloudinaryService.uploadImage(file);
+        ImageUploadResult result = cloudinaryService.uploadImage(mockFile);
 
-        // Assert: Verify the URL is returned correctly
-        assertThat(imageUrl).isEqualTo("https://cloudinary.com/test.jpg");
+        assertNotNull(result);
+        assertEquals("https://res.cloudinary.com/demo/image/upload/sample.jpg", result.getImageUrl());
+        assertEquals("sample_public_id", result.getPublicId());
     }
 
     @Test
-    void uploadImageShouldThrowExceptionWhenUploadFails() throws Exception {
-        MockMultipartFile file = new MockMultipartFile("image", "test.jpg", "image/jpeg", "test data".getBytes());
+    public void testUploadImageShouldThrowExceptionWhenUploadFails() throws Exception {
+        MultipartFile mockFile = new MockMultipartFile("file", "test.jpg", "image/jpeg", "dummy data".getBytes());
 
-        when(uploader.upload(any(byte[].class), eq(ObjectUtils.emptyMap()))).thenThrow(new IOException());
+        Mockito.when(uploader.upload(Mockito.any(byte[].class), Mockito.anyMap()))
+                .thenThrow(new IOException("Cloudinary upload failed"));
 
-        assertThatThrownBy(() -> cloudinaryService.uploadImage(file))
-                .isInstanceOf(ImageUploadException.class)
-                .hasMessage("Failed to upload image to Cloudinary");
+        assertThrows(ImageUploadException.class, () -> cloudinaryService.uploadImage(mockFile));
+    }
+
+    @Test
+    public void testDeleteImageShouldCallCloudinaryDestroy() throws Exception {
+        String publicId = "test_public_id";
+
+        cloudinaryService.deleteImage(publicId);
+
+        Mockito.verify(uploader, Mockito.times(1))
+                .destroy(publicId, ObjectUtils.emptyMap());
+    }
+
+    @Test
+    public void testDeleteImageShouldDoNothingWhenPublicIdIsNullOrEmpty() {
+        cloudinaryService.deleteImage(null);
+        cloudinaryService.deleteImage("");
+
+        Mockito.verifyNoInteractions(uploader);
+    }
+
+    @Test
+    public void testDeleteImageShouldThrowExceptionWhenDeletionFails() throws Exception {
+        String publicId = "test_public_id";
+
+        Mockito.when(uploader.destroy(Mockito.anyString(), Mockito.anyMap()))
+                .thenThrow(new IOException("Cloudinary deletion failed"));
+
+        assertThrows(ImageUploadException.class, () -> cloudinaryService.deleteImage(publicId));
     }
 }

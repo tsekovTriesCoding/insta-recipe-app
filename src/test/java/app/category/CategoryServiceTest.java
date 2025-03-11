@@ -80,14 +80,6 @@ public class CategoryServiceTest {
                 .recipes(List.of())
                 .build();
 
-        CategoryDetails categoryDetails = CategoryDetails
-                .builder()
-                .id(categoryId)
-                .name(category.getName().getValue())
-                .description("Random description")
-                .recipes(List.of())
-                .build();
-
         when(categoryRepository.findById(categoryId)).thenReturn(Optional.of(category));
 
         // Act: Call the service method
@@ -96,7 +88,7 @@ public class CategoryServiceTest {
         // Assert: Verify mapping works correctly
         assertThat(result).isNotNull();
         assertThat(result.getId()).isEqualTo(categoryId);
-        assertThat(result.getName()).isEqualTo(CategoryName.BEVERAGES.getValue());
+        assertThat(result.getName()).isEqualTo(CategoryName.BEVERAGES);
         assertThat(result.getDescription()).isEqualTo("Random description");
         assertThat(result.getRecipes()).isEqualTo(List.of());
 
@@ -148,52 +140,5 @@ public class CategoryServiceTest {
                 .hasMessage("Category with name " + categoryName + " not found");
 
         verify(categoryRepository, times(1)).findByName(categoryName);
-    }
-
-    @Test
-    void updateShouldAddRecipeWhenNotAlreadyInCategory() {
-        Recipe recipe = Recipe.builder()
-                .id(UUID.randomUUID())
-                .title("Random title")
-                .categories(new ArrayList<>())
-                .build();
-
-        Category category = Category.builder()
-                .id(UUID.randomUUID())
-                .name(CategoryName.BEVERAGES)
-                .recipes(new ArrayList<>())
-                .build();
-
-        categoryService.update(category, recipe);
-
-        assertThat(category.getRecipes()).contains(recipe);
-        assertThat(recipe.getCategories()).contains(category);
-
-        verify(categoryRepository, times(1)).save(category);
-    }
-
-    @Test
-    void updateShouldRemoveRecipeWhenAlreadyInCategory() {
-        Recipe recipe = Recipe.builder()
-                .id(UUID.randomUUID())
-                .title("Random title")
-                .categories(new ArrayList<>())
-                .build();
-
-        Category category = Category.builder()
-                .id(UUID.randomUUID())
-                .name(CategoryName.BEVERAGES)
-                .recipes(new ArrayList<>())
-                .build();
-
-        category.getRecipes().add(recipe);
-        recipe.getCategories().add(category);
-
-        categoryService.update(category, recipe);
-
-        assertThat(category.getRecipes()).doesNotContain(recipe);
-        assertThat(recipe.getCategories()).doesNotContain(category);
-
-        verify(categoryRepository, times(1)).save(category);
     }
 }

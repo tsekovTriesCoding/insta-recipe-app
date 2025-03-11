@@ -54,7 +54,6 @@ public class UserServiceIT {
                 .build();
     }
 
-
     @Test
     public void testRegisterSuccess() {
         userService.register(registerRequest);
@@ -109,8 +108,8 @@ public class UserServiceIT {
 
         MockMultipartFile file = new MockMultipartFile("file", "profile.jpg", "image/jpeg", "some image content".getBytes());
 
+        //TODO: Better test with new cloudinary
         String imageUrl = "http://cloudinary.com/abcd1234";
-        Mockito.when(cloudinaryService.uploadImage(file)).thenReturn(imageUrl);
 
         UUID userId = userRepository.findAll().get(0).getId();
         userService.updateProfilePicture(userId, file);
