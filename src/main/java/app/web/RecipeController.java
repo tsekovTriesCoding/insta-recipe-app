@@ -143,10 +143,4 @@ public class RecipeController {
 
         return "redirect:/recipes/my-recipes";
     }
-
-    @ExceptionHandler(RecipeNotFoundException.class)
-    public String handleRecipeNotFound(RecipeNotFoundException ex, Model model) {
-        model.addAttribute("error", ex.getMessage());
-        return "error-page";
-    }
 }

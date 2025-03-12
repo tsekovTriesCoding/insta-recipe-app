@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head th:replace="~{fragments/commons::head}">
+    <title>Internal Server Error</title>
+</head>
+<body style=" display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f8f9fa;">
+<div class="error-container"
+     style=" text-align: center;padding: 40px;border-radius: 10px;background: white;box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);">
+    <div class="error-icon" style="font-size: 80px;color: #dc3545;">⚠️</div>
+    <h2>Oops! Something went wrong.</h2>
+    <p class="error-message" style=" font-size: 18px;margin-top: 10px;color: #343a40;">An unexpected error has occurred
+        on our server.
+        Our team has been notified, and we're working to fix it.</p>
+    <p class="error-details" style="margin-top: 15px;font-size: 14px;color: #6c757d;word-break: break-word;"
+       th:text="${errorMessage}"></p>
+    <p class="error-code" style="font-size: 24px;font-weight: bold;color: #6c757d;">Error Code: 500 - Internal Server
+        Error</p>
+    <a href="/static" class="btn btn-primary back-button" style=" margin-top: 20px;">Go Back Home</a>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head th:replace="~{fragments/commons::head}">
+    <title>Oops! Page Not Found</title>
+</head>
+<body class="d-flex flex-column align-items-center" style="background-color: #f8f9fa;">
+<div class="error-container d-flex flex-column align-items-center border-opacity-100 p-lg-3"
+     style="border-radius: 10px;background: white;box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);">
+    <div class="error-icon" style="width: 100px; height: 100px; fill: #dc3545">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="red" stroke-width="2"
+             stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 20h.01"></path>
+            <path d="M12 16c0-3 4-3 4-6s-2-5-4-5-4 2-4 3"></path>
+        </svg>
+    </div>
+    <h2 class="mt-3">Oops! We couldn't find that.</h2>
+    <p style="font-size: 18px;margin-top: 10px; color: #343a40;">The page you are looking for isn't available right now.
+        If you believe this is an issue, please contact support.</p>
+    <div class="mt-3 text-center" style="font-size: 24px;font-weight: bold;color: #6c757d;">
+        <strong>Error Code:</strong>
+        <p class="text-danger">404 Not Found</p>
+    </div>
+    <a href="/home" class="btn btn-primary mt-3">Go to Home</a>
+</div>
+</body>
+</html>
