@@ -46,7 +46,7 @@ public class FavoriteService {
     }
 
     @Transactional
-    public boolean removeRecipeFromFavorites(UUID userId, UUID recipeId) {
+    public void removeRecipeFromFavorites(UUID userId, UUID recipeId) {
         Favorite favorite = favoriteRepository.findByUserIdAndRecipeId(userId, recipeId)
                 .orElseThrow(() -> new FavoriteNotFoundException(recipeId));
 
@@ -56,8 +56,6 @@ public class FavoriteService {
 
         eventPublisher.publishEvent(new ActivityLogEvent(recipe.getCreatedBy().getId(),
                 "You have successfully removed recipe: " + recipe.getTitle() + " from your favorites"));
-
-        return true;
     }
 
     public List<Recipe> getUserFavoriteRecipes(UUID userId) {

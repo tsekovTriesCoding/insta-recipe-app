@@ -47,13 +47,9 @@ public class FavoriteController {
                                  @AuthenticationPrincipal CustomUserDetails customUserDetails,
                                  RedirectAttributes redirectAttributes) {
 
-        boolean success = favoriteService.removeRecipeFromFavorites(customUserDetails.getId(), recipeId);
+        favoriteService.removeRecipeFromFavorites(customUserDetails.getId(), recipeId);
 
-        if (success) {
-            redirectAttributes.addFlashAttribute("successMessage", "Recipe removed from favorites!");
-        } else {
-            redirectAttributes.addFlashAttribute("errorMessage", "Failed to remove favorite.");
-        }
+        redirectAttributes.addFlashAttribute("successMessage", "Recipe removed from favorites!");
 
         return "redirect:/favorites";
     }
@@ -66,9 +62,9 @@ public class FavoriteController {
     }
 
     @ExceptionHandler(FavoriteNotFoundException.class)
-    public String handleFavoriteNotFoundException(FavoriteNotFoundException ex, Model model) {
-        model.addAttribute("error", ex.getMessage());
+    public String handleFavoriteNotFoundException(RedirectAttributes redirectAttributes) {
+        redirectAttributes.addFlashAttribute("errorMessage", "Failed to remove recipe from favorites list");
 
-        return "error-page";
+        return "redirect:/favorites";
     }
 }
