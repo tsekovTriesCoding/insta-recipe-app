@@ -366,7 +366,7 @@ public class UserServiceIT {
     }
 
     @Test
-    public void testUpdateUserRoleShouldToggleRoleFroAdminToUser() {
+    public void testChangeUserRoleShouldToggleRoleFroAdminToUser() {
         User user = User.builder()
                 .username("otherusername")
                 .email("email@example.com")
@@ -385,7 +385,7 @@ public class UserServiceIT {
     }
 
     @Test
-    public void testUpdateUserRoleShouldToggleRoleFromUserToAdmin() {
+    public void testChangeUserRoleShouldToggleRoleFromUserToAdmin() {
         User user = User.builder()
                 .username("otherusername")
                 .email("email@example.com")
@@ -404,7 +404,7 @@ public class UserServiceIT {
     }
 
     @Test
-    public void testUpdateUserRoleShouldThrowExceptionWhenUserNotFound() {
+    public void testChangeUserRoleShouldThrowExceptionWhenUserNotFound() {
         UUID nonExistentUserId = UUID.randomUUID();
 
         assertThrows(UserNotFoundException.class, () -> {
