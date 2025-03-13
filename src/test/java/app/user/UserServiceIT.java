@@ -1,5 +1,7 @@
 package app.user;
 
+import app.activitylog.event.ActivityLogEvent;
+import app.cloudinary.dto.ImageUploadResult;
 import app.cloudinary.service.CloudinaryService;
 import app.exception.UserAlreadyExistsException;
 import app.exception.UserNotFoundException;
@@ -8,23 +10,32 @@ import app.user.model.User;
 import app.user.repository.UserRepository;
 import app.user.service.UserService;
 import app.web.dto.RegisterRequest;
+import com.github.tomakehurst.wiremock.WireMockServer;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.mock.web.MockMultipartFile;
+import org.springframework.boot.test.context.TestConfiguration;
+import org.springframework.context.event.EventListener;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+import static com.github.tomakehurst.wiremock.client.WireMock.*;
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.verify;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -37,6 +48,9 @@ public class UserServiceIT {
     @Autowired
     private UserRepository userRepository;
 
+    @Autowired
+    private EventCaptureConfig eventCaptureConfig; // Captures the events.The @EventListener inside EventCaptureConfig will catch events published by UserService in a real database-backed test
+
     @MockitoBean
     private CloudinaryService cloudinaryService;
 
@@ -44,6 +58,43 @@ public class UserServiceIT {
     private PasswordEncoder passwordEncoder;
 
     private RegisterRequest registerRequest;
+
+    private static WireMockServer wireMockServer;
+
+    // Do not use @MockBean ApplicationEventPublisher in integration tests.
+    //It replaces the real publisher with a mock, preventing real event propagation.
+    @TestConfiguration
+    static class EventCaptureConfig {
+
+        private final List<ActivityLogEvent> capturedEvents = new ArrayList<>();
+
+        @EventListener
+        public void onActivityLogEvent(ActivityLogEvent event) {
+            capturedEvents.add(event);
+        }
+
+        public void clearCapturedEvents() {
+            capturedEvents.clear();
+        }
+
+        public List<ActivityLogEvent> getCapturedEvents() {
+            return capturedEvents;
+        }
+    }
+
+    @BeforeAll
+    static void startWireMock() {
+        wireMockServer = new WireMockServer(8081); // Same port as the real service
+        wireMockServer.start();
+
+        wireMockServer.stubFor(post(urlEqualTo("/api/v1/activity-log"))
+                .willReturn(aResponse().withStatus(200))); // Mock successful response
+    }
+
+    @AfterAll
+    static void stopWireMock() {
+        wireMockServer.stop();
+    }
 
     @BeforeEach
     public void setUp() {
@@ -96,7 +147,7 @@ public class UserServiceIT {
     }
 
     @Test
-    public void testUpdateProfilePictureSuccess() {
+    public void testUpdateProfilePictureWhenUserHasDefaultPicture() {
         User user = User.builder()
                 .username("otherusername")
                 .email("email@example.com")
@@ -106,18 +157,78 @@ public class UserServiceIT {
                 .build();
         userRepository.save(user);
 
-        MockMultipartFile file = new MockMultipartFile("file", "profile.jpg", "image/jpeg", "some image content".getBytes());
+        UUID userId = user.getId();
 
-        //TODO: Better test with new cloudinary
-        String imageUrl = "http://cloudinary.com/abcd1234";
+        MultipartFile newImage = mock(MultipartFile.class);
+        ImageUploadResult mockUploadResult = new ImageUploadResult("new-image-url", "new-public-id");
 
-        UUID userId = userRepository.findAll().get(0).getId();
-        userService.updateProfilePicture(userId, file);
+        when(cloudinaryService.uploadImage(any(MultipartFile.class))).thenReturn(mockUploadResult);
+
+        userService.updateProfilePicture(userId, newImage);
+
+        List<ActivityLogEvent> capturedEvents = eventCaptureConfig.getCapturedEvents();
+        ActivityLogEvent event = capturedEvents.get(0);
+        String expectedMessage = "You have successfully updated your profile picture";
 
         User updatedUser = userRepository.findById(userId).orElseThrow();
-        assertNotNull(updatedUser.getProfilePicture());
-        assertEquals(imageUrl, updatedUser.getProfilePicture());
+        assertEquals("new-image-url", updatedUser.getProfilePicture());
+        assertEquals("new-public-id", updatedUser.getImagePublicId());
         assertNotNull(updatedUser.getDateUpdated());
+
+        assertFalse(capturedEvents.isEmpty(), "No events were captured!");
+        assertEquals(expectedMessage, event.getAction());
+
+        // Clean up captured events (important for avoiding test interference)
+        eventCaptureConfig.clearCapturedEvents();
+
+        verify(cloudinaryService, never()).deleteImage(anyString());
+        verify(cloudinaryService, times(1)).uploadImage(any(MultipartFile.class));
+    }
+
+    @Test
+    public void testUpdateProfilePictureWhenUserHasUpdatedPicture() {
+        User user = User.builder()
+                .username("otherusername")
+                .email("email@example.com")
+                .password("password")
+                .role(Role.ADMIN)
+                .profilePicture("old-image-url")
+                .imagePublicId("old-public-id")
+                .dateRegistered(LocalDateTime.now())
+                .build();
+        userRepository.save(user);
+
+        UUID userId = user.getId();
+
+        // Mock Cloudinary upload result
+        MultipartFile newImage = mock(MultipartFile.class);
+        ImageUploadResult mockUploadResult = new ImageUploadResult("new-image-url", "new-public-id");
+
+        when(cloudinaryService.uploadImage(any(MultipartFile.class))).thenReturn(mockUploadResult);
+
+        // Act: Call updateProfilePicture
+        userService.updateProfilePicture(userId, newImage);
+
+        List<ActivityLogEvent> capturedEvents = eventCaptureConfig.getCapturedEvents();
+        ActivityLogEvent event = capturedEvents.get(0);
+        String expectedMessage = "You have successfully updated your profile picture";
+
+        // Assert: Fetch updated user from DB
+        User updatedUser = userRepository.findById(userId).orElseThrow();
+        assertEquals("new-image-url", updatedUser.getProfilePicture());
+        assertEquals("new-public-id", updatedUser.getImagePublicId());
+        assertNotNull(updatedUser.getDateUpdated());
+
+        assertFalse(capturedEvents.isEmpty(), "No events were captured!");
+        assertEquals(expectedMessage, event.getAction());
+
+        // Clean up captured events (important for avoiding test interference)
+        eventCaptureConfig.clearCapturedEvents();
+
+        // Verify Cloudinary delete was called ONCE
+        verify(cloudinaryService, times(1)).deleteImage("old-public-id");
+        // Verify Cloudinary upload was called ONCE
+        verify(cloudinaryService, times(1)).uploadImage(any(MultipartFile.class));
     }
 
     @Test
@@ -136,9 +247,19 @@ public class UserServiceIT {
 
         userService.updateUsername(testUserId, newUsername);
 
+        List<ActivityLogEvent> capturedEvents = eventCaptureConfig.getCapturedEvents();
+        ActivityLogEvent event = capturedEvents.get(0);
+        String expectedMessage = "You have successfully updated your username to: " + newUsername;
+
         User updatedUser = userRepository.findById(testUserId).orElseThrow();
         assertNotNull(updatedUser);
         assertEquals(newUsername, updatedUser.getUsername());
+
+        assertFalse(capturedEvents.isEmpty(), "No events were captured!");
+        assertEquals(expectedMessage, event.getAction());
+
+        // Clean up captured events (important for avoiding test interference)
+        eventCaptureConfig.clearCapturedEvents();
     }
 
     @Test
@@ -157,9 +278,19 @@ public class UserServiceIT {
 
         userService.updateEmail(testUserId, newEmail);
 
+        List<ActivityLogEvent> capturedEvents = eventCaptureConfig.getCapturedEvents();
+        ActivityLogEvent event = capturedEvents.get(0);
+        String expectedMessage = "You have successfully updated your email to: " + newEmail;
+
         User updatedUser = userRepository.findById(testUserId).orElseThrow();
         assertNotNull(updatedUser);
         assertEquals(newEmail, updatedUser.getEmail());
+
+        assertFalse(capturedEvents.isEmpty(), "No events were captured!");
+        assertEquals(expectedMessage, event.getAction());
+
+        // Clean up captured events (important for avoiding test interference)
+        eventCaptureConfig.clearCapturedEvents();
     }
 
     @Test
@@ -178,10 +309,19 @@ public class UserServiceIT {
 
         userService.updatePassword(testUserId, newPassword);
 
+        List<ActivityLogEvent> capturedEvents = eventCaptureConfig.getCapturedEvents();
+        ActivityLogEvent event = capturedEvents.get(0);
+        String expectedMessage = "You have successfully updated your password";
 
         User updatedUser = userRepository.findById(testUserId).orElseThrow();
         assertNotNull(updatedUser);
         assertTrue(passwordEncoder.matches(newPassword, updatedUser.getPassword()));
+
+        assertFalse(capturedEvents.isEmpty(), "No events were captured!");
+        assertEquals(expectedMessage, event.getAction());
+
+        // Clean up captured events (important for avoiding test interference)
+        eventCaptureConfig.clearCapturedEvents();
     }
 
     @Test
