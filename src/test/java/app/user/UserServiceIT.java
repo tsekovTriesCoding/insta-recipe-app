@@ -63,6 +63,7 @@ public class UserServiceIT {
 
     // Do not use @MockBean ApplicationEventPublisher in integration tests.
     //It replaces the real publisher with a mock, preventing real event propagation.
+    //Mocking ApplicationEventPublisher in integration tests can bypass the event-driven nature of Spring, which isn't ideal for testing how your application reacts to events.
     @TestConfiguration
     static class EventCaptureConfig {
 
