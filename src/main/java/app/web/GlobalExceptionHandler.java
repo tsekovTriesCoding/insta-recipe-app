@@ -25,6 +25,7 @@ public class GlobalExceptionHandler {
         return "error-page";
     }
 
+    @ResponseStatus(HttpStatus.NOT_FOUND)
     @ExceptionHandler(CategoryNotFoundException.class)
     public String handleCategoryNotFoundException(CategoryNotFoundException ex, Model model) {
         model.addAttribute("error", ex.getMessage());
