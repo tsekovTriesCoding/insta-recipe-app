@@ -32,6 +32,7 @@ public class GlobalExceptionHandler {
         return "error-page";
     }
 
+    @ResponseStatus(HttpStatus.NOT_FOUND)
     @ExceptionHandler(RecipeNotFoundException.class)
     public String handleRecipeNotFoundException(RecipeNotFoundException ex, Model model) {
         model.addAttribute("error", ex.getMessage());
@@ -54,11 +55,18 @@ public class GlobalExceptionHandler {
     @ExceptionHandler({
             AccessDeniedException.class,
             NoResourceFoundException.class,
-            MethodArgumentTypeMismatchException.class,
             MissingRequestValueException.class})
     public ModelAndView handleNotFoundExceptions() {
 
         return new ModelAndView("not-found");
+    }
+
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(MethodArgumentTypeMismatchException.class)
+    public String handleMethodArgumentTypeMismatchException(MethodArgumentTypeMismatchException ex, Model model) {
+        model.addAttribute("error", ex.getMessage());
+
+        return "error-page";
     }
 
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)

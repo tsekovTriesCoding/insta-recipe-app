@@ -30,6 +30,10 @@ public class CommentController {
             redirectAttributes.addFlashAttribute("error", "Please enter a comment");
 
             return "redirect:/recipes/" + id;
+        } else if (content.length() > 500) {
+            redirectAttributes.addFlashAttribute("error", "Content is too long");
+
+            return "redirect:/recipes/" + id;
         }
 
         commentService.add(content, id, customUserDetails.getId());

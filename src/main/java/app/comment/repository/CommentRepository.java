@@ -10,4 +10,6 @@ import java.util.UUID;
 @Repository
 public interface CommentRepository extends JpaRepository<Comment, UUID> {
     List<Comment> findAllByRecipeIdOrderByCreatedDate(UUID id);
+
+    boolean existsByContent(String commentContent);
 }
