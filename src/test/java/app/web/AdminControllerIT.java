@@ -3,6 +3,7 @@ package app.web;
 import app.activitylog.client.ActivityLogClient;
 import app.comment.model.Comment;
 import app.comment.repository.CommentRepository;
+import app.comment.service.CommentService;
 import app.recipe.model.Recipe;
 import app.recipe.repository.RecipeRepository;
 import app.user.model.Role;
@@ -27,9 +28,10 @@ import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Optional;
+import java.util.UUID;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
@@ -68,7 +70,6 @@ class AdminControllerIT {
 
     @BeforeEach
     void setUp() {
-        // Create an Admin User
         adminUser = new User();
         adminUser.setUsername("admin");
         adminUser.setEmail("admin@example.com");
@@ -78,7 +79,6 @@ class AdminControllerIT {
         adminUser.setIsActive(true);
         userRepository.save(adminUser);
 
-        // Create a Normal User
         normalUser = new User();
         normalUser.setUsername("user");
         normalUser.setEmail("user@example.com");
@@ -88,7 +88,6 @@ class AdminControllerIT {
         normalUser.setIsActive(true);
         userRepository.save(normalUser);
 
-        // Create a Test Recipe
         testRecipe = new Recipe();
         testRecipe.setTitle("Test Recipe");
         testRecipe.setCreatedBy(normalUser);
@@ -102,12 +101,12 @@ class AdminControllerIT {
         testRecipe.setServings(2);
         recipeRepository.save(testRecipe);
 
-        // Create a Test Comment
         testComment = new Comment();
         testComment.setContent("Test Comment");
         testComment.setCreator(normalUser);
         testComment.setCreatedDate(LocalDateTime.now());
         testComment.setRecipe(testRecipe);
+        commentRepository.save(testComment);
     }
 
     @Test
@@ -154,7 +153,9 @@ class AdminControllerIT {
 
     @Test
     @WithMockUser(username = "admin", roles = {"ADMIN"})
-    void testDeleteRecipe() throws Exception {
+    void testDeleteRecipe_WhenRecipeExists_ShouldDeleteSuccessfully() throws Exception {
+        testRecipe.getComments().add(testComment);
+
         mockMvc.perform(delete("/admin/recipes/{recipeId}", testRecipe.getId())
                         .with(csrf()))
                 .andExpect(status().is3xxRedirection())
@@ -163,6 +164,33 @@ class AdminControllerIT {
         given(activityLogClient.logActivity(any())).willReturn(ResponseEntity.ok().build());
 
         assertFalse(recipeRepository.existsById(testRecipe.getId()));
+    }
+
+    @Test
+    @WithMockUser(username = "admin", roles = {"ADMIN"})
+    public void testDeleteRecipe_WhenRecipeDoesNotExist_ShouldReturnErrorPage() throws Exception {
+        UUID nonExistentId = UUID.randomUUID();
+
+        mockMvc.perform(delete("/admin/recipes/" + nonExistentId)
+                        .with(csrf()))
+                .andExpect(status().isOk())
+                .andExpect(view().name("error-page")) // Ensure it loads the correct error page
+                .andExpect(model().attributeExists("error")) // Check if the message is present
+                .andExpect(model().attribute("error", "Recipe with id " + nonExistentId + " not found."));
+    }
+
+    @Test
+    @WithMockUser(username = "admin", roles = {"ADMIN"})
+    public void testDeleteRecipe_WhenRecipeHasComments_ShouldDeleteCascade() throws Exception {
+        testRecipe.getComments().add(testComment);
+
+        mockMvc.perform(delete("/admin/recipes/" + testRecipe.getId())
+                        .with(csrf()))
+                .andExpect(status().is3xxRedirection());
+
+        // Assert: Recipe and associated comments should be deleted
+        assertFalse(recipeRepository.existsById(testRecipe.getId()));
+        assertFalse(commentRepository.existsById(testComment.getId()));
     }
 
     @Test
@@ -177,8 +205,6 @@ class AdminControllerIT {
     @Test
     @WithMockUser(username = "admin", roles = {"ADMIN"})
     void testDeleteComment() throws Exception {
-        commentRepository.save(testComment);
-
         mockMvc.perform(delete("/admin/comments/{commentId}", testComment.getId())
                         .with(csrf()))
                 .andExpect(status().is3xxRedirection())
