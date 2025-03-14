@@ -166,4 +166,12 @@ public class RecipeService {
     public List<Recipe> getRecipesByIds(List<UUID> favoriteRecipeIds) {
         return recipeRepository.findAllByIdIn(favoriteRecipeIds);
     }
+
+    public void deleteByAdmin(UUID recipeId) {
+        Recipe recipe = getById(recipeId);
+
+        cloudinaryService.deleteImage(recipe.getImagePublicId());
+
+        recipeRepository.delete(recipe);
+    }
 }

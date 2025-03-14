@@ -6,6 +6,7 @@ import app.comment.repository.CommentRepository;
 import app.comment.service.CommentService;
 import app.recipe.model.Recipe;
 import app.recipe.repository.RecipeRepository;
+import app.recipe.service.RecipeService;
 import app.user.model.Role;
 import app.user.model.User;
 import app.user.repository.UserRepository;
@@ -28,10 +29,10 @@ import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Optional;
 import java.util.UUID;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
@@ -59,6 +60,12 @@ class AdminControllerIT {
 
     @Autowired
     private PasswordEncoder passwordEncoder;
+
+    @Autowired
+    private RecipeService recipeService;
+
+    @Autowired
+    private CommentService commentService;
 
     @MockitoBean
     private ActivityLogClient activityLogClient;
@@ -188,7 +195,7 @@ class AdminControllerIT {
                         .with(csrf()))
                 .andExpect(status().is3xxRedirection());
 
-        // Assert: Recipe and associated comments should be deleted
+//         Assert: Recipe and associated comments should be deleted
         assertFalse(recipeRepository.existsById(testRecipe.getId()));
         assertFalse(commentRepository.existsById(testComment.getId()));
     }
@@ -205,6 +212,7 @@ class AdminControllerIT {
     @Test
     @WithMockUser(username = "admin", roles = {"ADMIN"})
     void testDeleteComment() throws Exception {
+
         mockMvc.perform(delete("/admin/comments/{commentId}", testComment.getId())
                         .with(csrf()))
                 .andExpect(status().is3xxRedirection())

@@ -77,7 +77,7 @@ public class AdminController {
 
     @DeleteMapping("/recipes/{recipeId}")
     public ModelAndView deleteRecipe(@PathVariable UUID recipeId) {
-        recipeService.delete(recipeId);
+        recipeService.deleteByAdmin(recipeId);
 
         return new ModelAndView("redirect:/admin/recipes", "message", "You have successfully deleted recipe with [id]: " + recipeId);
     }
