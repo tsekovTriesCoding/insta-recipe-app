@@ -180,7 +180,7 @@ class AdminControllerIT {
 
         mockMvc.perform(delete("/admin/recipes/" + nonExistentId)
                         .with(csrf()))
-                .andExpect(status().isOk())
+                .andExpect(status().isNotFound())
                 .andExpect(view().name("error-page")) // Ensure it loads the correct error page
                 .andExpect(model().attributeExists("error")) // Check if the message is present
                 .andExpect(model().attribute("error", "Recipe with id " + nonExistentId + " not found."));
