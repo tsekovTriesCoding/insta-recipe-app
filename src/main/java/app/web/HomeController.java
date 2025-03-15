@@ -31,7 +31,7 @@ public class HomeController {
 
         model.addAttribute("categories", categories);
 
-        return "/home";
+        return "home";
     }
 
     @GetMapping("/about")
