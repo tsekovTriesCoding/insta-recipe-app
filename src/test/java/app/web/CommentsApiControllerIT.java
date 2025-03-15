@@ -5,7 +5,6 @@ import app.comment.model.Comment;
 import app.comment.repository.CommentRepository;
 import app.recipe.model.Recipe;
 import app.recipe.repository.RecipeRepository;
-import app.security.CustomUserDetails;
 import app.security.WithCustomUser;
 import app.user.model.Role;
 import app.user.model.User;
@@ -17,10 +16,6 @@ import org.junit.jupiter.api.TestInstance;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
