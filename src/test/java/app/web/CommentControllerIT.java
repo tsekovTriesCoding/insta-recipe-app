@@ -36,8 +36,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest
 @AutoConfigureMockMvc
-@Transactional
 @WithMockUser(username = "testuser", roles = "USER")
+@Transactional
 public class CommentControllerIT {
 
     @Autowired

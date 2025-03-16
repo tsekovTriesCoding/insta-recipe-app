@@ -18,6 +18,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -34,8 +35,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest
 @AutoConfigureMockMvc
-@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @WithCustomUser
+@Transactional
 public class CommentsApiControllerIT {
 
     @Autowired
@@ -59,7 +60,7 @@ public class CommentsApiControllerIT {
     private UUID testRecipeId;
     private UUID testCommentId;
 
-    @BeforeAll
+    @BeforeEach
     void setUp() {
         recipeOwner = new User();
         recipeOwner.setUsername("recipeOwner");
@@ -92,10 +93,7 @@ public class CommentsApiControllerIT {
         testRecipe.setServings(2);
         testRecipe = recipeRepository.save(testRecipe);
         testRecipeId = testRecipe.getId();
-    }
 
-    @BeforeEach
-    void initComment() {
         Comment testComment = new Comment();
         testComment.setContent("Test Comment");
         testComment.setRecipe(testRecipe);
