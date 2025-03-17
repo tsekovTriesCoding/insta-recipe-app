@@ -69,7 +69,6 @@ Cloudinary – Cloud storage for images
 
 ```bash
 git clone https://github.com/yourusername/InstaRecipeApp.git
-cd InstaRecipeApp
 ```
 
 2️⃣ Navigate to the project directory:
