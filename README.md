@@ -72,19 +72,37 @@ git clone https://github.com/yourusername/InstaRecipeApp.git
 cd InstaRecipeApp
 ```
 
-2️⃣ Set up the database
+2️⃣ Navigate to the project directory:
+
+``` cd InstaRecipe ```
+
+3️⃣ Set up the database
 
 -Ensure MySQL is running
 
 -Update application.properties with your database credentials
 
-3️⃣ Run the application
+4️⃣ Set Up Cloudinary
+
+1. Create an account at Cloudinary.
+
+2. Retrieve your API credentials (Cloud Name, API Key, and API Secret).
+
+3. Add the following properties to application.properties:
+
+```
+cloudinary.cloud-name=your_cloud_name
+cloudinary.api-key=your_api_key
+cloudinary.api-secret=your_api_secret
+```
+
+5️⃣ Run the application
 
 ``` bash 
 mvn spring-boot:run
 ```
 
-4️⃣ Access the app
+6️⃣ Open the application in your browser:
 
 Visit: ```http://localhost:8080```
 
