@@ -54,8 +54,7 @@ public class FavoriteService {
 
         Recipe recipe = recipeService.getById(favorite.getRecipe().getId());
 
-        eventPublisher.publishEvent(new ActivityLogEvent(recipe.getCreatedBy().getId(),
-                "You have successfully removed recipe: " + recipe.getTitle() + " from your favorites"));
+        eventPublisher.publishEvent(new ActivityLogEvent(userId, "You have successfully removed recipe: " + recipe.getTitle() + " from your favorites"));
     }
 
     public List<Recipe> getUserFavoriteRecipes(UUID userId) {
