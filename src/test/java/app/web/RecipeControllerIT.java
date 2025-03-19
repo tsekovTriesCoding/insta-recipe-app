@@ -10,12 +10,12 @@ import app.favorite.service.FavoriteService;
 import app.like.service.LikeService;
 import app.recipe.model.Recipe;
 import app.recipe.repository.RecipeRepository;
-import app.recipe.service.RecipeService;
 import app.security.CustomUserDetails;
 import app.user.model.Role;
 import app.user.model.User;
 import app.user.repository.UserRepository;
 import app.web.dto.AddRecipe;
+import app.web.dto.EditRecipe;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,7 +28,6 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
@@ -40,8 +39,7 @@ import java.util.UUID;
 import static org.hamcrest.Matchers.*;
 import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @SpringBootTest
@@ -64,24 +62,21 @@ public class RecipeControllerIT {
     @Autowired
     private FavoriteService favoriteService;
 
+    @Autowired
+    private CategoryRepository categoryRepository;
+
     @MockitoBean
     private CloudinaryService cloudinaryService;
 
     @MockitoBean
     private ActivityLogService activityLogService;
 
-    private User user;
-    private Recipe recipe;
-    private Recipe recipe2;
-    private Category category;
     private UUID recipeId;
     private UUID userId;
-    @Autowired
-    private CategoryRepository categoryRepository;
 
     @BeforeEach
     void setUp() {
-        user = new User();
+        User user = new User();
         user.setUsername("testUser");
         user.setEmail("testUser@example.com");
         user.setPassword("password");
@@ -91,7 +86,7 @@ public class RecipeControllerIT {
         user = userRepository.save(user);
         userId = user.getId();
 
-        recipe = new Recipe();
+        Recipe recipe = new Recipe();
         recipe.setTitle("Test Recipe");
         recipe.setDescription("Test Description");
         recipe.setCreatedBy(user);
@@ -104,7 +99,7 @@ public class RecipeControllerIT {
         recipe.setServings(2);
         recipeRepository.save(recipe);
 
-        recipe2 = new Recipe();
+        Recipe recipe2 = new Recipe();
         recipe2.setTitle("Cake");
         recipe2.setDescription("Cake description");
         recipe2.setCreatedBy(user);
@@ -116,7 +111,8 @@ public class RecipeControllerIT {
         recipe2.setCookTime(20);
         recipe2.setServings(2);
         recipeRepository.save(recipe2);
-        category = Category.builder()
+
+        Category category = Category.builder()
                 .name(CategoryName.DESSERTS)
                 .imageUrl("image")
                 .build();
@@ -125,6 +121,10 @@ public class RecipeControllerIT {
 
         recipeId = recipe.getId();
         userId = user.getId();
+
+        UserDetails userDetails = new CustomUserDetails(user.getId(), user.getUsername(), user.getPassword(), user.getRole(), user.getIsActive());
+        UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+        SecurityContextHolder.getContext().setAuthentication(authentication); // use this because Spring does not recognize my CustomUserDetails
     }
 
     @Test
@@ -188,10 +188,6 @@ public class RecipeControllerIT {
 
     @Test
     void testRecipeDetails_whenRecipeExists() throws Exception {
-        UserDetails userDetails = new CustomUserDetails(user.getId(), user.getUsername(), user.getPassword(), user.getRole(), user.getIsActive());
-        UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
-        SecurityContextHolder.getContext().setAuthentication(authentication); // use this because Spring does not recognize my CustomUserDetails
-
         mockMvc.perform(get("/recipes/" + recipeId))
                 .andExpect(status().isOk())
                 .andExpect(view().name("recipe-details"))
@@ -265,10 +261,6 @@ public class RecipeControllerIT {
 
     @Test
     void testRecipeDetails_whenUserHasFavoritedRecipe() throws Exception {
-        UserDetails userDetails = new CustomUserDetails(user.getId(), user.getUsername(), user.getPassword(), user.getRole(), user.getIsActive());
-        UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
-        SecurityContextHolder.getContext().setAuthentication(authentication);
-
         favoriteService.addRecipeToFavorites(userId, recipeId); // Mock favorite action
 
         mockMvc.perform(get("/recipes/" + recipeId))
@@ -289,7 +281,10 @@ public class RecipeControllerIT {
     }
 
     @Test
+    @WithMockUser
     void testAddRecipePage_whenUserIsNotAuthenticated() throws Exception {
+        SecurityContextHolder.getContext().setAuthentication(null);
+
         mockMvc.perform(get("/recipes/add"))
                 .andExpect(status().is3xxRedirection())
                 .andExpect(redirectedUrlPattern("**/login"));
@@ -297,16 +292,13 @@ public class RecipeControllerIT {
 
     @Test
     void testAddRecipe_whenValidRecipeIsProvided() throws Exception {
-        UserDetails userDetails = new CustomUserDetails(user.getId(), user.getUsername(), user.getPassword(), user.getRole(), user.getIsActive());
-        UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
-        SecurityContextHolder.getContext().setAuthentication(authentication);
-
         List<CategoryName> categories = List.of(CategoryName.DESSERTS);
 
         MockMultipartFile image = new MockMultipartFile("image", "test.jpg", "image/jpeg", new byte[1]);
         AddRecipe addRecipe = new AddRecipe();
         addRecipe.setTitle("Chocolate Cake");
         addRecipe.setDescription("Delicious homemade chocolate cake.");
+        addRecipe.setImage(image);
         addRecipe.setCategories(categories);
         addRecipe.setImage(image);
         addRecipe.setIngredients("Ingredient1,ingredient2,ingredient3");
@@ -317,20 +309,161 @@ public class RecipeControllerIT {
         ImageUploadResult mockUploadResult = new ImageUploadResult("http://image.url", "public-id");
         when(cloudinaryService.uploadImage(image)).thenReturn(mockUploadResult);
 
-        MockHttpServletRequestBuilder requestBuilder =
-                multipart("/recipes/add")
-                        .file(image)  // Add the image file
-                        .param("title", addRecipe.getTitle())
-                        .param("description", addRecipe.getDescription())
-                        .param("categories", String.valueOf(categories.get(0)))
-                        .param("ingredients", addRecipe.getIngredients())
-                        .param("instructions", addRecipe.getInstructions())
-                        .param("cookTime", String.valueOf(addRecipe.getCookTime()))
-                        .param("servings", String.valueOf(addRecipe.getServings()))
-                        .with(csrf());
-
-        mockMvc.perform(requestBuilder)
+        mockMvc.perform(post("/recipes/add")
+                        .with(csrf())
+                        .flashAttr("addRecipe", addRecipe))
                 .andExpect(status().is3xxRedirection())
                 .andExpect(redirectedUrlPattern("/recipes/*")); // Check that the redirect URL is like "/recipe/{id}"
+    }
+
+    @Test
+    void testAddRecipe_whenInvalidRecipeIsProvided() throws Exception {
+        mockMvc.perform(post("/recipes/add")
+                        .with(csrf())// Enable CSRF token for security
+                        // with no image
+                        .param("title", "") // Empty title (invalid)
+                        .param("description", "Short") // Too short description (invalid)
+                        .param("categories", String.valueOf(new ArrayList<>())) // No categories
+                        .param("ingredients", "") // Empty ingredients
+                        .param("instructions", "") // Empty instructions
+                        .param("cookTime", "-10") // Negative time (invalid)
+                        .param("servings", "0")) // Invalid servings
+                .andExpect(status().isOk()) // Should return 200 (stay on the same page)
+                .andExpect(view().name("add-recipe")) // Should not redirect, but stay on form page
+                .andExpect(model().attributeHasFieldErrors("addRecipe", "title", "description", "image", "categories", "cookTime", "servings"));
+    }
+
+    @Test
+    void testEditRecipe_WhenRecipeExists() throws Exception {
+        mockMvc.perform(get("/recipes/edit/" + recipeId))
+                .andExpect(status().isOk())
+                .andExpect(view().name("edit-recipe"))
+                .andExpect(model().attributeExists("editRecipe"))
+                .andExpect(model().attribute("editRecipe", hasProperty("title", is("Test Recipe"))))
+                .andExpect(model().attribute("editRecipe", hasProperty("description", is("Test Description"))))
+                .andExpect(model().attribute("editRecipe", hasProperty("categories", is(emptyCollectionOf(CategoryName.class)))))
+                .andExpect(model().attribute("editRecipe", hasProperty("ingredients", is("Salt,Pepper"))))
+                .andExpect(model().attribute("editRecipe", hasProperty("instructions", is("Mix everything"))))
+                .andExpect(model().attribute("editRecipe", hasProperty("cookTime", is(20))))
+                .andExpect(model().attribute("editRecipe", hasProperty("servings", is(2))));
+    }
+
+    @Test
+    @WithMockUser
+    void testEditRecipe_WhenRecipeDoesNotExist() throws Exception {
+        UUID invalidId = UUID.randomUUID();
+
+        mockMvc.perform(get("/recipes/edit/" + invalidId))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    @WithMockUser
+    void testEditRecipe_WhenValidRecipeProvided() throws Exception {
+        MockMultipartFile image = new MockMultipartFile("image", "test.jpg", "image/jpeg", new byte[1]);
+
+        Category newCategory = Category.builder()
+                .name(CategoryName.MAIN_COURSE)
+                .description("Test Description")
+                .imageUrl("image")
+                .build();
+
+        categoryRepository.save(newCategory);
+
+        ImageUploadResult mockUploadResult = new ImageUploadResult("http://image.url", "public-id");
+        when(cloudinaryService.uploadImage(image)).thenReturn(mockUploadResult);
+
+        EditRecipe editRecipe = EditRecipe.builder()
+                .title("Updated Recipe Title")
+                .description("Updated Recipe Description")
+                .image(image)
+                .categories(List.of(CategoryName.MAIN_COURSE))
+                .ingredients("new,ingredients,to,add")
+                .instructions("Updated instruction to test")
+                .cookTime(5)
+                .servings(4)
+                .build();
+
+        mockMvc.perform(post("/recipes/edit/" + recipeId)
+                        .with(csrf())
+                        .flashAttr("editRecipe", editRecipe)) // Simulating form submission
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("/recipes/" + recipeId));
+
+    }
+
+    @Test
+    @WithMockUser
+    void testEditRecipe_WhenInvalidRecipeProvided() throws Exception {
+        MockMultipartFile image = new MockMultipartFile("image", "test.jpg", "image/jpeg", new byte[(3 * 1024 * 1024) + 1]);
+
+        EditRecipe editRecipe = EditRecipe.builder()
+                .title("")
+                .description("Short")
+                .image(image)
+                .categories(new ArrayList<>())
+                .ingredients("")
+                .instructions("")
+                .cookTime(-5)
+                .servings(0)
+                .build();
+
+        mockMvc.perform(post("/recipes/edit/" + recipeId)
+                        .with(csrf())
+                        .flashAttr("editRecipe", editRecipe))
+                .andExpect(status().isOk()) // Should return 200 (stay on the same page)
+                .andExpect(view().name("edit-recipe")) // Should not redirect, but stay on form page
+                .andExpect(model().attributeHasFieldErrors("editRecipe", "title", "description", "image", "categories", "cookTime", "servings"));
+    }
+
+    @Test
+    void testMyRecipes_WhenUserHasRecipes() throws Exception {
+        mockMvc.perform(get("/recipes/my-recipes"))
+                .andExpect(status().isOk())
+                .andExpect(view().name("my-recipes"))
+                .andExpect(model().attributeExists("myRecipes"))
+                .andExpect(model().attribute("myRecipes", hasSize(2)))
+                .andExpect(model().attribute("myRecipes", hasItem(hasProperty("title", is("Test Recipe")))))
+                .andExpect(model().attribute("myRecipes", hasItem(hasProperty("title", is("Cake")))));
+
+    }
+
+    @Test
+    void testMyRecipes_WhenUserHasNoRecipes() throws Exception {
+        recipeRepository.deleteAll();
+
+        mockMvc.perform(get("/recipes/my-recipes"))
+                .andExpect(status().isOk())
+                .andExpect(view().name("my-recipes"))
+                .andExpect(model().attributeExists("myRecipes"))
+                .andExpect(model().attribute("myRecipes", hasSize(0)));
+    }
+
+    @Test
+    void testMyRecipes_WhenUserIsNotAuthenticated() throws Exception {
+        SecurityContextHolder.getContext().setAuthentication(null);
+
+        mockMvc.perform(get("/recipes/my-recipes"))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("http://localhost/users/login"));
+    }
+
+    @Test
+    @WithMockUser
+    void testDeleteRecipe_WhenRecipeExists() throws Exception {
+        mockMvc.perform(delete("/recipes/delete/" + recipeId)
+                        .with(csrf()))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("/recipes/my-recipes"));
+    }
+
+    @Test
+    @WithMockUser
+    void testDeleteRecipe_WhenRecipeDoesNotExist() throws Exception {
+        UUID recipeId = UUID.randomUUID();
+
+        mockMvc.perform(delete("/recipes/delete/" + recipeId)
+                        .with(csrf()))
+                .andExpect(status().isNotFound());
     }
 }

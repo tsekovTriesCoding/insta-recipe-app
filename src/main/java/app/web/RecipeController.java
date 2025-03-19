@@ -1,11 +1,10 @@
 package app.web;
 
 import app.category.model.CategoryName;
-import app.exception.RecipeNotFoundException;
+import app.favorite.service.FavoriteService;
 import app.like.service.LikeService;
 import app.mapper.DtoMapper;
 import app.recipe.model.Recipe;
-import app.favorite.service.FavoriteService;
 import app.recipe.service.RecipeService;
 import app.security.CustomUserDetails;
 import app.web.dto.AddRecipe;
