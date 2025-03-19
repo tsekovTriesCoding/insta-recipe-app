@@ -73,7 +73,9 @@ git clone https://github.com/yourusername/InstaRecipeApp.git
 
 2️⃣ Navigate to the project directory:
 
-``` cd InstaRecipe ```
+```
+cd InstaRecipe 
+```
 
 3️⃣ Set up the database
 
