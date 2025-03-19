@@ -143,4 +143,3 @@ class UserControllerIT {
                 .andExpect(model().attributeHasFieldErrors("registerRequest","email"));
     }
 }
-
