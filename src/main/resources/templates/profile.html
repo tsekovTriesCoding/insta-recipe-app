@@ -25,15 +25,18 @@
                          alt="Profile Picture"
                          class="rounded-circle border border-secondary"
                          style="width: 130px; height: 130px; object-fit: cover;">
-                    <button class="btn btn-primary btn-sm position-absolute bottom-0 end-0"
+                    <button class="btn-change change-picture btn btn-sm position-absolute bottom-0 end-0"
                             data-bs-toggle="modal"
                             data-bs-target="#changePictureModal">
                         Change Picture
                     </button>
                 </div>
                 <div class="profile-status-container align-self-center mt-lg-3">
-                    <p th:if="*{isActive}" class="active-profile">ACTIVE</p>
-                    <p th:unless="*{isActive}" class="inactive-profile">INACTIVE</p>
+                    <p>
+                        <span class="profile-status-label">Your status:</span>
+                        <span th:if="*{isActive}" class="active-profile">ACTIVE</span>
+                        <span th:unless="*{isActive}" class="inactive-profile">INACTIVE</span>
+                    </p>
                 </div>
                 <div class="container">
                     <div class="m-xl-4">
@@ -41,7 +44,7 @@
                         <div id="username"
                              class="form-control bg-light d-flex justify-content-between align-items-center mb-0">
                             <span th:text="${userProfileInfo.username}">john_doe</span>
-                            <button type="button" class="btn btn-sm btn-outline-primary ms-3" data-bs-toggle="modal"
+                            <button type="button" class="btn-change btn btn-sm btn-outline-primary ms-3" data-bs-toggle="modal"
                                     data-bs-target="#changeUsernameModal">
                                 Change
                             </button>
@@ -53,7 +56,7 @@
                         <div id="email"
                              class="form-control bg-light d-flex justify-content-between align-items-center mb-0">
                             <span th:text="*{email}">john@example.com</span>
-                            <button type="button" class="btn btn-sm btn-outline-primary ms-3" data-bs-toggle="modal"
+                            <button type="button" class="btn-change btn btn-sm btn-outline-primary ms-3" data-bs-toggle="modal"
                                     data-bs-target="#changeEmailModal">
                                 Change
                             </button>
@@ -64,7 +67,7 @@
                         <div id="password"
                              class="form-control bg-light d-flex justify-content-between align-items-center mb-0">
                             <span>********</span>
-                            <button type="button" class="btn btn-sm btn-outline-primary ms-3" data-bs-toggle="modal"
+                            <button type="button" class="btn-change btn btn-sm btn-outline-primary ms-3" data-bs-toggle="modal"
                                     data-bs-target="#changePasswordModal">
                                 Change
                             </button>
@@ -79,7 +82,7 @@
                 </div>
 
                 <div class="d-flex justify-content-center mt-4">
-                    <a th:href="@{'/my-profile/' + ${userProfileInfo.id} + '/activity-log'} " class="btn btn-lg btn-light px-5 py-3 shadow text-capitalize">Activity Log</a>
+                    <a th:href="@{'/my-profile/' + ${userProfileInfo.id} + '/activity-log'} " class="btn-activity-log btn btn-lg btn-light px-5 py-3 shadow text-capitalize">Activity Log</a>
                 </div>
             </div>
         </div>

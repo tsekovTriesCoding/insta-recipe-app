@@ -72,14 +72,21 @@
 }
 
 .view-recipe-btn,
-.btn-change {
+.btn-change,
+.btn-activity-log {
     border-color: rgba(255, 175, 75, 0.9);
     color: rgba(255, 87, 34, 0.9);
     transition: all 0.3s ease-in-out;
 }
 
+.change-picture {
+    background: linear-gradient(135deg, rgba(255, 87, 34, 0.9), rgba(255, 175, 75, 0.9));
+    color: white;
+}
+
 .view-recipe-btn:hover,
-.btn-change:hover {
+.btn-change:hover,
+.btn-activity-log:hover {
     background: linear-gradient(135deg, rgba(255, 175, 75, 0.9), rgba(255, 87, 34, 0.9));
     color: #fff;
     border-color: transparent;
@@ -295,6 +302,13 @@
 }
 
 /*-----------------------*/
+
+.profile-status-container .profile-status-label {
+    font-weight: bold;
+    color: #333; /* Dark gray for better readability */
+    margin-right: 5px;
+}
+
 .profile-status-container .active-profile {
     backdrop-filter: blur(10px);
     padding: 6px 12px;
