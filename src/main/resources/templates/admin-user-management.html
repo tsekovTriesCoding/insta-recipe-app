@@ -33,7 +33,7 @@
                         th:text="${user.active ? 'Active' : 'Inactive'}" class="status">
                     </td>
                     <td>
-                        <div class="d-flex gap-2">
+                        <div class="d-flex gap-2 justify-content-center">
                             <form th:action="@{'/admin/users/change-role/' + ${user.id}}" th:method="PUT">
                                 <button type="submit" class="btn btn-warning btn-sm update-role">Change Role</button>
                             </form>

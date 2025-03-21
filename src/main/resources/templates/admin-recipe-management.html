@@ -26,12 +26,14 @@
                 <tr th:each="recipe : ${recipes}">
                     <td th:text="${recipe.title}"></td>
                     <td th:text="${recipe.author}"></td>
-                    <td th:text="${recipe.createdDate}"></td>
+                    <td th:text="|${#temporals.format(recipe.createdDate, 'dd MMM YYYY HH:mm')}|"></td>
                     <td>
-                        <a th:href="@{'/recipes/' + ${recipe.id}}" class="btn btn-info btn-sm">View</a>
-                        <form th:action="@{'/admin/recipes/' + ${recipe.id}}" th:method="DELETE">
-                            <button class="btn btn-danger btn-sm delete-recipe">Delete</button>
-                        </form>
+                        <div class="d-flex gap-2 justify-content-center">
+                            <a th:href="@{'/recipes/' + ${recipe.id}}" class="btn btn-info btn-sm">View</a>
+                            <form th:action="@{'/admin/recipes/' + ${recipe.id}}" th:method="DELETE">
+                                <button class="btn btn-danger btn-sm delete-recipe">Delete</button>
+                            </form>
+                        </div>
                     </td>
                 </tr>
                 </tbody>

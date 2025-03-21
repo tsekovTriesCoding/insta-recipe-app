@@ -26,7 +26,7 @@
                 <tr th:each="comment : ${comments}">
                     <td th:text="${comment.author}"></td>
                     <td th:text="${comment.content}"></td>
-                    <td th:text="${comment.createdDate}"></td>
+                    <td th:text="|${#temporals.format(comment.createdDate, 'dd MMM YYYY HH:mm')}|"></td>
                     <td>
                         <form th:action="@{'/admin/comments/' + ${comment.id}}" th:method="DELETE">
                             <button class="btn btn-danger btn-sm delete-comment">Delete</button>
