@@ -1,11 +1,18 @@
 package app;
 
+import app.category.model.CategoryName;
+import app.recipe.model.Recipe;
 import app.user.model.Role;
 import app.user.model.User;
+import app.web.dto.AddRecipe;
+import app.web.dto.RecipeDetails;
 import app.web.dto.RegisterRequest;
 import lombok.experimental.UtilityClass;
+import org.springframework.mock.web.MockMultipartFile;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 @UtilityClass
@@ -31,6 +38,39 @@ public class TestBuilder {
                 .password("password")
                 .confirmPassword("password")
                 .build();
+    }
 
+    public static Recipe aRandomRecipe() {
+        return Recipe.builder()
+                .id(UUID.randomUUID())
+                .title("title")
+                .description("description")
+                .ingredients(List.of("tomato", "cucumber"))
+                .instructions("Instructions")
+                .createdDate(LocalDateTime.now())
+                .cookTime(2)
+                .prepTime(3)
+                .servings(4)
+                .image("imageUrl")
+                .comments(new ArrayList<>())
+                .likes(new ArrayList<>())
+                .build();
+    }
+
+    public static AddRecipe aRandomAddRecipe() {
+        MockMultipartFile image = new MockMultipartFile("image", "image.jpg", "image/jpg", new byte[1]);
+
+        AddRecipe addRecipe = new AddRecipe();
+        addRecipe.setTitle("title");
+        addRecipe.setDescription("description");
+        addRecipe.setImage(image);
+        addRecipe.setInstructions("Instructions");
+        addRecipe.setIngredients("ingredient1, ingredient2");
+        addRecipe.setCategories(List.of(CategoryName.MAIN_COURSE));
+        addRecipe.setCookTime(1);
+        addRecipe.setPrepTime(2);
+        addRecipe.setServings(3);
+
+        return addRecipe;
     }
 }
