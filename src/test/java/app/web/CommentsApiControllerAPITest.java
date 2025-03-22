@@ -28,7 +28,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @WebMvcTest(CommentsApiController.class)
 @WithMockUser
-public class CommentsApiControllerIT {
+public class CommentsApiControllerAPITest {
 
     @MockitoBean
     private CommentService commentService;
