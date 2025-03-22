@@ -1,34 +1,32 @@
 package app.web;
 
-import app.user.model.Role;
-import app.user.model.User;
-import app.user.repository.UserRepository;
+import app.exception.UserAlreadyExistsException;
+import app.user.service.UserService;
 import app.web.dto.RegisterRequest;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.mock.web.MockHttpSession;
+import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
-
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doThrow;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@SpringBootTest
-@AutoConfigureMockMvc
-@Transactional
-class UserControllerIT {
+@WebMvcTest(UserController.class)
+@WithMockUser
+class UserControllerAPITest {
+
+    @MockitoBean
+    private UserService userService;
 
     @Autowired
     private MockMvc mockMvc;
-
-    @Autowired
-    private UserRepository userRepository;
 
     @Test
     void testGetLoginPage() throws Exception {
@@ -68,7 +66,10 @@ class UserControllerIT {
 
         mockMvc.perform(post("/users/register")
                         .with(csrf())
-                        .flashAttr("registerRequest", registerRequest))
+                        .formField("username", registerRequest.getUsername())
+                        .formField("email", registerRequest.getEmail())
+                        .formField("password", registerRequest.getPassword())
+                        .formField("confirmPassword", registerRequest.getConfirmPassword()))
                 .andExpect(status().is3xxRedirection())
                 .andExpect(redirectedUrl("/home"));
     }
@@ -84,7 +85,30 @@ class UserControllerIT {
 
         mockMvc.perform(post("/users/register")
                         .with(csrf())
-                        .flashAttr("registerRequest", registerRequest))
+                        .formField("username", registerRequest.getUsername())
+                        .formField("email", registerRequest.getEmail())
+                        .formField("password", registerRequest.getPassword())
+                        .formField("confirmPassword", registerRequest.getConfirmPassword()))
+                .andExpect(status().isOk())
+                .andExpect(view().name("register"))
+                .andExpect(model().attributeHasFieldErrors("registerRequest", "username", "email", "password", "confirmPassword"));
+    }
+
+    @Test
+    void testRegisterWithInvalidInputs() throws Exception {
+        RegisterRequest registerRequest = RegisterRequest.builder()
+                .username("")
+                .email("newEmail")
+                .password("test")
+                .confirmPassword("test")
+                .build();
+
+        mockMvc.perform(post("/users/register")
+                        .with(csrf())
+                        .formField("username", registerRequest.getUsername())
+                        .formField("email", registerRequest.getEmail())
+                        .formField("password", registerRequest.getPassword())
+                        .formField("confirmPassword", registerRequest.getConfirmPassword()))
                 .andExpect(status().isOk())
                 .andExpect(view().name("register"))
                 .andExpect(model().attributeHasFieldErrors("registerRequest", "username", "email", "password", "confirmPassword"));
@@ -92,15 +116,6 @@ class UserControllerIT {
 
     @Test
     void testRegisterWithExistingUsername() throws Exception {
-        User user = new User();
-        user.setUsername("testUser");
-        user.setEmail("testUser@example.com");
-        user.setPassword("password");
-        user.setRole(Role.USER);
-        user.setDateRegistered(LocalDateTime.now());
-        user.setIsActive(true);
-        userRepository.save(user);
-
         RegisterRequest registerRequest = RegisterRequest.builder()
                 .username("testUser")
                 .email("newEmail@abv.bg")
@@ -108,25 +123,22 @@ class UserControllerIT {
                 .confirmPassword("testPassword")
                 .build();
 
+        doThrow(new UserAlreadyExistsException("User with username " + registerRequest.getUsername() + " already exists."))
+                .when(userService).register(any(RegisterRequest.class));
+
         mockMvc.perform(post("/users/register")
                         .with(csrf())
-                        .flashAttr("registerRequest", registerRequest))
-                .andExpect(status().isOk())
-                .andExpect(view().name("register"))
-                .andExpect(model().attributeHasFieldErrors("registerRequest","username"));
+                        .formField("username", registerRequest.getUsername())
+                        .formField("email", registerRequest.getEmail())
+                        .formField("password", registerRequest.getPassword())
+                        .formField("confirmPassword", registerRequest.getConfirmPassword()))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(view().name("redirect:/users/register"))
+                .andExpect(flash().attributeExists("error"));
     }
 
     @Test
     void testRegisterWithExistingEmail() throws Exception {
-        User user = new User();
-        user.setUsername("testUser");
-        user.setEmail("testUser@example.com");
-        user.setPassword("password");
-        user.setRole(Role.USER);
-        user.setDateRegistered(LocalDateTime.now());
-        user.setIsActive(true);
-        userRepository.save(user);
-
         RegisterRequest registerRequest = RegisterRequest.builder()
                 .username("newUser")
                 .email("testUser@example.com")
@@ -134,11 +146,17 @@ class UserControllerIT {
                 .confirmPassword("testPassword")
                 .build();
 
+        doThrow(new UserAlreadyExistsException("User with email " + registerRequest.getEmail() + " already exists."))
+                .when(userService).register(any(RegisterRequest.class));
+
         mockMvc.perform(post("/users/register")
                         .with(csrf())
-                        .flashAttr("registerRequest", registerRequest))
-                .andExpect(status().isOk())
-                .andExpect(view().name("register"))
-                .andExpect(model().attributeHasFieldErrors("registerRequest","email"));
+                        .formField("username", registerRequest.getUsername())
+                        .formField("email", registerRequest.getEmail())
+                        .formField("password", registerRequest.getPassword())
+                        .formField("confirmPassword", registerRequest.getConfirmPassword()))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(view().name("redirect:/users/register"))
+                .andExpect(flash().attributeExists("error"));
     }
 }
