@@ -114,7 +114,7 @@ public class RecipeController {
         return "edit-recipe";
     }
 
-    @PostMapping("/edit/{id}")
+    @PutMapping("/edit/{id}")
     public String editRecipe(@Valid EditRecipe editRecipe,
                              BindingResult bindingResult) {
 

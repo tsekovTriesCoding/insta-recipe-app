@@ -13,7 +13,7 @@
                     <h3 class="fw-bold">Edit Recipe</h3>
                     <p class="text-muted">Make changes to your delicious creation!</p>
                 </div>
-                <form th:method="POST"
+                <form th:method="PUT"
                       th:action="@{/recipes/edit/{id}(id=${editRecipe.id})}"
                       th:object="${editRecipe}"
                       enctype="multipart/form-data">
