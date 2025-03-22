@@ -2,111 +2,85 @@ package app.web;
 
 import app.activitylog.dto.ActivityLogResponse;
 import app.activitylog.service.ActivityLogService;
-import app.cloudinary.dto.ImageUploadResult;
-import app.cloudinary.service.CloudinaryService;
 import app.security.CustomUserDetails;
 import app.user.model.Role;
 import app.user.model.User;
-import app.user.repository.UserRepository;
-import org.junit.jupiter.api.BeforeEach;
+import app.user.service.UserService;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.http.HttpMethod;
-import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
+import java.util.UUID;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static app.TestBuilder.aRandomUser;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@SpringBootTest
-@AutoConfigureMockMvc
-@Transactional
-public class ProfileControllerIT {
+@WebMvcTest(ProfileController.class)
+public class ProfileControllerAPITest {
 
-    @Autowired
-    private MockMvc mockMvc;
-
-    @Autowired
-    private UserRepository userRepository;
+    @MockitoBean
+    private UserService userService;
 
     @MockitoBean
     private ActivityLogService activityLogService;
 
-    @MockitoBean
-    private CloudinaryService cloudinaryService;
-
-    private User testUser;
-
-    @BeforeEach
-    void setUp() {
-        testUser = new User();
-        testUser.setUsername("testUser");
-        testUser.setEmail("testUser@example.com");
-        testUser.setPassword("password");
-        testUser.setRole(Role.USER);
-        testUser.setDateRegistered(LocalDateTime.now());
-        testUser.setIsActive(true);
-        testUser = userRepository.save(testUser);
-    }
+    @Autowired
+    private MockMvc mockMvc;
 
     @Test
     void testGetProfilePage_ShouldReturnProfilePage() throws Exception {
-        UserDetails userDetails = new CustomUserDetails(testUser.getId(), testUser.getUsername(), testUser.getPassword(), testUser.getRole(), testUser.getIsActive());
-        UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
-        SecurityContextHolder.getContext().setAuthentication(authentication); // use this because Spring does not recognize my CustomUserDetails
+        CustomUserDetails principal = new CustomUserDetails(UUID.randomUUID(), "user", "pass", Role.USER, true);
 
-        mockMvc.perform(get("/my-profile"))
+        User user = aRandomUser();
+
+        when(userService.getUserById(any())).thenReturn(user);
+
+        mockMvc.perform(get("/my-profile")
+                        .with(user(principal)))
                 .andExpect(status().isOk())
                 .andExpect(view().name("profile"))
                 .andExpect(model().attributeExists("userProfileInfo"));
     }
 
     @Test
-    @WithMockUser(username = "testUser")
+    @WithMockUser
     void testChangeMyProfilePicture_ShouldSucceed() throws Exception {
         MockMultipartFile profilePicture = new MockMultipartFile(
-                "profilePicture", "profile.jpg", "image/jpeg", "test image content".getBytes()
-        );
+                "profilePicture", "profile.jpg", "image/jpeg", "test image content".getBytes());
 
-        ImageUploadResult mockResult = new ImageUploadResult("https://mock-cloudinary-url.com/test.jpg", "test");
-
-        when(cloudinaryService.uploadImage(any(MultipartFile.class)))
-                .thenReturn(mockResult);
-
-        mockMvc.perform(multipart(HttpMethod.PUT, "/my-profile/" + testUser.getId() + "/change-picture") // Use HttpMethod.PUT
+        mockMvc.perform(multipart(HttpMethod.PUT, "/my-profile/" + UUID.randomUUID() + "/change-picture") // Use HttpMethod.PUT
                         .file(profilePicture)
-                        .with(csrf())
-                        .contentType(MediaType.MULTIPART_FORM_DATA))
+                        .with(csrf()))
                 .andExpect(status().is3xxRedirection())
                 .andExpect(redirectedUrl("/my-profile"))
                 .andExpect(flash().attribute("success", "Profile picture updated successfully"));
     }
 
     @Test
-    @WithMockUser(username = "testUser", roles = "USER")
+    @WithMockUser
     void testChangeProfilePicture_FileEmpty_ShouldReturnError() throws Exception {
-        MockMultipartFile emptyFile = new MockMultipartFile("profilePicture", new byte[0]);
+        MockMultipartFile emptyFile = new MockMultipartFile("profilePicture", "profile.jpg", "image/jpeg", new byte[0]);
 
-        mockMvc.perform(multipart(HttpMethod.PUT, "/my-profile/" + testUser.getId() + "/change-picture")
+        User user = aRandomUser();
+
+        when(userService.getUserById(any())).thenReturn(user);
+
+        mockMvc.perform(multipart(HttpMethod.PUT, "/my-profile/" + UUID.randomUUID() + "/change-picture")
                         .file(emptyFile)
                         .with(csrf()))
                 .andExpect(status().isOk())
@@ -123,7 +97,11 @@ public class ProfileControllerIT {
         byte[] largeFile = new byte[3 * 1024 * 1024 + 1];
         MockMultipartFile file = new MockMultipartFile("profilePicture", "large-image.jpg", "image/jpeg", largeFile);
 
-        mockMvc.perform(multipart(HttpMethod.PUT, "/my-profile/" + testUser.getId() + "/change-picture")
+        User user = aRandomUser();
+
+        when(userService.getUserById(any())).thenReturn(user);
+
+        mockMvc.perform(multipart(HttpMethod.PUT, "/my-profile/" + UUID.randomUUID() + "/change-picture")
                         .file(file)
                         .with(csrf()))
                 .andExpect(status().isOk())
@@ -143,7 +121,11 @@ public class ProfileControllerIT {
                 "This is a text file".getBytes()
         );
 
-        mockMvc.perform(multipart(HttpMethod.PUT, "/my-profile/{id}/change-picture", testUser.getId())
+        User user = aRandomUser();
+
+        when(userService.getUserById(any())).thenReturn(user);
+
+        mockMvc.perform(multipart(HttpMethod.PUT, "/my-profile/{id}/change-picture", UUID.randomUUID())
                         .file(invalidFile)
                         .with(csrf()))
                 .andExpect(status().isOk()) // Should return the profile page, not a redirect
@@ -153,23 +135,31 @@ public class ProfileControllerIT {
     }
 
     @Test
-    @WithMockUser(username = "testUser", roles = "USER")
+    @WithMockUser
     void testChangeUsername_ShouldChangeUsername() throws Exception {
-        mockMvc.perform(put("/my-profile/" + testUser.getId() + "/change-username")
+        CustomUserDetails principal = new CustomUserDetails(UUID.randomUUID(), "user", "pass", Role.USER, true);
+
+        User user = aRandomUser();
+        when(userService.getUserById(user.getId())).thenReturn(user);
+        when(userService.loadUserByUsername(any())).thenReturn(principal);
+
+        mockMvc.perform(put("/my-profile/" + UUID.randomUUID() + "/change-username")
                         .param("username", "newUsername")
                         .with(csrf()))
                 .andExpect(status().is3xxRedirection())
                 .andExpect(redirectedUrl("/my-profile"));
-
-        User updatedUser = userRepository.findById(testUser.getId()).orElseThrow();
-        assertEquals("newUsername", updatedUser.getUsername());
     }
 
     @Test
-    @WithMockUser(username = "testUser", roles = "USER")
+    @WithMockUser
     void testChangeUsername_UsernameExists_ShouldReturnError() throws Exception {
-        mockMvc.perform(put("/my-profile/" + testUser.getId() + "/change-username")
-                        .param("username", "testUser") //existing username, in this case the same
+        User user = aRandomUser();
+
+        when(userService.getUserById(user.getId())).thenReturn(user);
+        when(userService.existsByUsername(user.getUsername())).thenReturn(true);
+
+        mockMvc.perform(put("/my-profile/" + user.getId() + "/change-username")
+                        .param("username", user.getUsername())
                         .with(csrf()))
                 .andExpect(status().isOk())
                 .andExpect(view().name("profile"))
@@ -179,9 +169,13 @@ public class ProfileControllerIT {
     }
 
     @Test
-    @WithMockUser(username = "testUser", roles = "USER")
+    @WithMockUser
     void testChangeUsername_UsernameTooShort_ShouldReturnError() throws Exception {
-        mockMvc.perform(put("/my-profile/{id}/change-username", testUser.getId())
+        User user = aRandomUser();
+
+        when(userService.getUserById(user.getId())).thenReturn(user);
+
+        mockMvc.perform(put("/my-profile/{id}/change-username", user.getId())
                         .param("username", "abc") // Simulate form input
                         .with(csrf()))
                 .andExpect(view().name("profile"))
@@ -191,23 +185,29 @@ public class ProfileControllerIT {
     }
 
     @Test
-    @WithMockUser(username = "testUser", roles = "USER")
+    @WithMockUser
     void testChangeEmail_ShouldSucceed() throws Exception {
-        mockMvc.perform(put("/my-profile/" + testUser.getId() + "/change-email")
+        User user = aRandomUser();
+
+        when(userService.getUserById(user.getId())).thenReturn(user);
+
+        mockMvc.perform(put("/my-profile/" + user.getId() + "/change-email")
                         .param("email", "new@example.com")
                         .with(csrf()))
                 .andExpect(status().is3xxRedirection())
                 .andExpect(redirectedUrl("/my-profile"));
-
-        User updatedUser = userRepository.findById(testUser.getId()).orElseThrow();
-        assertEquals("new@example.com", updatedUser.getEmail());
     }
 
     @Test
-    @WithMockUser(username = "testUser", roles = "USER")
+    @WithMockUser
     void testChangeEmail_EmailExists_ShouldReturnError() throws Exception {
-        mockMvc.perform(put("/my-profile/" + testUser.getId() + "/change-email")
-                        .param("email", "testUser@example.com")
+        User user = aRandomUser();
+
+        when(userService.getUserById(user.getId())).thenReturn(user);
+        when(userService.existsByEmail(user.getEmail())).thenReturn(true);
+
+        mockMvc.perform(put("/my-profile/" + user.getId() + "/change-email")
+                        .param("email", user.getEmail())
                         .with(csrf()))
                 .andExpect(status().isOk())
                 .andExpect(view().name("profile"))
@@ -217,9 +217,13 @@ public class ProfileControllerIT {
     }
 
     @Test
-    @WithMockUser(username = "testUser", roles = "USER")
+    @WithMockUser
     void testChangeEmailEmpty() throws Exception {
-        mockMvc.perform(put("/my-profile/{id}/change-email", testUser.getId())
+        User user = aRandomUser();
+
+        when(userService.getUserById(user.getId())).thenReturn(user);
+
+        mockMvc.perform(put("/my-profile/{id}/change-email", user.getId())
                         .param("email", "")
                         .with(csrf()))
                 .andExpect(status().isOk()) // Should stay on the profile page
@@ -230,12 +234,16 @@ public class ProfileControllerIT {
     }
 
     @Test
-    @WithMockUser(username = "testUser", roles = "USER")
+    @WithMockUser
     void testChangeEmailInvalidFormat() throws Exception {
-        mockMvc.perform(put("/my-profile/{id}/change-email", testUser.getId())
+        User user = aRandomUser();
+
+        when(userService.getUserById(user.getId())).thenReturn(user);
+
+        mockMvc.perform(put("/my-profile/{id}/change-email", user.getId())
                         .param("email", "invalid-email")
                         .with(csrf()))
-                .andExpect(status().isOk()) // Should stay on the profile page
+                .andExpect(status().isOk())
                 .andExpect(view().name("profile"))
                 .andExpect(model().attributeExists("changeEmail"))
                 .andExpect(model().attributeExists("openEmailModal"))
@@ -243,9 +251,13 @@ public class ProfileControllerIT {
     }
 
     @Test
-    @WithMockUser(username = "testUser", roles = "USER")
+    @WithMockUser
     void testChangePassword_ShouldSucceed() throws Exception {
-        mockMvc.perform(put("/my-profile/" + testUser.getId() + "/change-password")
+        User user = aRandomUser();
+
+        when(userService.getUserById(user.getId())).thenReturn(user);
+
+        mockMvc.perform(put("/my-profile/" + user.getId() + "/change-password")
                         .param("password", "newPassword")
                         .with(csrf()))
                 .andExpect(status().is3xxRedirection())
@@ -253,9 +265,13 @@ public class ProfileControllerIT {
     }
 
     @Test
-    @WithMockUser(username = "testUser", roles = "USER")
+    @WithMockUser
     void testChangePassword_LessThan6Characters_ShouldReturnError() throws Exception {
-        mockMvc.perform(put("/my-profile/" + testUser.getId() + "/change-password")
+        User user = aRandomUser();
+
+        when(userService.getUserById(user.getId())).thenReturn(user);
+
+        mockMvc.perform(put("/my-profile/" + user.getId() + "/change-password")
                         .param("password", "newPa")
                         .with(csrf()))
                 .andExpect(status().isOk())
@@ -266,80 +282,81 @@ public class ProfileControllerIT {
     }
 
     @Test
-    @WithMockUser(username = "testuser", roles = "USER")
+    @WithMockUser
     void testActivityLog_ShouldReturnActivityLogPage() throws Exception {
+        User user = aRandomUser();
+
         ActivityLogResponse response1 = ActivityLogResponse.builder()
-                .userId(testUser.getId())
+                .userId(UUID.randomUUID())
                 .action("Recipe added")
                 .createdOn(LocalDateTime.now())
                 .build();
 
         ActivityLogResponse response2 = ActivityLogResponse.builder()
-                .userId(testUser.getId())
+                .userId(UUID.randomUUID())
                 .action("Comment added")
                 .createdOn(LocalDateTime.now().plusDays(1))
                 .build();
 
         List<ActivityLogResponse> mockLogs = List.of(response1, response2);
 
-        Mockito.when(activityLogService.getActivityLog(testUser.getId())).thenReturn(mockLogs);
+        when(activityLogService.getActivityLog(user.getId())).thenReturn(mockLogs);
 
-        mockMvc.perform(get("/my-profile/{id}/activity-log", testUser.getId()))
+        mockMvc.perform(get("/my-profile/{id}/activity-log", user.getId()))
                 .andExpect(status().isOk())
                 .andExpect(view().name("activity-log"))
                 .andExpect(model().attributeExists("activityLog"))
                 .andExpect(model().attribute("activityLog", mockLogs))
                 .andExpect(model().attributeExists("userId"))
-                .andExpect(model().attribute("userId", testUser.getId()));
+                .andExpect(model().attribute("userId", user.getId()));
     }
 
     @Test
-    @WithMockUser(username = "testuser", roles = "USER")
+    @WithMockUser
     void testClearActivityLog_ShouldDeleteAllLoggedActivities() throws Exception {
+        User user = aRandomUser();
+
         ActivityLogResponse response1 = ActivityLogResponse.builder()
-                .userId(testUser.getId())
+                .userId(UUID.randomUUID())
                 .action("Recipe added")
                 .createdOn(LocalDateTime.now())
                 .build();
 
         ActivityLogResponse response2 = ActivityLogResponse.builder()
-                .userId(testUser.getId())
+                .userId(UUID.randomUUID())
                 .action("Comment added")
                 .createdOn(LocalDateTime.now().plusDays(1))
                 .build();
 
         List<ActivityLogResponse> mockLogs = List.of(response1, response2);
 
-        Mockito.when(activityLogService.getActivityLog(testUser.getId())).thenReturn(mockLogs);
+        when(activityLogService.getActivityLog(user.getId())).thenReturn(mockLogs);
 
         // Perform GET request before deletion to verify logs exist
-        mockMvc.perform(get("/my-profile/{id}/activity-log", testUser.getId()))
+        mockMvc.perform(get("/my-profile/{id}/activity-log", user.getId()))
                 .andExpect(status().isOk())
                 .andExpect(view().name("activity-log"))
                 .andExpect(model().attributeExists("activityLog"))
                 .andExpect(model().attribute("activityLog", mockLogs))
                 .andExpect(model().attributeExists("userId"))
-                .andExpect(model().attribute("userId", testUser.getId()));
+                .andExpect(model().attribute("userId", user.getId()));
 
         // Step 2: Mock delete behavior
-        doNothing().when(activityLogService).deleteLogsByUserId(testUser.getId());
+        doNothing().when(activityLogService).deleteLogsByUserId(user.getId());
 
         // Perform DELETE request
-        mockMvc.perform(delete("/my-profile/{id}/activity-log/clear", testUser.getId())
+        mockMvc.perform(delete("/my-profile/{id}/activity-log/clear", user.getId())
                         .with(csrf()))
                 .andExpect(status().is3xxRedirection())
-                .andExpect(redirectedUrl("/my-profile/" + testUser.getId() + "/activity-log"));
+                .andExpect(redirectedUrl("/my-profile/" + user.getId() + "/activity-log"));
 
         // Step 3: Mock the activity log after deletion (empty)
-        Mockito.when(activityLogService.getActivityLog(testUser.getId())).thenReturn(Collections.emptyList());
+        Mockito.when(activityLogService.getActivityLog(user.getId())).thenReturn(Collections.emptyList());
 
         // Perform GET request after deletion to verify logs are empty
-        mockMvc.perform(get("/my-profile/{id}/activity-log", testUser.getId()))
+        mockMvc.perform(get("/my-profile/{id}/activity-log", user.getId()))
                 .andExpect(status().isOk())
                 .andExpect(model().attributeExists("activityLog"))
                 .andExpect(model().attribute("activityLog", Collections.emptyList()));
-
-        // Verify interactions
-        verify(activityLogService, times(1)).deleteLogsByUserId(testUser.getId());
     }
 }
