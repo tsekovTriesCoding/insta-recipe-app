@@ -1,58 +1,51 @@
 package app.web;
 
 import app.category.model.Category;
-import app.category.model.CategoryName;
-import app.category.repository.CategoryRepository;
-import org.junit.jupiter.api.BeforeEach;
+import app.category.service.CategoryService;
+import app.exception.CategoryNotFoundException;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.UUID;
 
+import static app.TestBuilder.aRandomCategory;
 import static org.hamcrest.Matchers.*;
+import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@SpringBootTest
-@AutoConfigureMockMvc
-@Transactional
-public class CategoryControllerIT {
+@WebMvcTest(CategoryController.class)
+@WithMockUser
+public class CategoryControllerAPITest {
+
+    @MockitoBean
+    private CategoryService categoryService;
 
     @Autowired
     private MockMvc mockMvc;
 
-    @Autowired
-    private CategoryRepository categoryRepository;
-
-    private Category testCategory;
-
-    @BeforeEach
-    void setUp() {
-        testCategory = new Category();
-        testCategory.setName(CategoryName.DESSERTS);
-        testCategory.setImageUrl("test-image.png");
-        categoryRepository.save(testCategory);
-    }
-
-    @WithMockUser(username = "testUser")
     @Test
     void testCategoryView_ShouldReturnCategoryPage() throws Exception {
-        mockMvc.perform(get("/categories/" + testCategory.getId()))
+        Category category = aRandomCategory();
+
+        when(categoryService.getById(category.getId())).thenReturn(category);
+
+        mockMvc.perform(get("/categories/" + category.getId()))
                 .andExpect(status().isOk())
                 .andExpect(view().name("category"))
                 .andExpect(model().attributeExists("categoryDetails"))
-                .andExpect(model().attribute("categoryDetails", hasProperty("name", equalTo("Desserts"))));
+                .andExpect(model().attribute("categoryDetails", hasProperty("name", equalTo("Main Course"))));
     }
 
-    @WithMockUser(username = "testUser")
     @Test
     void testCategoryView_WhenCategoryDoesNotExist_ShouldReturnErrorPage() throws Exception {
         UUID nonExistingCategoryId = UUID.randomUUID();
+
+        when(categoryService.getById(nonExistingCategoryId)).thenThrow(new CategoryNotFoundException("Category with id " + nonExistingCategoryId + " not found"));
 
         mockMvc.perform(get("/categories/{id}", nonExistingCategoryId))
                 .andExpect(status().isNotFound())
