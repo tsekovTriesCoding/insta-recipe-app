@@ -1,10 +1,13 @@
 package app;
 
+import app.category.model.Category;
 import app.category.model.CategoryName;
+import app.comment.model.Comment;
 import app.recipe.model.Recipe;
 import app.user.model.Role;
 import app.user.model.User;
 import app.web.dto.AddRecipe;
+import app.web.dto.EditRecipe;
 import app.web.dto.RecipeDetails;
 import app.web.dto.RegisterRequest;
 import lombok.experimental.UtilityClass;
@@ -72,5 +75,36 @@ public class TestBuilder {
         addRecipe.setServings(3);
 
         return addRecipe;
+    }
+
+    public static EditRecipe aRandomEditRecipe() {
+        return EditRecipe.builder()
+                .id(UUID.randomUUID())
+                .title("title")
+                .description("description")
+                .instructions("Instructions")
+                .categories(List.of(CategoryName.MAIN_COURSE))
+                .ingredients("ingredient1, ingredient2")
+                .cookTime(2)
+                .prepTime(3)
+                .servings(4)
+                .build();
+    }
+
+    public static Comment aRandomComment() {
+        return Comment.builder()
+                .id(UUID.randomUUID())
+                .content("content")
+                .createdDate(LocalDateTime.now())
+                .build();
+
+    }
+
+    public static Category aRandomCategory() {
+        return Category.builder()
+                .id(UUID.randomUUID())
+                .name(CategoryName.MAIN_COURSE)
+                .imageUrl("imageUrl")
+                .build();
     }
 }
