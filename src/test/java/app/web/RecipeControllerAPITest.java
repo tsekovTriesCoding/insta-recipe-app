@@ -40,7 +40,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(RecipeController.class)
-public class RecipeControllerIT {
+public class RecipeControllerAPITest {
 
     @MockitoBean
     private RecipeService recipeService;

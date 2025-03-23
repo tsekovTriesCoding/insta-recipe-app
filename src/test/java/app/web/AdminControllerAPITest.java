@@ -26,7 +26,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @WebMvcTest(AdminController.class)
 @WithMockUser
-class AdminControllerIT {
+class AdminControllerAPITest {
 
     @MockitoBean
     private UserService userService;
