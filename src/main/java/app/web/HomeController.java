@@ -4,6 +4,9 @@ import app.category.service.CategoryService;
 import app.mapper.DtoMapper;
 import app.web.dto.CategoryShort;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -18,6 +21,12 @@ public class HomeController {
 
     @GetMapping("/")
     public String getIndexPage() {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+
+        if (auth != null && auth.isAuthenticated()) {
+            return "redirect:/home"; // Redirect logged-in users to home
+        }
+
         return "index";
     }
 
