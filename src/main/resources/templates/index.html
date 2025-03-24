@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html class="h-100" lang="en" xmlns="http://www.w3.org/1999/xhtml"
-      xmlns:th="http://www.thymeleaf.org">
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec='http://www.thymeleaf.org/extras/spring-security'>
 <head th:replace="~{fragments/commons::head}"></head>
 <body class="d-flex flex-column h-100">
 <header th:replace="~{fragments/commons::header}"></header>
@@ -8,7 +9,7 @@
     <div class="hero">
         <h1>Welcome to InstaRecipe</h1>
         <p>Discover, share, and connect with food lovers around the world.</p>
-        <div class="d-flex justify-content-center gap-md-5 mt-4">
+        <div sec:authorize="${isAnonymous()}" class="d-flex justify-content-center gap-md-5 mt-4">
             <a th:href="@{/users/login}" class="btn btn-primary btn-lg px-4 py-2 flex-grow-1 text-center" style="max-width: 200px;">Login</a>
             <a th:href="@{/users/register}" class="btn btn-primary btn-lg px-4 py-2 flex-grow-1 text-center" style="max-width: 200px;">Register</a>
         </div>

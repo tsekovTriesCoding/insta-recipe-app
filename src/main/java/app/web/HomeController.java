@@ -21,12 +21,6 @@ public class HomeController {
 
     @GetMapping("/")
     public String getIndexPage() {
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-
-        if (auth != null && auth.isAuthenticated()) {
-            return "redirect:/home"; // Redirect logged-in users to home
-        }
-
         return "index";
     }
 
