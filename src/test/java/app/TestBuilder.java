@@ -34,6 +34,18 @@ public class TestBuilder {
                 .build();
     }
 
+    public static User aRandomWithoutId() {
+        return User.builder()
+                .username("username")
+                .email("email")
+                .password("password")
+                .profilePicture("/images/default-profile.png")
+                .dateRegistered(LocalDateTime.now())
+                .role(Role.USER)
+                .isActive(true)
+                .build();
+    }
+
     public static RegisterRequest aRandomRegisterRequest() {
         return RegisterRequest.builder()
                 .username("username")
@@ -46,6 +58,22 @@ public class TestBuilder {
     public static Recipe aRandomRecipe() {
         return Recipe.builder()
                 .id(UUID.randomUUID())
+                .title("title")
+                .description("description")
+                .ingredients(List.of("tomato", "cucumber"))
+                .instructions("Instructions")
+                .createdDate(LocalDateTime.now())
+                .cookTime(2)
+                .prepTime(3)
+                .servings(4)
+                .image("imageUrl")
+                .comments(new ArrayList<>())
+                .likes(new ArrayList<>())
+                .build();
+    }
+
+    public static Recipe aRandomRecipeWithoutId() {
+        return Recipe.builder()
                 .title("title")
                 .description("description")
                 .ingredients(List.of("tomato", "cucumber"))
@@ -103,6 +131,13 @@ public class TestBuilder {
     public static Category aRandomCategory() {
         return Category.builder()
                 .id(UUID.randomUUID())
+                .name(CategoryName.MAIN_COURSE)
+                .imageUrl("imageUrl")
+                .build();
+    }
+
+    public static Category aRandomCategoryWithoutId() {
+        return Category.builder()
                 .name(CategoryName.MAIN_COURSE)
                 .imageUrl("imageUrl")
                 .build();
