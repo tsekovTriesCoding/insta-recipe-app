@@ -7,6 +7,7 @@ import app.category.repository.CategoryRepository;
 import app.category.service.CategoryService;
 import app.cloudinary.dto.ImageUploadResult;
 import app.cloudinary.service.CloudinaryService;
+import app.config.EventCaptureConfig;
 import app.recipe.model.Recipe;
 import app.recipe.repository.RecipeRepository;
 import app.recipe.service.RecipeService;
@@ -19,12 +20,9 @@ import com.github.tomakehurst.wiremock.WireMockServer;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.context.TestConfiguration;
-import org.springframework.context.event.EventListener;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import static app.TestBuilder.*;
@@ -33,7 +31,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 import static org.mockito.Mockito.verify;
 
-@SpringBootTest
+@SpringBootTest(classes = EventCaptureConfig.class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class RecipeServiceIT {
 
@@ -59,31 +57,9 @@ public class RecipeServiceIT {
     private CloudinaryService cloudinaryService;
 
     @Autowired
-    private EventCaptureConfig eventCaptureConfig; // Captures the events.The @EventListener inside EventCaptureConfig will catch events published by UserService in a real database-backed test
+    private EventCaptureConfig eventCaptureConfig; // Captures the events.The @EventListener inside EventCaptureConfig will catch events published by the service in a real database-backed test
 
     private WireMockServer wireMockServer;
-
-    // Do not use @MockBean ApplicationEventPublisher in integration tests.
-    //It replaces the real publisher with a mock, preventing real event propagation.
-    //Mocking ApplicationEventPublisher in integration tests can bypass the event-driven nature of Spring, which isn't ideal for testing how your application reacts to events.
-    @TestConfiguration
-    static class EventCaptureConfig {
-
-        private final List<ActivityLogEvent> capturedEvents = new ArrayList<>();
-
-        @EventListener
-        public void onActivityLogEvent(ActivityLogEvent event) {
-            capturedEvents.add(event);
-        }
-
-        public void clearCapturedEvents() {
-            capturedEvents.clear();
-        }
-
-        public List<ActivityLogEvent> getCapturedEvents() {
-            return capturedEvents;
-        }
-    }
 
     @BeforeAll
     void startWireMock() {

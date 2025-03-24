@@ -3,6 +3,7 @@ package app.user;
 import app.activitylog.event.ActivityLogEvent;
 import app.cloudinary.dto.ImageUploadResult;
 import app.cloudinary.service.CloudinaryService;
+import app.config.EventCaptureConfig;
 import app.exception.UserAlreadyExistsException;
 import app.exception.UserNotFoundException;
 import app.user.model.Role;
@@ -11,17 +12,17 @@ import app.user.repository.UserRepository;
 import app.user.service.UserService;
 import app.web.dto.RegisterRequest;
 import com.github.tomakehurst.wiremock.WireMockServer;
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.context.TestConfiguration;
-import org.springframework.context.event.EventListener;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -34,7 +35,7 @@ import static org.mockito.Mockito.*;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.verify;
 
-@SpringBootTest
+@SpringBootTest(classes = EventCaptureConfig.class)
 public class UserServiceIT {
 
     @Autowired
@@ -53,28 +54,6 @@ public class UserServiceIT {
     private EventCaptureConfig eventCaptureConfig; // Captures the events.The @EventListener inside EventCaptureConfig will catch events published by UserService in a real database-backed test
 
     private static WireMockServer wireMockServer;
-
-    // Do not use @MockBean ApplicationEventPublisher in integration tests.
-    //It replaces the real publisher with a mock, preventing real event propagation.
-    //Mocking ApplicationEventPublisher in integration tests can bypass the event-driven nature of Spring, which isn't ideal for testing how your application reacts to events.
-    @TestConfiguration
-    static class EventCaptureConfig {
-
-        private final List<ActivityLogEvent> capturedEvents = new ArrayList<>();
-
-        @EventListener
-        public void onActivityLogEvent(ActivityLogEvent event) {
-            capturedEvents.add(event);
-        }
-
-        public void clearCapturedEvents() {
-            capturedEvents.clear();
-        }
-
-        public List<ActivityLogEvent> getCapturedEvents() {
-            return capturedEvents;
-        }
-    }
 
     @BeforeAll
     static void startWireMock() {
