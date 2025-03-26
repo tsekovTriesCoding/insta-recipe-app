@@ -358,3 +358,17 @@
     border-radius: 5px;
     text-align: center;
 }
+
+/*-----------------------*/
+.error-container {
+    text-align: center;
+    padding: 40px;
+    border-radius: 10px;
+    background: white;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.error-icon {
+    font-size: 80px;
+    color: #dc3545;
+}

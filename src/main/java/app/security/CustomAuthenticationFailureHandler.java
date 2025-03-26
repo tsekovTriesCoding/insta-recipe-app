@@ -17,7 +17,7 @@ public class CustomAuthenticationFailureHandler implements AuthenticationFailure
                                         HttpServletResponse response,
                                         AuthenticationException exception) throws IOException {
 
-        String errorMessage = "Invalid username or password.";
+        String errorMessage = "Invalid username or password";
         if (exception instanceof DisabledException) {
             errorMessage = "Your account is inactive. Please contact the admin.";
         }

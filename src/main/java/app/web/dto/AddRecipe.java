@@ -15,13 +15,13 @@ import java.util.List;
 
 @Data
 public class AddRecipe {
-    @Size(min = 3, max = 30)
+    @Size(min = 3, max = 30, message = "Title must be between 3 and 30 symbols")
     private String title;
 
-    @Size(min = 10, max = 1500)
+    @Size(min = 10, max = 1500,message = "Description must be between 10 and 1500 symbols")
     private String description;
 
-    @NotEmpty
+    @NotEmpty(message = "Enter at least one category")
     private List<CategoryName> categories;
 
     @FileSize(maxSize = 3145728, message = "File size must be less than 3MB")
@@ -30,20 +30,20 @@ public class AddRecipe {
     private MultipartFile image;
 
     @NotNull
-    @Size(min = 10, max = 1500)
+    @Size(min = 10, max = 1500, message = "Ingredients have to be between 10 and 1500 symbols")
     private String ingredients;
 
     @NotNull
-    @Size(min = 10, max = 1500)
+    @Size(min = 10, max = 1500, message = "Instructions have to be between 10 and 1500 symbols")
     private String instructions;
 
-    @NotNull
+    @NotNull(message = "Cook time is missing")
     @Min(1)
     private Integer cookTime;
 
     private Integer prepTime;
 
-    @NotNull
+    @NotNull(message = "Servings count is missing")
     @Min(1)
     private Integer servings;
 }

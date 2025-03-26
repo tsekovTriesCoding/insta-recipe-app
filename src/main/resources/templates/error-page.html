@@ -1,15 +1,18 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
+<head th:replace="~{fragments/commons::head}">
     <title>Error</title>
-    <link rel="stylesheet" href="/css/bootstrap.min.css">
 </head>
-<body class="text-center">
-<div class="container mt-5">
+<body style="display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f8f9fa;">
+<div class="error-container">
+    <div class="error-icon">⚠️</div>
     <h2 class="text-danger">Something went wrong</h2>
-    <p th:text="${error}" class="text-muted"></p>
-    <a th:href="@{/home}" class="btn btn-primary">Go to Home</a>
+    <p style="font-size: 18px;margin-top: 10px;color: #343a40;" th:text="${error}"></p>
+    <a th:href="@{/home}" class="btn btn-primary back-button" style="margin-top: 20px;">Go to Home</a>
 </div>
 </body>
 </html>
