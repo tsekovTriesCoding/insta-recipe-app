@@ -51,7 +51,7 @@ Frontend: Thymeleaf, Bootstrap
 
 ORM: Hibernate
 
-Database: MySQL (HSQLDB for testing)
+Database: MySQL (H2DB for testing)
 
 Security: Spring Security
 
