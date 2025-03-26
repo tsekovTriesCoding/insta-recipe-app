@@ -70,10 +70,10 @@ public class RecipeService {
 
         return Recipe.builder()
                 .title(recipe.getTitle())
-                .description(recipe.getDescription())
+                .description(recipe.getDescription().trim())
                 .categories(categories)
                 .ingredients(ingredients)
-                .instructions(recipe.getInstructions())
+                .instructions(recipe.getInstructions().trim())
                 .createdDate(LocalDateTime.now())
                 .createdBy(creator)
                 .servings(recipe.getServings())
@@ -101,7 +101,7 @@ public class RecipeService {
         }
 
         if (!editRecipe.getDescription().equals(recipeToUpdate.getDescription())) {
-            recipeToUpdate.setDescription(editRecipe.getDescription());
+            recipeToUpdate.setDescription(editRecipe.getDescription().trim());
         }
 
         if (!categories.equals(recipeToUpdate.getCategories())) {
@@ -109,7 +109,7 @@ public class RecipeService {
         }
 
         if (!editRecipe.getIngredients().equals(String.join(",", recipeToUpdate.getIngredients()))) {
-            List<String> updatedIngredients = new ArrayList<>(List.of(editRecipe.getIngredients().split(",")));
+            List<String> updatedIngredients = new ArrayList<>(List.of(editRecipe.getIngredients().trim().split(",")));
             recipeToUpdate.setIngredients(updatedIngredients);
         }
 
