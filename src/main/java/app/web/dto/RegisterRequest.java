@@ -15,7 +15,7 @@ import lombok.NoArgsConstructor;
 public class RegisterRequest {
 
     @NotNull
-    @Size(min = 5, message = "Username must be at least 5 symbols")
+    @Size(min = 5, max = 30, message = "Username must be between 5 and 30 symbols")
     @UniqueUsername
     private String username;
 

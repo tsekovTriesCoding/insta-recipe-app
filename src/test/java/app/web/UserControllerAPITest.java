@@ -97,7 +97,7 @@ class UserControllerAPITest {
     @Test
     void testRegisterWithInvalidInputs() throws Exception {
         RegisterRequest registerRequest = RegisterRequest.builder()
-                .username("")
+                .username("*".repeat(31))
                 .email("newEmail")
                 .password("test")
                 .confirmPassword("test")
