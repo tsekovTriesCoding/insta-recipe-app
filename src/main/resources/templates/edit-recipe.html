@@ -22,7 +22,7 @@
                         <input th:field="*{title}" th:errorclass="is-invalid" type="text" class="form-control"
                                id="title"
                                name="title"
-                               placeholder="Enter recipe title">
+                               placeholder="Enter recipe title" required minlength="3" maxlength="30">
 
                         <small th:errors="*{title}" id="titleError" class="bg-danger rounded text-white"></small>
                     </div>
@@ -30,7 +30,7 @@
                         <label for="categories" class="form-label">Categories</label>
                         <select th:field="*{categories}" th:errorclass="is-invalid" id="categories" name="categories"
                                 class="form-select"
-                                multiple>
+                                multiple required>
                             <option th:each="category : ${categories}" th:value="${category}" th:text="${category.value}"
                                     th:attr="selected=${#lists.contains(categories, category)}">
                                 Choose a category
@@ -45,7 +45,7 @@
                         <textarea th:field="*{description}" th:errorclass="is-invalid" id="description"
                                   name="description"
                                   class="form-control" rows="4"
-                                  placeholder="Enter a brief description"></textarea>
+                                  placeholder="Enter a brief description" required minlength="10" maxlength="1500"></textarea>
 
                         <small th:errors="*{description}" id="descriptionError"
                                class="bg-danger rounded text-white"></small>
@@ -55,7 +55,7 @@
                         <textarea th:field="*{ingredients}" th:errorclass="is-invalid" id="ingredients"
                                   name="ingredients"
                                   class="form-control" rows="4"
-                                  placeholder="List ingredients separated by commas"></textarea>
+                                  placeholder="List ingredients separated by commas" required minlength="10" maxlength="1500"></textarea>
 
                         <small th:errors="*{ingredients}" id="ingredientsError"
                                class="bg-danger rounded text-white"></small>
@@ -65,7 +65,7 @@
                         <textarea th:field="*{instructions}" th:errorclass="is-invalid" id="instructions"
                                   name="instructions"
                                   class="form-control" rows="4"
-                                  placeholder="Write the steps to prepare the recipe"></textarea>
+                                  placeholder="Write the steps to prepare the recipe" required minlength="10" maxlength="1500"></textarea>
 
                         <small th:errors="*{instructions}" id="instructionsError"
                                class="bg-danger rounded text-white"></small>
@@ -73,7 +73,7 @@
                     <div class="mb-3">
                         <label for="image" class="form-label">Recipe Image</label>
                         <input th:field="*{image}" th:errorclass="is-invalid" type="file" class="form-control"
-                               id="image" name="image">
+                               id="image" name="image" onchange="validateFileSize()">
 
                         <small th:errors="*{image}" id="imageError"
                                class="bg-danger rounded text-white"></small>
@@ -83,7 +83,7 @@
                             <label for="cookTime" class="form-label">Cook Time</label>
                             <input th:field="*{cookTime}" th:errorclass="is-invalid" type="number" class="form-control"
                                    id="cookTime"
-                                   name="cookTime">
+                                   name="cookTime" required min="1">
 
                             <small th:errors="*{cookTime}" id="cookTimeError"
                                    class="bg-danger rounded text-white"></small>
@@ -97,7 +97,7 @@
                             <label for="servings" class="form-label">Servings</label>
                             <input th:field="*{servings}" th:errorclass="is-invalid" type="number" class="form-control"
                                    id="servings"
-                                   name="servings">
+                                   name="servings" required min="1">
                             <small th:errors="*{servings}" id="servingsError"
                                    class="bg-danger rounded text-white"></small>
 
@@ -127,6 +127,16 @@
         const choicesContainer = originalSelect.closest('.choices');
         if (choicesContainer) {
             choicesContainer.classList.add('is-invalid');
+        }
+    }
+</script>
+
+<script>
+    function validateFileSize() {
+        const file = document.getElementById("image").files[0];
+        if (file && file.size > 3 * 1024 * 1024) {
+            alert("File size must not exceed 3MB.");
+            document.getElementById("image").value = "";
         }
     }
 </script>

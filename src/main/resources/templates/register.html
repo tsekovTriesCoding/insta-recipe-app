@@ -27,7 +27,7 @@
                         <label for="username" class="form-label text-dark">Username</label>
                         <input th:field="*{username}" th:errorclass="is-invalid" type="text" class="form-control"
                                id="username"
-                               placeholder="Enter your username">
+                               placeholder="Enter your username" required minlength="5" maxlength="30">
 
                         <small th:errors="*{username}" id="usernameError" class="bg-danger rounded text-white"></small>
                     </div>
@@ -35,7 +35,7 @@
                         <label for="email" class="form-label text-dark">Email Address</label>
                         <input th:field="*{email}" th:errorclass="is-invalid" type="email" class="form-control"
                                id="email"
-                               placeholder="Enter your email">
+                               placeholder="Enter your email" required>
 
                         <small th:errors="*{email}" id="emailError" class="bg-danger rounded text-white"></small>
                     </div>
@@ -43,7 +43,7 @@
                         <label for="password" class="form-label text-dark">Password</label>
                         <input th:field="*{password}" th:errorclass="is-invalid" type="password" class="form-control"
                                id="password"
-                               placeholder="Create a password">
+                               placeholder="Create a password" required minlength="6" maxlength="50">
 
                         <small th:errors="*{password}" id="passwordError" class="bg-danger rounded text-white"></small>
                     </div>
@@ -51,7 +51,7 @@
                         <label for="confirmPassword" class="form-label text-dark">Confirm Password</label>
                         <input th:field="*{confirmPassword}" th:errorclass="is-invalid" type="password"
                                class="form-control" id="confirmPassword"
-                               placeholder="Confirm your password">
+                               placeholder="Confirm your password" required minlength="6" maxlength="50">
 
                         <small th:errors="*{confirmPassword}" id="confirmPasswordError"
                                class="bg-danger rounded text-white"></small>

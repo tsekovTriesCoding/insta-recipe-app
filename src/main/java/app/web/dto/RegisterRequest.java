@@ -25,10 +25,10 @@ public class RegisterRequest {
     private String email;
 
     @NotNull
-    @Size(min = 6, message = "Password must be at least 6 symbols")
+    @Size(min = 6, max = 30, message = "Password must be at between 6 and 50 symbols")
     private String password;
 
     @NotNull
-    @Size(min = 6, message = "Password must be at least 6 symbols")
+    @Size(min = 6, max = 30, message = "Password must be at between 6 and 50 symbols")
     private String confirmPassword;
 }
