@@ -14,6 +14,7 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 @RequiredArgsConstructor
@@ -37,6 +38,7 @@ public class LikeService {
             Like like = new Like();
             like.setUser(user);
             like.setRecipe(recipe);
+            like.setLikedDate(LocalDateTime.now());
 
             likeRepository.save(like);
 
