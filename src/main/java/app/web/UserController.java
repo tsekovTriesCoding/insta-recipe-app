@@ -43,7 +43,7 @@ public class UserController {
     public String register(@Valid RegisterRequest registerRequest,
                            BindingResult bindingResult) {
 
-        if (bindingResult.hasErrors()) {
+        if (bindingResult.hasErrors() || !registerRequest.getPassword().equals(registerRequest.getConfirmPassword())) {
             return "register";
         }
 
