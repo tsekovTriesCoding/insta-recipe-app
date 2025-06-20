@@ -1,0 +1,70 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: insta-recipe-app
+    ports:
+      - "8080:8080"
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:mysql://db:3306/${MAIN_DB_NAME}?allowPublicKeyRetrieval=true&useSSL=false&createDatabaseIfNotExist=true&serverTimezone=UTC
+      - SPRING_DATASOURCE_USERNAME=${DB_USERNAME}
+      - SPRING_DATASOURCE_PASSWORD=${DB_PASSWORD}
+      - SPRING_JPA_HIBERNATE_DDL_AUTO=update
+      - ACTIVITY_LOG_SERVICE_URL=http://activity-log:8081
+      - cloudinary.cloud_name=${CLOUD_NAME}
+      - cloudinary.api_key=${API_KEY}
+      - cloudinary.api_secret=${API_SECRET}
+    depends_on:
+      - db
+      - activity-log
+
+  db:
+    image: mysql:8.0
+    container_name: main-app-db
+    ports:
+      - "3307:3306"
+    environment:
+      - MYSQL_DATABASE=${MAIN_DB_NAME}
+      - MYSQL_USER=${DB_USERNAME}
+      - MYSQL_PASSWORD=${DB_PASSWORD}
+      - MYSQL_ROOT_PASSWORD=${DB_PASSWORD}
+    volumes:
+      - main_mysql_data:/var/lib/mysql
+    command: --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
+
+  activity-log:
+    image: activity-log-service:latest
+    container_name: activity-log
+    ports:
+      - "8082:8081"
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:mysql://activity-log-db:3306/${ACTIVITY_DB_NAME}?allowPublicKeyRetrieval=true&useSSL=false&createDatabaseIfNotExist=true&serverTimezone=UTC
+      - SPRING_DATASOURCE_USERNAME=${DB_USERNAME}
+      - SPRING_DATASOURCE_PASSWORD=${DB_PASSWORD}
+    depends_on:
+      activity-log-db:
+        condition: service_healthy
+
+  activity-log-db:
+    image: mysql:8.0
+    container_name: activity-log-db
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u${DB_USERNAME}", "-p${DB_PASSWORD}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    ports:
+      - "3308:3306"
+    environment:
+      - MYSQL_DATABASE=${ACTIVITY_DB_NAME}
+      - MYSQL_USER=${DB_USERNAME}
+      - MYSQL_PASSWORD=${DB_PASSWORD}
+      - MYSQL_ROOT_PASSWORD=${DB_PASSWORD}
+    volumes:
+      - activity_log_mysql_data:/var/lib/mysql
+    command: --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
+
+volumes:
+  main_mysql_data:
+  activity_log_mysql_data:
