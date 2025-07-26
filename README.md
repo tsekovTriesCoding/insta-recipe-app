@@ -107,6 +107,41 @@ mvn spring-boot:run
 
 Visit: ```http://localhost:8080```
 
+## 📦 Run with Docker
+
+You can run the entire application stack (main app + MySQL + activity log microservice) in Docker containers using docker-compose.
+
+1️⃣ Create a .env file
+Create a .env file in the root directory with the following:
+```MAIN_DB_NAME=insta_recipe_db
+ACTIVITY_DB_NAME=activity_log_db
+DB_USERNAME=your_mysql_username
+DB_PASSWORD=your_mysql_password
+CLOUD_NAME=your_cloudinary_cloud_name
+API_KEY=your_cloudinary_api_key
+API_SECRET=your_cloudinary_api_secret
+```
+🛑 Do not commit this file to version control.
+
+2️⃣ Build and Run Containers
+
+```docker-compose up --build```
+
+This will start:
+
+- insta-recipe-app (Spring Boot app)
+
+- main-app-db (MySQL for the main app)
+
+- activity-log (activity logging microservice)
+
+- activity-log-db (MySQL for the activity log service)
+
+3️⃣ Access the Application
+
+Open your browser at:
+http://localhost:8080
+
 ## 📜 License
 
 This project is licensed under the MIT License.
